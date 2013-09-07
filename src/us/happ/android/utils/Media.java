@@ -57,12 +57,12 @@ public class Media {
 	    return output;
 	  }
 	
-	private static float dpFromPx(Context context, float px) {
+	public static float dpFromPx(Context context, float px) {
 	    return px / context.getResources().getDisplayMetrics().density;
 	}
 
 
-	private static float pxFromDp(Context context, float dp) {
+	public static float pxFromDp(Context context, float dp) {
 	    return dp * context.getResources().getDisplayMetrics().density;
 	}
 }

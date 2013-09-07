@@ -1,6 +1,7 @@
 package us.happ.android.adapter;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import us.happ.android.R;
 import us.happ.android.model.Mood;
@@ -67,7 +68,10 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		
 		// TODO
 		// lazy load
-		holder.avatar.setImageBitmap(Media.getRoundedCornerBitmap(mContext, mContactsManager.getAvatar(m.getNumber()), 0.6f));
+		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(m.getDuration()*1000);
+		Log.i("decay", decay+"");
+		if (decay < 0) decay = 0;
+		holder.avatar.setImageBitmap(Media.getRoundedCornerBitmap(mContext, mContactsManager.getAvatar(m.getNumber()), decay));
 		
 		holder.name.setText(mContactsManager.getName(m.getNumber()));
 		holder.message.setText(m.getMessage());

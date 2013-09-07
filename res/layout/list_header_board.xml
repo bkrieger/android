@@ -1,37 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@color/white"
-    android:orientation="vertical" >
+    android:background="@color/white" >
+
+    <ImageView
+        android:id="@+id/hippo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="-48dp"
+        android:src="@drawable/hippo" />
 
     <LinearLayout
+        android:id="@+id/board_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:padding="10dp" >
+        android:orientation="vertical" >
 
-        <TextView
-            android:id="@+id/board_name"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Me"
-            android:textColor="@color/happ_purple"
-            android:textSize="20dp"
-            android:textStyle="bold" />
+            android:orientation="vertical"
+            android:padding="10dp" >
 
-        <TextView
-            android:id="@+id/board_message"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="What&apos;s up?"
-            android:textColor="@color/black"
-            android:textSize="16dp" />
+            <TextView
+                android:id="@+id/board_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Me"
+                android:textColor="@color/happ_purple"
+                android:textSize="20dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/board_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="What&apos;s up?"
+                android:textColor="@color/black"
+                android:textSize="16dp" />
+        </LinearLayout>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="3dp"
+            android:background="@color/board_strip" />
     </LinearLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="3dp"
-        android:background="@color/board_strip" />
-
-</LinearLayout>
+</FrameLayout>
