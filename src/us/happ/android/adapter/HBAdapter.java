@@ -5,13 +5,16 @@ import java.util.ArrayList;
 import us.happ.android.R;
 import us.happ.android.model.Mood;
 import us.happ.android.utils.ContactsManager;
+import us.happ.android.utils.Media;
 import android.content.Context;
+import android.graphics.BitmapFactory;
 
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 public class HBAdapter extends ArrayAdapter<Mood> {
@@ -19,12 +22,14 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 	private ArrayList<Mood> data;
 	private LayoutInflater inflater;
 	private ContactsManager mContactsManager;
+	private Context mContext;
 	
 	public HBAdapter(Context context, int resource, ContactsManager contactsManager) {
 		super(context, resource);
 		inflater = LayoutInflater.from(context);
 		data = new ArrayList<Mood>();
 		mContactsManager = contactsManager;
+		mContext = context;
 	}
 	
 	@Override
@@ -49,6 +54,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		if (convertView == null){
 			v = inflater.inflate(R.layout.list_item_board, parent, false);
 			holder = new ViewHolder();
+			holder.avatar = (ImageView) v.findViewById(R.id.board_avatar);
 			holder.name = (TextView) v.findViewById(R.id.board_name);
 			holder.message = (TextView) v.findViewById(R.id.board_message);
 			v.setTag(holder);
@@ -59,6 +65,10 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		
 		Mood m = data.get(position);
 		
+		// TODO
+		// lazy load
+		holder.avatar.setImageBitmap(Media.getRoundedCornerBitmap(mContext, mContactsManager.getAvatar(m.getNumber()), 0.6f));
+		
 		holder.name.setText(mContactsManager.getName(m.getNumber()));
 		holder.message.setText(m.getMessage());
 		
@@ -67,6 +77,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 	}
 	
 	class ViewHolder {
+		ImageView avatar;
 		TextView name;
 		TextView message;
 	}

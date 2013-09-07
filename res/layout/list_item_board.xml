@@ -2,19 +2,36 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:padding="10dp"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:padding="10dp" >
 
-    <TextView
-        android:id="@+id/board_name"
-        android:text="Hello"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <ImageView
+        android:id="@+id/board_avatar"
+        android:layout_width="70dp"
+        android:layout_height="70dp" />
 
-    <TextView
-        android:id="@+id/board_message"
-        android:text="Hello"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:orientation="vertical" >
+
+        <TextView
+            android:id="@+id/board_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Brandon Krieger"
+            android:textColor="@color/happ_purple"
+            android:textSize="20dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/board_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="What&apos;s up?"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
+    </LinearLayout>
 
 </LinearLayout>
