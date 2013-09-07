@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -47,13 +48,30 @@ public class ComposeActivity extends ActionBarActivity {
         	  finish();
         	  overridePendingTransition(R.anim.fade_in, R.anim.slide_down);
         	  return true;
+          case R.id.action_submit:
+        	  submit();
+        	  return true;
           default:            
         	  return super.onOptionsItemSelected(item);    
     	}
     }
 	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+	    if ((keyCode == KeyEvent.KEYCODE_BACK)) { //Back key pressed
+	       finish();
+	       overridePendingTransition(R.anim.fade_in, R.anim.slide_down);
+	       return true;
+	    }
+	    return super.onKeyDown(keyCode, event);
+	}
+	
 	public void onComposeSubmit(View v){
-		// TODO check for empty string
+		submit();
+	}
+	
+	public void submit(){
+		
 		String message = mComposeET.getText().toString();
 		Intent intent = new Intent();
 		

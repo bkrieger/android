@@ -8,4 +8,6 @@
     <color name="happ_purple_dark">#FF870359</color>
     
     <color name="board_strip">#22AA0470</color>
+    
+    <color name="btn_selector">#AAAA0470</color>
 </resources>

@@ -16,9 +16,12 @@ import us.happ.android.service.APIService;
 import us.happ.android.R;
 import us.happ.android.service.ServiceReceiver;
 import us.happ.android.utils.ContactsManager;
+import android.app.AlertDialog;
 import android.app.ListActivity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -26,8 +29,12 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ListView;
 
 public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver{
@@ -44,7 +51,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
 	private ContactsManager mContactsManager;
 
-	private Object mPhoneNumber;
+	private String mPhoneNumber;
 
 	private ActionBar actionbar;
 
@@ -58,8 +65,23 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		
 		// Set up lists
 		mListView = (ListView) findViewById(android.R.id.list);
+		View mHeader = getLayoutInflater().inflate(R.layout.list_header_board, null, true);
+		mListView.addHeaderView(mHeader, null, false);
 		mListAdapter = new HBAdapter(this, 0, mContactsManager); // TODO don't pass in contactsManager
 		mListView.setAdapter(mListAdapter);
+		
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
+            	final String number = ((Mood) adapterView.getItemAtPosition(position)).getNumber();
+                    	
+            	 Intent callIntent = new Intent(Intent.ACTION_VIEW);
+                 callIntent.setData(Uri.parse("sms:" + number));
+                 startActivity(callIntent);
+    
+            }
+        });
 		
 		// Setup receivers
         mReceiver = new ServiceReceiver(new Handler());
@@ -69,6 +91,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
         mPhoneNumber = ContactsManager.clearnNumber(tMgr.getLine1Number());
         
+        // Action Bar
+        actionbar = getSupportActionBar();
+        actionbar.setDisplayShowTitleEnabled(false);
+        
+        mContactsManager.makeContactsMapping();
         Bundle extras = new Bundle();
         String[] numbers = mContactsManager.getAllContacts();
 		extras.putStringArray("n", numbers);
@@ -76,16 +103,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         ServiceHelper mServiceHelper = ServiceHelper.getInstance();
         getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
         
-        // Action Bar
-        actionbar = getSupportActionBar();
-        actionbar.setDisplayShowTitleEnabled(false);
-        
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		
 		return true;
 	}
 	

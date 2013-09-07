@@ -29,9 +29,6 @@ public class ContactsManager {
 		map = new HashMap<String, Contact>();
 		mContext = context;
 		mContentResolver = mContext.getContentResolver();
-		
-		
-		makeContactsMapping();
 	}
 
 	public String[] getAllContacts(){
@@ -48,7 +45,7 @@ public class ContactsManager {
 		return map.get(number).name;
 	}
 	
-	private void makeContactsMapping(){
+	public void makeContactsMapping(){
 
 		Contact contact;
 		
