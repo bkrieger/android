@@ -3,6 +3,7 @@
 
     <string name="app_name">Happ</string>
     <string name="action_compose">Compose</string>
+    <string name="action_submit">Send</string>
     
     <string name="hint_compose">What is happening?</string>
 

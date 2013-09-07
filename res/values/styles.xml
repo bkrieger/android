@@ -2,18 +2,24 @@
 
     <style name="HappTheme" parent="@style/Theme.AppCompat.Light">
         <item name="android:actionBarStyle">@style/HappActionBar</item>
+        <item name="android:selectableItemBackground">@drawable/ab_item_background</item>
 
         <!-- Support Library Compatability -->
         <item name="actionBarStyle">@style/HappActionBar</item>
+        <item name="selectableItemBackground">@drawable/ab_item_background</item>
+        
     </style>
 
     <style name="HappActionBar" parent="@style/Widget.AppCompat.ActionBar">
         <item name="android:background">@color/happ_purple</item>
         <item name="android:titleTextStyle">@style/TitleTextStyle</item>
-
+        <item name="android:icon">@drawable/ic_happ</item>
+        
         <!-- Support Library Compatability -->
         <item name="background">@color/happ_purple</item>
         <item name="titleTextStyle">@style/TitleTextStyle</item>
+        <item name="icon">@drawable/ic_happ</item>
+        
     </style>
 
     <style name="TitleTextStyle" parent="@style/TextAppearance.AppCompat.Widget.ActionBar.Title">

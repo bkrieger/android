@@ -22,13 +22,15 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v7.app.ActionBar;
+import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ListView;
 
-public class MainActivity extends ListActivity implements ServiceReceiver.Receiver{
+public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver{
 
 	private static final int ID_COMPOSE = 1;
 	
@@ -44,6 +46,8 @@ public class MainActivity extends ListActivity implements ServiceReceiver.Receiv
 
 	private Object mPhoneNumber;
 
+	private ActionBar actionbar;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -53,7 +57,7 @@ public class MainActivity extends ListActivity implements ServiceReceiver.Receiv
         mContactsManager = new ContactsManager(this);
 		
 		// Set up lists
-		mListView = getListView();
+		mListView = (ListView) findViewById(android.R.id.list);
 		mListAdapter = new HBAdapter(this, 0, mContactsManager); // TODO don't pass in contactsManager
 		mListView.setAdapter(mListAdapter);
 		
@@ -71,6 +75,10 @@ public class MainActivity extends ListActivity implements ServiceReceiver.Receiv
         extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
         ServiceHelper mServiceHelper = ServiceHelper.getInstance();
         getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
+        
+        // Action Bar
+        actionbar = getSupportActionBar();
+        actionbar.setDisplayShowTitleEnabled(false);
         
 	}
 

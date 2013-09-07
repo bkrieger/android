@@ -4,6 +4,6 @@
     <color name="white">#F0F0F0</color>
     <color name="black">#303030</color>
     
-    <color name="happ_purple">#7D0B8C</color>
-    
+    <color name="happ_purple">#AA0470</color>
+    <color name="happ_purple_dark">#870359</color>
 </resources>

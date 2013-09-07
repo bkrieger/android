@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
@@ -27,8 +28,17 @@ public class ComposeActivity extends ActionBarActivity {
 		actionbar = getSupportActionBar();
 		actionbar.setHomeButtonEnabled(true);
 		actionbar.setDisplayHomeAsUpEnabled(true);
+		actionbar.setTitle("Back");
+		actionbar.setDisplayShowTitleEnabled(true);
+		actionbar.setDisplayShowHomeEnabled(false);
 	}
 
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.compose, menu);
+		return true;
+	}
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {    
@@ -43,10 +53,17 @@ public class ComposeActivity extends ActionBarActivity {
     }
 	
 	public void onComposeSubmit(View v){
+		// TODO check for empty string
+		String message = mComposeET.getText().toString();
 		Intent intent = new Intent();
-		intent.putExtra("compose_msg", mComposeET.getText().toString());
-		Log.i("text", mComposeET.getText().toString());
-		setResult(1, intent);
+		
+		if (message.length() > 0){	
+			intent.putExtra("compose_msg", message);
+			setResult(1, intent);
+		} else {
+			setResult(0, intent);
+		}
+		
 		finish();
   	  	overridePendingTransition(R.anim.fade_in, R.anim.slide_down);
 	}

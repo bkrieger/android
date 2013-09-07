@@ -2,10 +2,9 @@
       xmlns:happ="http://schemas.android.com/apk/res-auto" >
 
     <item
-        android:id="@+id/action_compose"
-        android:icon="@drawable/ic_action_compose"
-        android:orderInCategory="1"
+        android:id="@+id/action_submit"
+        android:icon="@drawable/ic_action_submit"
         happ:showAsAction="always"
-        android:title="@string/action_compose"/>
+        android:title="@string/action_submit"/>
 
 </menu>
