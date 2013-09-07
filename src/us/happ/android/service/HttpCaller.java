@@ -21,6 +21,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.HttpResponseException;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.conn.util.InetAddressUtils;
 import org.apache.http.impl.client.BasicResponseHandler;
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -86,5 +87,43 @@ public class HttpCaller {
     	}
     	return result;
     }
+
+    // TODO
+    // handle duplicate code
+    // TODO
+    // change from path to NameValue
+	public static String postRequest(APIService apiService, String path) {
+		HttpClient httpclient = new DefaultHttpClient();
+		
+		String url = HOST + path;
+
+		// Prepare a request object
+		HttpPost httpPost = new HttpPost(url);
+
+		// Execute the request
+		HttpResponse response;
+		
+		// Set timeout
+		final HttpParams httpParams = httpclient.getParams();
+		HttpConnectionParams.setConnectionTimeout(httpParams, 5000);
+		
+		try {
+			response = httpclient.execute(httpPost);
+			
+//			Log.i(TAG, EntityUtils.toString(response.getEntity()));
+			
+			// Examine the response status
+			String result = new BasicResponseHandler().handleResponse(response);
+			
+			return result;
+
+		} catch (HttpResponseException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		return null;
+	}
 
 }

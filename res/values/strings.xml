@@ -2,7 +2,8 @@
 <resources>
 
     <string name="app_name">Happ</string>
-    <string name="action_settings">Settings</string>
-    <string name="hello_world">Hello world!</string>
+    <string name="action_compose">Compose</string>
+    
+    <string name="hint_compose">What is happening?</string>
 
 </resources>

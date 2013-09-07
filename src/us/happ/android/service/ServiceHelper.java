@@ -34,8 +34,7 @@ public class ServiceHelper{
 	
 	// Operations available
 	public static final int GET_MOODS = 0x00;
-	
-	
+	public static final int POST_MOODS = 0x01;
 	
 	private SparseArray<ResultReceiver> receivers;
 	
