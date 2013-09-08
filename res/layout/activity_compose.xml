@@ -16,8 +16,10 @@
             android:layout_height="wrap_content"
             android:layout_marginBottom="15dp"
             android:layout_marginTop="30dp"
-            android:maxLines="40"
             android:hint="@string/hint_compose"
+            android:imeOptions="actionSend"
+            android:maxLength="40"
+            android:singleLine="true"
             android:color="@color/black" />
 
         <Button
@@ -40,7 +42,6 @@
             android:clickable="true"
             android:onClick="onClickDuration"
             android:orientation="horizontal" >
-            >
 
             <TextView
                 android:layout_width="0px"
@@ -51,7 +52,6 @@
                 android:text="@string/duration_title"
                 android:textColor="@color/black"
                 android:textSize="16dp" />
-                />
 
             <TextView
                 android:id="@+id/duration_value"

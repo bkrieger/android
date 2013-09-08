@@ -8,6 +8,8 @@
     <string name="mood_title">Category</string>
     <string name="duration_title">in the next</string>
     
+    <string name="me">Me</string>
+    <string name="tag_line">What\'s Happening?</string>
     <string name="hint_compose">What is happening?</string>
 
 </resources>

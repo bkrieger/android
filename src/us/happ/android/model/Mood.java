@@ -31,6 +31,10 @@ public class Mood {
 		this.setResId(map.get(tagId));
 	}
 	
+	public static int resIdFromTag(int tagId){
+		return map.get(tagId);
+	}
+	
 	// Getters and Setters
 	public String getNumber() {
 		return number;

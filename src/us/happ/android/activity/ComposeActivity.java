@@ -13,9 +13,11 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.inputmethod.EditorInfo;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.TextView.OnEditorActionListener;
 import us.happ.android.model.Tag;
 import us.happ.android.model.Duration;
 
@@ -41,6 +43,20 @@ public class ComposeActivity extends ActionBarActivity {
 		actionbar.setDisplayShowHomeEnabled(false);
 		
 		mComposeET = (EditText) findViewById(R.id.compose_message);
+		mComposeET.setOnEditorActionListener(new OnEditorActionListener(){
+
+			@Override
+			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+				if (event != null && event.getAction() != KeyEvent.ACTION_DOWN){
+					return false;
+				} else if (actionId == EditorInfo.IME_ACTION_SEND) { 
+					submit();
+					return true;
+				}
+				return true;
+			}
+			
+		});
 
 		setTag(Tag.CHILL);
 		setDuration(Duration.TWO_HOURS);

@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="@color/board_bg" >
-	
+
     <ImageView
         android:id="@+id/hippo"
         android:layout_width="match_parent"
@@ -17,31 +17,60 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:orientation="vertical" >
+        android:orientation="vertical"
+        android:clickable="true"
+        android:onClick="onHeaderClick" >
 
-        <LinearLayout
+        <TextView
+            android:id="@+id/board_tagline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="10dp" >
+            android:gravity="center"
+            android:text="@string/tag_line"
+            android:textColor="@color/happ_purple"
+            android:padding="10dp"
+            android:textSize="20dp"
+            android:visibility="visible" />
 
-            <TextView
-                android:id="@+id/board_name"
+        <RelativeLayout
+            android:id="@+id/board_mewrap"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:visibility="gone" >
+
+            <ImageView
+                android:id="@+id/board_tag"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Me"
-                android:textColor="@color/happ_purple"
-                android:textSize="20dp"
-                android:textStyle="bold" />
+                android:layout_alignParentRight="true"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_tag_food" />
 
-            <TextView
-                android:id="@+id/board_message"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="What&apos;s up?"
-                android:textColor="@color/black"
-                android:textSize="16dp" />
-        </LinearLayout>
+                android:layout_alignParentLeft="true"
+                android:layout_toLeftOf="@id/board_tag"
+                android:orientation="vertical" >
+
+                <TextView
+                    android:id="@+id/board_name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/me"
+                    android:textColor="@color/happ_purple"
+                    android:textSize="20dp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/board_message"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/black"
+                    android:textSize="16dp" />
+            </LinearLayout>
+        </RelativeLayout>
 
         <View
             android:layout_width="match_parent"

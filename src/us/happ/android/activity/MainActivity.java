@@ -17,6 +17,7 @@ import us.happ.android.utils.Media;
 import us.happ.android.utils.SmoothInterpolator;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -35,7 +36,9 @@ import android.view.animation.Transformation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout.LayoutParams;
+import android.widget.ImageView;
 import android.widget.ListView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver{
@@ -45,6 +48,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	// receiver flags
 	private int getMoodsId = -1;
 	private int postMoodsId = -1;
+	private int getMeId = -1;
 	
 	private ServiceReceiver mReceiver;
 	private ListView mListView;
@@ -75,6 +79,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		View header = getLayoutInflater().inflate(R.layout.list_header_board, null, true);
 		mListView.addHeaderView(header, null, false);
 		mHeader = header.findViewById(R.id.board_header);
+		ViewHolder holder = new ViewHolder();
+		holder.tag = (ImageView) mHeader.findViewById(R.id.board_tag);
+		holder.message = (TextView) mHeader.findViewById(R.id.board_message);
+		holder.meWrap = mHeader.findViewById(R.id.board_mewrap);
+		holder.tagLine = mHeader.findViewById(R.id.board_tagline);
+		mHeader.setTag(holder);
+		
 		mHippo = header.findViewById(R.id.hippo);
 		mListAdapter = new HBAdapter(this, 0, mContactsManager); // TODO don't pass in contactsManager
 		mListView.setAdapter(mListAdapter);
@@ -143,6 +154,12 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
         ServiceHelper mServiceHelper = ServiceHelper.getInstance();
         getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
+        
+        extras = new Bundle();
+        String[] number = {mPhoneNumber};
+		extras.putStringArray("n", number);
+        extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
+        getMeId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
 	}
 
 	@Override
@@ -159,14 +176,22 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
           case android.R.id.home:
         	  return true;
           case R.id.action_compose:
-        	  Intent intent = new Intent(this, ComposeActivity.class);
-        	  startActivityForResult(intent, ID_COMPOSE);
-        	  overridePendingTransition(R.anim.slide_up, R.anim.fade_out);
+        	  compose();
         	  return true;
           default:            
         	  return super.onOptionsItemSelected(item);    
     	}
     }
+	
+	public void compose(){
+		Intent intent = new Intent(this, ComposeActivity.class);
+		startActivityForResult(intent, ID_COMPOSE);
+		overridePendingTransition(R.anim.slide_up, R.anim.fade_out);
+	}
+	
+	public void onHeaderClick(View v){
+		compose();
+	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
@@ -177,6 +202,12 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			String msg = data.getStringExtra("compose_msg");
 			String tag = data.getStringExtra("compose_tag");
 			String duration = data.getStringExtra("compose_duration");
+			
+			ViewHolder holder = (ViewHolder) mHeader.getTag();
+			holder.message.setText(msg);
+			holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(Integer.parseInt(tag))));
+			holder.meWrap.setVisibility(View.VISIBLE);
+			holder.tagLine.setVisibility(View.GONE);
 			
 			Bundle extras = new Bundle();
 			extras.putString("number", mPhoneNumber+"");
@@ -239,9 +270,36 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			} catch (JSONException e){}
 			
 			postMoodsId = -1;
+		} else if (taskId == getMeId){
+			try {
+				JSONObject jResults = new JSONObject(results);
+				JSONArray data = jResults.getJSONArray("data");
+				
+				ViewHolder holder = (ViewHolder) mHeader.getTag();
+				
+				if (data.length() > 0){
+					JSONObject d = (JSONObject) data.get(0);
+					holder.message.setText(d.getString("message"));
+					holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(d.getInt("tag"))));
+					holder.meWrap.setVisibility(View.VISIBLE);
+					holder.tagLine.setVisibility(View.GONE);
+				} else {
+					holder.meWrap.setVisibility(View.GONE);
+					holder.tagLine.setVisibility(View.VISIBLE);
+				}
+				
+			} catch (JSONException e){}
+			
+			getMeId = -1;
 		}
 	}
 	
+	class ViewHolder {
+		TextView message;
+		ImageView tag;
+		View meWrap;
+		View tagLine;
+	}
 	
 	private int mLastMotionY;
 	private void applyHeaderPadding(MotionEvent ev) {
