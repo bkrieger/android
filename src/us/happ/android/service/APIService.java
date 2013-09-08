@@ -67,7 +67,9 @@ public class APIService extends IntentService {
 				// TODO Auto-generated catch block
 				e1.printStackTrace();
 			}
-			params = "?id="+ number + "&msg=" + msg + "&tags[]=lol&timestamp=3&duration=1000";
+			String tag = intent.getStringExtra("tag");
+			String duration = intent.getStringExtra("duration");
+			params = "?id="+ number + "&msg=" + msg + "&tag="+ tag + "&duration=" + duration;
 			
 			Log.i("url", params);
 			results = HttpCaller.postRequest(this, "/moods" + params);

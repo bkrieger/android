@@ -175,10 +175,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			Toast.makeText(this, "Sending..", Toast.LENGTH_SHORT).show();
 			
 			String msg = data.getStringExtra("compose_msg");
+			String tag = data.getStringExtra("compose_tag");
+			String duration = data.getStringExtra("compose_duration");
 			
 			Bundle extras = new Bundle();
 			extras.putString("number", mPhoneNumber+"");
 			extras.putString("msg", msg);
+			extras.putString("tag", tag);
+			extras.putString("duration", duration);
 	        extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
 	        ServiceHelper mServiceHelper = ServiceHelper.getInstance();
 	        postMoodsId = mServiceHelper.startService(this, ServiceHelper.POST_MOODS, extras);
@@ -188,7 +192,10 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 		String results = resultData.getString(APIService.RESULTS);
-		if (results == null) return;
+		if (results == null) {
+			resetHeaderPadding();
+			return;
+		}
 		Log.i("results", results);
 		
 		int taskId = resultData.getInt(APIService.TASK_ID);
@@ -205,7 +212,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				Mood m;
 				for (int i = 0; i < data.length(); i++){
 					d = (JSONObject) data.get(i);
-					m = new Mood(d.getString("_id"), d.getString("message"), d.getLong("timestamp"), d.getInt("duration"));
+					m = new Mood(
+							d.getString("_id"), 
+							d.getString("message"), 
+							d.getLong("timestamp"), 
+							d.getInt("duration"),
+							d.getInt("tag")
+						);
 					moods.add(m);
 				}
 				

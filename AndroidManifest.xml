@@ -29,6 +29,7 @@
             </intent-filter>
         </activity>
         <activity
+            android:windowSoftInputMode="adjustResize"
             android:name="us.happ.android.activity.ComposeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait" >

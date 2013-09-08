@@ -58,6 +58,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 			holder.avatar = (ImageView) v.findViewById(R.id.board_avatar);
 			holder.name = (TextView) v.findViewById(R.id.board_name);
 			holder.message = (TextView) v.findViewById(R.id.board_message);
+			holder.tag = (ImageView) v.findViewById(R.id.board_tag);
 			v.setTag(holder);
 		} else {
 			v = convertView;
@@ -69,9 +70,9 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		// TODO
 		// lazy load
 		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(m.getDuration()*1000);
-		
 		if (decay < 0) decay = 0;
 		holder.avatar.setImageBitmap(Media.getRoundedCornerBitmap(mContext, mContactsManager.getAvatar(m.getNumber()), decay));
+		holder.tag.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), m.getResId()));
 		
 		holder.name.setText(mContactsManager.getName(m.getNumber()));
 		holder.message.setText(m.getMessage());
@@ -84,6 +85,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		ImageView avatar;
 		TextView name;
 		TextView message;
+		ImageView tag;
 	}
 	
 	public void updateData(ArrayList<Mood> moods){

@@ -10,28 +10,43 @@
         android:layout_width="70dp"
         android:layout_height="70dp" />
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginLeft="10dp"
-        android:orientation="vertical" >
+        android:layout_height="wrap_content" >
 
-        <TextView
-            android:id="@+id/board_name"
+        <ImageView
+            android:id="@+id/board_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Brandon Krieger"
-            android:textColor="@color/happ_purple"
-            android:textSize="18dp"
-            android:textStyle="bold" />
+            android:layout_gravity="center_vertical"
+            android:layout_alignParentRight="true"
+            android:src="@drawable/ic_tag_food" />
 
-        <TextView
-            android:id="@+id/board_message"
+        <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="What&apos;s up?"
-            android:textColor="@color/black"
-            android:textSize="14dp" />
-    </LinearLayout>
+            android:layout_alignParentLeft="true"
+            android:layout_marginLeft="10dp"
+            android:layout_toLeftOf="@id/board_tag"
+            android:orientation="vertical" >
+
+            <TextView
+                android:id="@+id/board_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Brandon Krieger"
+                android:textColor="@color/happ_purple"
+                android:textSize="18dp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/board_message"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="What&apos;s up?"
+                android:textColor="@color/black"
+                android:textSize="14dp" />
+        </LinearLayout>
+    </RelativeLayout>
 
 </LinearLayout>

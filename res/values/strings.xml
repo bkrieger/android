@@ -5,6 +5,9 @@
     <string name="action_compose">Compose</string>
     <string name="action_submit">Send</string>
     
+    <string name="mood_title">Category</string>
+    <string name="duration_title">in the next</string>
+    
     <string name="hint_compose">What is happening?</string>
 
 </resources>
