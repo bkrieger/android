@@ -18,16 +18,18 @@
             android:id="@+id/board_tag"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_vertical"
             android:layout_alignParentRight="true"
+            android:layout_gravity="center_vertical"
             android:src="@drawable/ic_tag_food" />
 
         <LinearLayout
+            android:id="@+id/board_wrap"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentLeft="true"
             android:layout_marginLeft="10dp"
             android:layout_toLeftOf="@id/board_tag"
+            android:paddingBottom="20dp"
             android:orientation="vertical" >
 
             <TextView
@@ -47,6 +49,17 @@
                 android:textColor="@color/black"
                 android:textSize="14dp" />
         </LinearLayout>
+
+        <TextView
+            android:id="@+id/board_timestamp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentBottom="true"
+            android:layout_below="@id/board_tag"
+            android:layout_marginLeft="10dp"
+            android:text="12:45pm"
+            android:textColor="@color/gray"
+            android:textSize="14dp" />
     </RelativeLayout>
 
 </LinearLayout>

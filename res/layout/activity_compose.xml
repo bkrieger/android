@@ -1,75 +1,69 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
     android:padding="10dp" >
+
+    <EditText
+        android:id="@+id/compose_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="15dp"
+        android:hint="@string/hint_compose"
+        android:imeOptions="actionSend"
+        android:maxLength="40"
+        android:singleLine="true"
+        android:textColorHint="@color/compose_hint"
+        android:color="@color/black" />
+
+    <Button
+        android:id="@+id/mood_value"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:layout_gravity="center_horizontal|center_vertical"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/spinner"
+        android:clickable="true"
+        android:onClick="onClickMood"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:textColor="@color/happ_purple"
+        android:textSize="16dp"
+        android:textStyle="bold" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_alignParentTop="true"
-        android:orientation="vertical" >
+        android:clickable="true"
+        android:onClick="onClickDuration"
+        android:orientation="horizontal" >
 
-        <EditText
-            android:id="@+id/compose_message"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:layout_marginTop="30dp"
-            android:hint="@string/hint_compose"
-            android:imeOptions="actionSend"
-            android:maxLength="40"
-            android:textColorHint="@color/compose_hint"
-            android:singleLine="true"
-            android:color="@color/black" />
-
-        <Button
-            android:id="@+id/mood_value"
-            android:layout_width="match_parent"
+        <TextView
+            android:layout_width="0px"
             android:layout_height="40dp"
-            android:layout_gravity="center_horizontal|center_vertical"
             android:layout_marginTop="10dp"
+            android:layout_weight="1"
+            android:gravity="right|center_vertical"
+            android:text="@string/duration_title"
+            android:textColor="@color/black"
+            android:textSize="16dp" />
+
+        <TextView
+            android:id="@+id/duration_value"
+            android:layout_width="0px"
+            android:layout_height="40dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="10dp"
+            android:layout_weight="2"
             android:background="@drawable/spinner"
-            android:clickable="true"
-            android:onClick="onClickMood"
+            android:gravity="left|center_vertical"
             android:paddingLeft="10dp"
-            android:paddingRight="10dp"
             android:textColor="@color/happ_purple"
             android:textSize="16dp"
             android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clickable="true"
-            android:onClick="onClickDuration"
-            android:orientation="horizontal" >
-
-            <TextView
-                android:layout_width="0px"
-                android:layout_height="40dp"
-                android:layout_marginTop="10dp"
-                android:layout_weight="1"
-                android:gravity="right|center_vertical"
-                android:text="@string/duration_title"
-                android:textColor="@color/black"
-                android:textSize="16dp" />
-
-            <TextView
-                android:id="@+id/duration_value"
-                android:layout_width="0px"
-                android:layout_height="40dp"
-                android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
-                android:layout_weight="2"
-                android:background="@drawable/spinner"
-                android:gravity="left|center_vertical"
-                android:paddingLeft="10dp"
-                android:textColor="@color/happ_purple"
-                android:textSize="16dp"
-                android:textStyle="bold" />
                 />
-        </LinearLayout>
     </LinearLayout>
 
-</RelativeLayout>
+</LinearLayout>

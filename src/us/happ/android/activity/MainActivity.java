@@ -19,6 +19,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -143,9 +144,29 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         
         // Fetch
         refreshing = true;
-        mContactsManager.makeContactsMapping();
-        fetch();
+        new fetchContactsTask().execute("");
 	}
+	
+	private class fetchContactsTask extends AsyncTask<String, Void, String> {
+
+        @Override
+        protected String doInBackground(String... params) {
+        	mContactsManager.makeContactsMapping();;
+        	return "";
+        }      
+
+        @Override
+        protected void onPostExecute(String results) {
+        	fetch();
+        }
+
+        @Override
+        protected void onPreExecute() {}
+
+        @Override
+        protected void onProgressUpdate(Void... values) {}
+        
+	}   
 	
 	private void fetch(){
 		Bundle extras = new Bundle();
@@ -160,6 +181,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		extras.putStringArray("n", number);
         extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
         getMeId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
+	}
+	
+	public void onResume(){
+		super.onResume();
+		fetch();
 	}
 
 	@Override
@@ -232,6 +258,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		int taskId = resultData.getInt(APIService.TASK_ID);
 		
 		if (taskId == getMoodsId){
+			this.findViewById(R.id.splash).setVisibility(View.GONE);
 			refreshing = false;
 			ArrayList<Mood> moods = new ArrayList<Mood>();
 			
@@ -243,6 +270,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				Mood m;
 				for (int i = 0; i < data.length(); i++){
 					d = (JSONObject) data.get(i);
+					
+					// remote self from contacts
+					if (d.getString("_id") == mPhoneNumber)
+						continue;
+					
 					m = new Mood(
 							d.getString("_id"), 
 							d.getString("message"), 

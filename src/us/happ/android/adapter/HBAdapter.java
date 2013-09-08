@@ -1,13 +1,17 @@
 package us.happ.android.adapter;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 
 import us.happ.android.R;
 import us.happ.android.model.Mood;
+import us.happ.android.utils.BitmapCache;
 import us.happ.android.utils.ContactsManager;
 import us.happ.android.utils.Media;
 import android.content.Context;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 
 import android.util.Log;
@@ -24,6 +28,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 	private LayoutInflater inflater;
 	private ContactsManager mContactsManager;
 	private Context mContext;
+	private BitmapCache mBitmapCache;
 	
 	public HBAdapter(Context context, int resource, ContactsManager contactsManager) {
 		super(context, resource);
@@ -31,6 +36,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		data = new ArrayList<Mood>();
 		mContactsManager = contactsManager;
 		mContext = context;
+		mBitmapCache = new BitmapCache();
 	}
 	
 	@Override
@@ -59,6 +65,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 			holder.name = (TextView) v.findViewById(R.id.board_name);
 			holder.message = (TextView) v.findViewById(R.id.board_message);
 			holder.tag = (ImageView) v.findViewById(R.id.board_tag);
+			holder.timestamp = (TextView) v.findViewById(R.id.board_timestamp);
 			v.setTag(holder);
 		} else {
 			v = convertView;
@@ -69,14 +76,28 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		
 		// TODO
 		// lazy load
-		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(m.getDuration()*1000);
+		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(1000*60*60*4); // 4 hours
 		if (decay < 0) decay = 0;
-		holder.avatar.setImageBitmap(Media.getRoundedCornerBitmap(
-				mContext, mContactsManager.getAvatar(m.getNumber()), decay, Long.parseLong(m.getNumber())));
+		// Check cache first
+		Bitmap bitmap = mBitmapCache.getBitmapFromMemCache(m.getNumber());
+
+		if (bitmap == null){
+			// TODO use workers
+			Bitmap b = Media.getRoundedCornerBitmap(
+					mContext, mContactsManager.getAvatar(m.getNumber()), decay, Long.parseLong(m.getNumber()));
+			holder.avatar.setImageBitmap(b);
+			mBitmapCache.addBitmapToMemoryCache(m.getNumber(), b);
+		} else {
+			holder.avatar.setImageBitmap(bitmap);
+		}
+		
 		holder.tag.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), m.getResId()));
 		
 		holder.name.setText(mContactsManager.getName(m.getNumber()));
 		holder.message.setText(m.getMessage());
+		
+		DateFormat outputFormatter = new SimpleDateFormat("h:mma");
+		holder.timestamp.setText(outputFormatter.format(m.getTimestamp()));
 		
 		return v;
 		
@@ -87,6 +108,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		TextView name;
 		TextView message;
 		ImageView tag;
+		TextView timestamp;
 	}
 	
 	public void updateData(ArrayList<Mood> moods){

@@ -3,21 +3,33 @@ package us.happ.android.activity;
 import us.happ.android.R;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.util.AttributeSet;
 import android.util.Log;
+import android.view.Display;
 import android.view.KeyEvent;
+import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.MeasureSpec;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
+import android.widget.AdapterView.OnItemClickListener;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import us.happ.android.adapter.TagsAdapter;
 import us.happ.android.model.Tag;
 import us.happ.android.model.Duration;
 
@@ -34,13 +46,33 @@ public class ComposeActivity extends ActionBarActivity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_compose);
 
-
 		actionbar = getSupportActionBar();
 		actionbar.setHomeButtonEnabled(true);
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setTitle("Back");
 		actionbar.setDisplayShowTitleEnabled(true);
 		actionbar.setDisplayShowHomeEnabled(false);
+		
+//		final View contentView = findViewById(android.R.id.content);
+//		contentView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+//		    @Override
+//		    public void onGlobalLayout() {
+//		        int heightDiff = contentView.getRootView().getHeight() - contentView.getHeight();
+//		        if (heightDiff > 300) { // if more than 300 pixels, its probably a keyboard...
+//		            Log.i("keyboard", "shown");
+//		            
+//		            Display display = getWindowManager().getDefaultDisplay(); 
+//		            int width = display.getWidth();  // deprecated
+//		            int height = display.getHeight();  // deprecated
+//		            
+//		            int marginTop = height - heightDiff - contentView.getHeight();
+//		            
+//		            Log.i("marginTop", marginTop+"");
+//
+//		            
+//		        }
+//		     }
+//		});
 		
 		mComposeET = (EditText) findViewById(R.id.compose_message);
 		mComposeET.setOnEditorActionListener(new OnEditorActionListener(){
@@ -96,38 +128,58 @@ public class ComposeActivity extends ActionBarActivity {
 
 	public void onClickMood(View v) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		final Tag[] tags = Tag.values();
-		String[] tagLabels = new String[tags.length];
-		for (int i = 0; i < tags.length; i++) {
-			tagLabels[i] = tags[i].label;
-		}
-		builder.setTitle(getResources().getString(R.string.mood_title))
-				.setItems(tagLabels, new DialogInterface.OnClickListener() {
+		
+		LayoutInflater inflater = getLayoutInflater();
+		View dialogView = inflater.inflate(R.layout.dialog_tags, null);
+		builder.setView(dialogView);
+		ListView mListView = (ListView) dialogView.findViewById(android.R.id.list);
+		TagsAdapter adapter = new TagsAdapter(this, 0, Tag.values());
+		mListView.setAdapter(adapter);
+		
+		final AlertDialog dialog = builder.create();
+		
+		mListView.setOnItemClickListener(new OnItemClickListener(){
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						setTag(tags[which]);
-					}
-				});
-		builder.create().show();
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
+				setTag(Tag.values()[position]);
+				dialog.dismiss();
+			}
+			
+		});
+
+		dialog.show();
 	}
 
 	public void onClickDuration(View v) {
 		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		final Duration[] durations = Duration.values();
-		String[] durationLabels = new String[durations.length];
-		for (int i = 0; i < durations.length; i++) {
-			durationLabels[i] = durations[i].label;
+		
+		LayoutInflater inflater = getLayoutInflater();
+		View dialogView = inflater.inflate(R.layout.dialog_tags, null);
+		builder.setView(dialogView);
+		ListView mListView = (ListView) dialogView.findViewById(android.R.id.list);
+		((TextView) dialogView.findViewById(R.id.dialog_header)).setText(getResources().getString(R.string.duration_title));
+		
+		String[] durations = new String[Duration.values().length];
+		for (int i = 0; i < Duration.values().length; i++){
+			durations[i] = Duration.values()[i].label;
 		}
-		builder.setTitle(getResources().getString(R.string.duration_title))
-				.setItems(durationLabels, new DialogInterface.OnClickListener() {
+		mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item_dialog_duration, durations));
+		
+		final AlertDialog dialog = builder.create();
+		
+		mListView.setOnItemClickListener(new OnItemClickListener(){
 
-					@Override
-					public void onClick(DialogInterface dialog, int which) {
-						setDuration(durations[which]);
-					}
-				});
-		builder.create().show();
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
+				setDuration(Duration.values()[position]);
+				dialog.dismiss();
+			}
+			
+		});
+
+		dialog.show();
+
 	}
 
 	private void setTag(Tag tag) {

@@ -7,7 +7,9 @@
         <!-- Support Library Compatability -->
         <item name="actionBarStyle">@style/HappActionBar</item>
         <item name="selectableItemBackground">@drawable/ab_item_background</item>
+        
         <item name="android:editTextStyle">@style/EditTextAppTheme</item>
+        
     </style>
 
     <style name="HappActionBar" parent="@style/Widget.AppCompat.ActionBar">
