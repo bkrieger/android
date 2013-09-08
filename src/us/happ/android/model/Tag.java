@@ -5,9 +5,9 @@ import us.happ.android.R;
 public enum Tag {
 	CHILL("Chill", "1"),
 	FOOD("Food", "2"),
-	MOVIE("Movie", "4"),
-	PARTY("Party", "8"),
-	SPORTS("Sports", "16");
+	MOVIE("Movie", "3"),
+	PARTY("Party", "4"),
+	SPORTS("Sports", "5");
 	
 	public String label;
 	public String valueForPost;

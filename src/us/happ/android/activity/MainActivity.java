@@ -90,7 +90,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		mListAdapter = new HBAdapter(this, 0, mContactsManager); // TODO don't pass in contactsManager
 		mListView.setAdapter(mListAdapter);
 		
-		hippoHeight = (int) Media.pxFromDp(this, 48);
+		hippoHeight = (int) Media.pxFromDp(this, 58);
 		
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 

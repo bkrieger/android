@@ -12,9 +12,9 @@ public class Mood {
 		map = new HashMap<Integer, Integer>();
 		map.put(1, R.drawable.ic_tag_chill);
 		map.put(2, R.drawable.ic_tag_food);
-		map.put(4, R.drawable.ic_tag_movie);
-		map.put(8, R.drawable.ic_tag_party);
-		map.put(16, R.drawable.ic_tag_sport);
+		map.put(3, R.drawable.ic_tag_movie);
+		map.put(4, R.drawable.ic_tag_party);
+		map.put(5, R.drawable.ic_tag_sport);
 	}
 
 	private String number;
