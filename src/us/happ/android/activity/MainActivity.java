@@ -36,6 +36,7 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout.LayoutParams;
 import android.widget.ListView;
+import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver{
 
@@ -171,6 +172,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode == ID_COMPOSE && resultCode == 1){
 
+			Toast.makeText(this, "Sending..", Toast.LENGTH_SHORT).show();
+			
 			String msg = data.getStringExtra("compose_msg");
 			
 			Bundle extras = new Bundle();
@@ -213,6 +216,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			getMoodsId = -1;
 			resetHeaderPadding();
 		} else if (taskId == postMoodsId){
+			
+			try {
+				JSONObject jResults = new JSONObject(results);
+				if (jResults.getInt("status") == 200)
+					Toast.makeText(this, "Sent!", Toast.LENGTH_SHORT).show();
+				else
+					Toast.makeText(this, "Error submitting. Try again.", Toast.LENGTH_SHORT).show();
+			} catch (JSONException e){}
 			
 			postMoodsId = -1;
 		}

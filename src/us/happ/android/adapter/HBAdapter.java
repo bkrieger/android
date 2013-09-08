@@ -69,7 +69,7 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 		// TODO
 		// lazy load
 		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(m.getDuration()*1000);
-		Log.i("decay", decay+"");
+		
 		if (decay < 0) decay = 0;
 		holder.avatar.setImageBitmap(Media.getRoundedCornerBitmap(mContext, mContactsManager.getAvatar(m.getNumber()), decay));
 		

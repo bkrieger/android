@@ -22,7 +22,7 @@
             android:layout_height="wrap_content"
             android:text="Brandon Krieger"
             android:textColor="@color/happ_purple"
-            android:textSize="20dp"
+            android:textSize="18dp"
             android:textStyle="bold" />
 
         <TextView
@@ -31,7 +31,7 @@
             android:layout_height="wrap_content"
             android:text="What&apos;s up?"
             android:textColor="@color/black"
-            android:textSize="16dp" />
+            android:textSize="14dp" />
     </LinearLayout>
 
 </LinearLayout>
