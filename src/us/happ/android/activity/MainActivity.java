@@ -15,6 +15,7 @@ import us.happ.android.service.ServiceReceiver;
 import us.happ.android.utils.ContactsManager;
 import us.happ.android.utils.Media;
 import us.happ.android.utils.SmoothInterpolator;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -51,21 +52,28 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private int postMoodsId = -1;
 	private int getMeId = -1;
 	
+	private final static int HIPPO_HEIGHT = 58; // 48 + 10
+	
+	private boolean INITIALIZED = false;
+	
 	private ServiceReceiver mReceiver;
 	private ListView mListView;
 	private HBAdapter mListAdapter;
-
+	private ServiceHelper mServiceHelper;
 	private ContactsManager mContactsManager;
 
 	private String mPhoneNumber;
 
 	private ActionBar actionbar;
+	private ProgressDialog mProgressDialog;
 
 	private View mHeader;
 	private View mHippo;
 	private int hippoHeight;
 	
 	private boolean refreshing = false;
+
+	private long startTime;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -91,7 +99,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		mListAdapter = new HBAdapter(this, 0, mContactsManager); // TODO don't pass in contactsManager
 		mListView.setAdapter(mListAdapter);
 		
-		hippoHeight = (int) Media.pxFromDp(this, 58);
+		hippoHeight = (int) Media.pxFromDp(this, HIPPO_HEIGHT);
 		
 		mListView.setOnItemClickListener(new OnItemClickListener() {
 
@@ -142,22 +150,31 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         actionbar = getSupportActionBar();
         actionbar.setDisplayShowTitleEnabled(false);
         
+        // Progress dialog
+        mProgressDialog = new ProgressDialog(this);
+        
         // Fetch
+        mServiceHelper = ServiceHelper.getInstance();
         refreshing = true;
+        mProgressDialog.setMessage("Retrieving Contacts");
+    	mProgressDialog.show();
         new fetchContactsTask().execute("");
+        fetchMe();
 	}
 	
 	private class fetchContactsTask extends AsyncTask<String, Void, String> {
 
         @Override
         protected String doInBackground(String... params) {
-        	mContactsManager.makeContactsMapping();;
+        	mContactsManager.makeContactsMapping();
         	return "";
         }      
 
         @Override
         protected void onPostExecute(String results) {
-        	fetch();
+//        	mProgressDialog.dismiss();
+        	mProgressDialog.setMessage("Finding out what's happening..");
+        	fetchMoods();
         }
 
         @Override
@@ -169,14 +186,20 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	}   
 	
 	private void fetch(){
+		fetchMoods();
+		fetchMe();
+	}
+	
+	private void fetchMoods(){
 		Bundle extras = new Bundle();
         String[] numbers = mContactsManager.getAllContacts();
 		extras.putStringArray("n", numbers);
         extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
-        ServiceHelper mServiceHelper = ServiceHelper.getInstance();
         getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
-        
-        extras = new Bundle();
+	}
+	
+	private void fetchMe(){        
+		Bundle extras = new Bundle();
         String[] number = {mPhoneNumber};
 		extras.putStringArray("n", number);
         extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
@@ -185,7 +208,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	public void onResume(){
 		super.onResume();
-		fetch();
+		if (INITIALIZED)
+			fetch();
 	}
 
 	@Override
@@ -258,8 +282,9 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		int taskId = resultData.getInt(APIService.TASK_ID);
 		
 		if (taskId == getMoodsId){
-			this.findViewById(R.id.splash).setVisibility(View.GONE);
+			INITIALIZED = true;
 			refreshing = false;
+			mProgressDialog.dismiss();
 			ArrayList<Mood> moods = new ArrayList<Mood>();
 			
 			try {
@@ -271,6 +296,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				for (int i = 0; i < data.length(); i++){
 					d = (JSONObject) data.get(i);
 					
+					// TODO check if works
 					// remote self from contacts
 					if (d.getString("_id") == mPhoneNumber)
 						continue;

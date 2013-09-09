@@ -11,6 +11,7 @@ import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.provider.Contacts.People;
 import android.provider.ContactsContract;
 import android.util.Log;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
@@ -46,31 +47,18 @@ public class ContactsManager {
 	}
 	
 	public void makeContactsMapping(){
-
+		Cursor cur = mContentResolver.query(Phone.CONTENT_URI, null, null, null, null);
 		Contact contact;
 		
-        Cursor cur = mContentResolver.query(ContactsContract.Contacts.CONTENT_URI, null, null, null, null);
-        if (cur.getCount() > 0) {
-            while (cur.moveToNext()) {
-                  String id = cur.getString(cur.getColumnIndex(ContactsContract.Contacts._ID));
-                  String name = cur.getString(cur.getColumnIndex(ContactsContract.Contacts.DISPLAY_NAME));
-                  if (Integer.parseInt(cur.getString(
-                        cur.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                     Cursor pCur = mContentResolver.query(
-                               Phone.CONTENT_URI,
-                               null,
-                               Phone.CONTACT_ID +" = ?",
-                               new String[]{id}, null);
-                     while (pCur.moveToNext()) {
-                         String phoneNo = clearnNumber(pCur.getString(pCur.getColumnIndex(Phone.NUMBER)));
-                         int photoId = pCur.getInt(pCur.getColumnIndex(Phone.PHOTO_ID));
-                         contact = new Contact(name, photoId);
-                         map.put(phoneNo, contact);
-                     }
-                    pCur.close();
-                }
-            }
-        }
+		while (cur.moveToNext()){
+			String name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
+			String phoneNo = clearnNumber(cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
+			int photoId = cur.getInt(cur.getColumnIndex(Phone.PHOTO_ID));
+			contact = new Contact(name, photoId);
+            map.put(phoneNo, contact);
+		}
+		
+		cur.close();
 	}
 	
 	public static String clearnNumber(String number){
