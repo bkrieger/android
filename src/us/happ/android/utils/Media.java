@@ -16,7 +16,7 @@ import android.graphics.RectF;
 public class Media {
 	
 	static String[] colors = {
-		"#0404AA",
+		"#F22C2C",
 		"#006699",
 		"#04AA2B",
 		"#AA2804",

@@ -15,6 +15,7 @@
         android:imeOptions="actionSend"
         android:maxLength="40"
         android:singleLine="true"
+        android:inputType="textCapSentences|textAutoCorrect"
         android:textColorHint="@color/compose_hint"
         android:color="@color/black" />
 

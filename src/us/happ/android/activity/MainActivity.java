@@ -46,7 +46,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver{
-
+	
+	// Activity results flags
 	private static final int ID_COMPOSE = 1;
 	
 	// receiver flags
@@ -54,40 +55,44 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private int postMoodsId = -1;
 	private int getMeId = -1;
 	
+	// constants
 	private final static int HIPPO_HEIGHT = 58; // 48 + 10
 	
+	// flags
 	private boolean INITIALIZED = false;
+	private boolean refreshing = false;
+	private boolean allowPullToRefresh = true;
 	
 	private ServiceReceiver mReceiver;
 	private ListView mListView;
 	private HBAdapter mListAdapter;
 	private ServiceHelper mServiceHelper;
 	private ContactsManager mContactsManager;
-
-	private String mPhoneNumber;
-
 	private ActionBar actionbar;
 	private ProgressDialog mProgressDialog;
-
+	
+	private String mPhoneNumber;
+	
+	// Views
 	private View mHeader;
 	private View mHippo;
 	private int hippoHeight;
-	
-	private boolean refreshing = false;
-
-	private long startTime;
-
 	private View hippoStatic;
 	private View hippoDynamic;
+	private View stripView;
+	private View sadHippoView;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-        // TODO runnable on different thread
         mContactsManager = new ContactsManager(this);
 		
+        // Sad hippo
+        stripView = findViewById(R.id.main_strip);
+        sadHippoView = findViewById(R.id.main_sad_hippo);
+        
 		// Set up lists
 		mListView = (ListView) findViewById(android.R.id.list);
 		View header = getLayoutInflater().inflate(R.layout.list_header_board, null, true);
@@ -111,41 +116,17 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		hippoHeight = (int) Media.pxFromDp(this, HIPPO_HEIGHT);
 		
 		mListView.setOnItemClickListener(new OnItemClickListener() {
-
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-            	final String number = ((Mood) adapterView.getItemAtPosition(position)).getNumber();   	
+            	 final String number = ((Mood) adapterView.getItemAtPosition(position)).getNumber();   	
             	 Intent callIntent = new Intent(Intent.ACTION_VIEW);
                  callIntent.setData(Uri.parse("sms:" + number));
                  startActivity(callIntent);
-    
             }
         });
 		
 		// pull to refresh
-		mListView.setOnTouchListener(new OnTouchListener(){
-			 
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (refreshing) return false;
-				
-				final int y = (int) event.getY();
-				
-			    switch (event.getAction()) {
-			    	case MotionEvent.ACTION_UP:
-						resetHeaderPadding();
-						break;
-		            case MotionEvent.ACTION_DOWN:
-		                mLastMotionY = y;
-		                break;
-		            case MotionEvent.ACTION_MOVE:
-		                applyHeaderPadding(event);
-		                break;
-			    }
-				return false;
-			}
-		
-		});
+		mListView.setOnTouchListener(pullToRefreshListener);
 		
 		// Setup receivers
         mReceiver = new ServiceReceiver(new Handler());
@@ -165,12 +146,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         // Fetch
         mServiceHelper = ServiceHelper.getInstance();
         refreshing = true;
-        mProgressDialog.setMessage("Retrieving Contacts");
+        mProgressDialog.setMessage(getResources().getString(R.string.dialog_retrieve_contacts));
     	mProgressDialog.show();
         new fetchContactsTask().execute("");
         fetchMe();
 	}
 	
+	// Fetching contacts asynchronously
 	private class fetchContactsTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -181,8 +163,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
         @Override
         protected void onPostExecute(String results) {
-//        	mProgressDialog.dismiss();
-        	mProgressDialog.setMessage("Finding out what's happening..");
+        	mProgressDialog.setMessage(MainActivity.this.getResources().getString(R.string.dialog_retrieve_moods));
         	fetchMoods();
         }
 
@@ -225,7 +206,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
-		
 		return true;
 	}
 	
@@ -309,6 +289,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				JSONObject jResults = new JSONObject(results);
 				JSONArray data = jResults.getJSONArray("data");
 				
+				if (data.length() == 0){
+					stripView.setVisibility(View.GONE);
+					sadHippoView.setVisibility(View.VISIBLE);
+				} else {
+					stripView.setVisibility(View.VISIBLE);
+					sadHippoView.setVisibility(View.GONE);
+				}
+				
 				JSONObject d;
 				Mood m;
 				for (int i = 0; i < data.length(); i++){
@@ -340,9 +328,9 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			try {
 				JSONObject jResults = new JSONObject(results);
 				if (jResults.getInt("status") == 200)
-					Toast.makeText(this, "Sent!", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getResources().getString(R.string.toast_post_success), Toast.LENGTH_SHORT).show();
 				else
-					Toast.makeText(this, "Error submitting. Try again.", Toast.LENGTH_SHORT).show();
+					Toast.makeText(this, getResources().getString(R.string.toast_post_error), Toast.LENGTH_SHORT).show();
 			} catch (JSONException e){}
 			
 			postMoodsId = -1;
@@ -371,12 +359,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		View tagLine;
 	}
 	
+	// Pull to refresh stuffs
 	private int mLastMotionY;
 	private void applyHeaderPadding(MotionEvent ev) {
 		// clever hack :D
 		if (mListView.getFirstVisiblePosition() > 0 || mListView.getChildAt(0).getTop() != 0) return;
 		
-		int topPadding = (int) ((ev.getY() - mLastMotionY) / 4);
+		int topPadding = (int) ((ev.getY() - mLastMotionY) / 2);
 		
 		if (topPadding < 0) topPadding = 0;
 		
@@ -443,8 +432,35 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		 public boolean willChangeBounds(){
 			 return true;
 		 }
-	 }
+	}
 	 
-	
+	OnTouchListener pullToRefreshListener = new OnTouchListener(){
+		
+		@Override
+		public boolean onTouch(View v, MotionEvent event) {
+			if (refreshing) return false;
+			
+			final int y = (int) event.getY();
+			
+		    switch (event.getAction()) {
+		    	case MotionEvent.ACTION_UP:
+		    		allowPullToRefresh = true;
+					resetHeaderPadding();
+					break;
+	            case MotionEvent.ACTION_DOWN:
+	                mLastMotionY = y;
+	                allowPullToRefresh = mListView.getChildAt(0).getTop() == 0;
+	                break;
+	            case MotionEvent.ACTION_MOVE:
+	            	if (allowPullToRefresh && mListView.getChildAt(0).getTop() < 0)
+	            		allowPullToRefresh = false;
+	            	if (allowPullToRefresh)
+	            		applyHeaderPadding(event);
+	                break;
+		    }
+			return false;
+		}
+
+	};
 
 }

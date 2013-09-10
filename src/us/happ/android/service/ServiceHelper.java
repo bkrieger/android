@@ -36,6 +36,8 @@ public class ServiceHelper{
 	public static final int GET_MOODS = 0x00;
 	public static final int POST_MOODS = 0x01;
 	
+	private int idCount = 0;
+	
 	private SparseArray<ResultReceiver> receivers;
 	
 	private static ServiceHelper instance;
@@ -76,8 +78,10 @@ public class ServiceHelper{
 		int taskId;
 		int size = receivers.size();
 		
-		if (size == 0) taskId = 0;
-		else taskId = receivers.keyAt(size - 1) + 1;
+//		if (size == 0) taskId = 0;
+//		else taskId = receivers.keyAt(size - 1) + 1;
+		taskId = idCount;
+		idCount += 1;
 		
 	    ResultReceiver receiver = extras.getParcelable(ServiceReceiver.NAME);
 	    extras.remove(ServiceReceiver.NAME);

@@ -12,10 +12,12 @@ public class GifWebView extends WebView {
 		int px = (int) Media.pxFromDp(context, 48);
 		if (px <= 48){
 			loadUrl("file:///android_asset/hippo_mhdpi.gif");
-		} else if (px == 64){
+		} else if (px == 72){
 			loadUrl("file:///android_asset/hippo_hdpi.gif");
-		} else {
+		} else if (px == 96){
 			loadUrl("file:///android_asset/hippo_xhdpi.gif");
+		} else {
+			loadUrl("file:///android_asset/hippo_xxhdpi.gif");
 		}
 		
 		setInitialScale(100);

@@ -11,5 +11,11 @@
     <string name="me">Me</string>
     <string name="tag_line">What\'s Happening?</string>
     <string name="hint_compose">What is happening?</string>
+    
+    <string name="dialog_retrieve_moods">Finding out what\'s happening..</string>
+    <string name="dialog_retrieve_contacts">Retrieving Contacts</string>
+
+    <string name="toast_post_success">Sent!</string>
+    <string name="toast_post_error">Error submitting. Please try again.</string>
 
 </resources>
