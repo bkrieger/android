@@ -4,32 +4,45 @@
     android:layout_height="wrap_content"
     android:background="@color/board_bg" >
 
-    <ImageView
+    <FrameLayout
         android:id="@+id/hippo"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center_horizontal"
         android:layout_marginTop="-53dp"
-        android:padding="5dp"
-        android:src="@drawable/hippo" />
+        android:padding="5dp" >
+
+        <ImageView
+            android:id="@+id/hippo_static"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:src="@drawable/hippo" />
+
+        <us.happ.android.view.GifWebView
+            android:id="@+id/hippo_dynamic"
+            android:layout_width="65dp"
+            android:layout_height="48dp"
+            android:layout_gravity="center"
+            android:visibility="gone" />
+    </FrameLayout>
 
     <LinearLayout
         android:id="@+id/board_header"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/white"
-        android:orientation="vertical"
         android:clickable="true"
-        android:onClick="onHeaderClick" >
+        android:onClick="onHeaderClick"
+        android:orientation="vertical" >
 
         <TextView
             android:id="@+id/board_tagline"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="center"
+            android:padding="10dp"
             android:text="@string/tag_line"
             android:textColor="@color/happ_purple"
-            android:padding="10dp"
             android:textSize="20dp"
             android:visibility="visible" />
 

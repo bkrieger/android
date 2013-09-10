@@ -18,6 +18,8 @@ import us.happ.android.utils.SmoothInterpolator;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -75,6 +77,9 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
 	private long startTime;
 
+	private View hippoStatic;
+	private View hippoDynamic;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -94,6 +99,10 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		holder.meWrap = mHeader.findViewById(R.id.board_mewrap);
 		holder.tagLine = mHeader.findViewById(R.id.board_tagline);
 		mHeader.setTag(holder);
+		
+		// dancing hippo
+		hippoStatic = header.findViewById(R.id.hippo_static);
+		hippoDynamic = header.findViewById(R.id.hippo_dynamic);
 		
 		mHippo = header.findViewById(R.id.hippo);
 		mListAdapter = new HBAdapter(this, 0, mContactsManager); // TODO don't pass in contactsManager
@@ -250,23 +259,32 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			Toast.makeText(this, "Sending..", Toast.LENGTH_SHORT).show();
 			
 			String msg = data.getStringExtra("compose_msg");
-			String tag = data.getStringExtra("compose_tag");
+			int tag = data.getIntExtra("compose_tag", 1);
 			String duration = data.getStringExtra("compose_duration");
 			
-			ViewHolder holder = (ViewHolder) mHeader.getTag();
-			holder.message.setText(msg);
-			holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(Integer.parseInt(tag))));
-			holder.meWrap.setVisibility(View.VISIBLE);
-			holder.tagLine.setVisibility(View.GONE);
+			updateHeader(msg, tag);
 			
 			Bundle extras = new Bundle();
 			extras.putString("number", mPhoneNumber+"");
 			extras.putString("msg", msg);
-			extras.putString("tag", tag);
+			extras.putString("tag", tag+"");
 			extras.putString("duration", duration);
 	        extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
 	        ServiceHelper mServiceHelper = ServiceHelper.getInstance();
 	        postMoodsId = mServiceHelper.startService(this, ServiceHelper.POST_MOODS, extras);
+		}
+	}
+	
+	private void updateHeader(String message, int tagId){
+		ViewHolder holder = (ViewHolder) mHeader.getTag();
+		if (message == null){
+			holder.meWrap.setVisibility(View.GONE);
+			holder.tagLine.setVisibility(View.VISIBLE);
+		} else {
+			holder.message.setText(message);
+			holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(tagId)));
+			holder.meWrap.setVisibility(View.VISIBLE);
+			holder.tagLine.setVisibility(View.GONE);
 		}
 	}
 
@@ -333,17 +351,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				JSONObject jResults = new JSONObject(results);
 				JSONArray data = jResults.getJSONArray("data");
 				
-				ViewHolder holder = (ViewHolder) mHeader.getTag();
-				
 				if (data.length() > 0){
 					JSONObject d = (JSONObject) data.get(0);
-					holder.message.setText(d.getString("message"));
-					holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(d.getInt("tag"))));
-					holder.meWrap.setVisibility(View.VISIBLE);
-					holder.tagLine.setVisibility(View.GONE);
+					updateHeader(d.getString("message"), d.getInt("tag"));
 				} else {
-					holder.meWrap.setVisibility(View.GONE);
-					holder.tagLine.setVisibility(View.VISIBLE);
+					updateHeader(null, 0);
 				}
 				
 			} catch (JSONException e){}
@@ -390,11 +402,15 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			 a.setInterpolator(new SmoothInterpolator());
 			 a.setDuration(500);
 			 mHeader.startAnimation(a);
+			 hippoDynamic.setVisibility(View.GONE);
+			 hippoStatic.setVisibility(View.VISIBLE);
 		 } else {
 			 BounceAnimation a = new BounceAnimation(startPadding, hippoHeight);
 			 a.setInterpolator(new SmoothInterpolator());
 			 a.setDuration(500);
 			 mHeader.startAnimation(a);
+			 hippoDynamic.setVisibility(View.VISIBLE);
+			 hippoStatic.setVisibility(View.GONE);
 			 refreshing = true;
 			 fetch();
 		 }
@@ -404,7 +420,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		 private int startPadding;
 		 private int endPadding;
 		 
-		 public BounceAnimation(int startPadding, int endPadding){
+		 public BounceAnimation(int startPadding, final int endPadding){
 			 this.startPadding = startPadding;
 			 this.endPadding = endPadding;
 		 }

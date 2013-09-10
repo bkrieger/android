@@ -59,10 +59,9 @@ public class TagsAdapter extends ArrayAdapter<Tag>{
 		}
 		
 		Tag t = tags[position];
-		
 	
 		holder.title.setText(t.label);
-		holder.icon.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), Mood.resIdFromTag(Integer.parseInt(t.valueForPost))));
+		holder.icon.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), Mood.resIdFromTag(t.valueForPost)));
 				
 		return v;
 		
