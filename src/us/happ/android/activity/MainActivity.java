@@ -53,7 +53,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	// receiver flags
 	private int getMoodsId = -1;
 	private int postMoodsId = -1;
-	private int getMeId = -1;
 	
 	// constants
 	private final static int HIPPO_HEIGHT = 58; // 48 + 10
@@ -149,7 +148,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         mProgressDialog.setMessage(getResources().getString(R.string.dialog_retrieve_contacts));
     	mProgressDialog.show();
         new fetchContactsTask().execute("");
-        fetchMe();
 	}
 	
 	// Fetching contacts asynchronously
@@ -164,7 +162,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         @Override
         protected void onPostExecute(String results) {
         	mProgressDialog.setMessage(MainActivity.this.getResources().getString(R.string.dialog_retrieve_moods));
-        	fetchMoods();
+        	fetch();
         }
 
         @Override
@@ -176,26 +174,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	}   
 	
 	private void fetch(){
-		fetchMoods();
-		fetchMe();
-	}
-	
-	private void fetchMoods(){
 		Bundle extras = new Bundle();
         String[] numbers = mContactsManager.getAllContacts();
 		extras.putStringArray("n", numbers);
+		extras.putString("me", mPhoneNumber);
         extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
         getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
 	}
-	
-	private void fetchMe(){        
-		Bundle extras = new Bundle();
-        String[] number = {mPhoneNumber};
-		extras.putStringArray("n", number);
-        extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
-        getMeId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
-	}
-	
+
 	public void onResume(){
 		super.onResume();
 		if (INITIALIZED)
@@ -272,7 +258,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 		String results = resultData.getString(APIService.RESULTS);
 		if (results == null) {
-			resetHeaderPadding();
+			resetHeaderPadding(false);
 			return;
 		}
 		Log.i("results", results);
@@ -287,9 +273,18 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			
 			try {
 				JSONObject jResults = new JSONObject(results);
-				JSONArray data = jResults.getJSONArray("data");
+				JSONObject data = jResults.getJSONObject("data");
+				JSONObject me = data.getJSONObject("me");
+				JSONArray contacts = data.getJSONArray("contacts");
 				
-				if (data.length() == 0){
+				// Update me
+				if (me.getString("_id") != null){
+					updateHeader(me.getString("message"), me.getInt("tag"));
+				} else {
+					updateHeader(null, 0);
+				}
+				
+				if (contacts.length() == 0){
 					stripView.setVisibility(View.GONE);
 					sadHippoView.setVisibility(View.VISIBLE);
 				} else {
@@ -299,13 +294,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				
 				JSONObject d;
 				Mood m;
-				for (int i = 0; i < data.length(); i++){
-					d = (JSONObject) data.get(i);
-					
-					// TODO check if works
-					// remote self from contacts
-					if (d.getString("_id") == mPhoneNumber)
-						continue;
+				for (int i = 0; i < contacts.length(); i++){
+					d = (JSONObject) contacts.get(i);
 					
 					m = new Mood(
 							d.getString("_id"), 
@@ -322,7 +312,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			mListAdapter.updateData(moods);
 
 			getMoodsId = -1;
-			resetHeaderPadding();
+			resetHeaderPadding(false);
 		} else if (taskId == postMoodsId){
 			
 			try {
@@ -334,21 +324,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			} catch (JSONException e){}
 			
 			postMoodsId = -1;
-		} else if (taskId == getMeId){
-			try {
-				JSONObject jResults = new JSONObject(results);
-				JSONArray data = jResults.getJSONArray("data");
-				
-				if (data.length() > 0){
-					JSONObject d = (JSONObject) data.get(0);
-					updateHeader(d.getString("message"), d.getInt("tag"));
-				} else {
-					updateHeader(null, 0);
-				}
-				
-			} catch (JSONException e){}
-			
-			getMeId = -1;
 		}
 	}
 	
@@ -379,14 +354,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
 	}
 	
-	private void resetHeaderPadding() {
+	private void resetHeaderPadding(boolean refresh) {
 
 		 LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
 		 int startPadding = lp.topMargin;
 		 
 		 if (startPadding == 0) return;
 		 
-		 if (startPadding <= hippoHeight){
+		 if (!refresh){
 			 BounceAnimation a = new BounceAnimation(startPadding, 0);
 			 a.setInterpolator(new SmoothInterpolator());
 			 a.setDuration(500);
@@ -445,7 +420,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		    switch (event.getAction()) {
 		    	case MotionEvent.ACTION_UP:
 		    		allowPullToRefresh = true;
-					resetHeaderPadding();
+					resetHeaderPadding(true);
 					break;
 	            case MotionEvent.ACTION_DOWN:
 	                mLastMotionY = y;

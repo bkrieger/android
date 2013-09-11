@@ -38,11 +38,11 @@ public class APIService extends IntentService {
 		case ServiceHelper.GET_MOODS:
 			Log.i(TAG, "GET MOODS");
 			
+			String me = intent.getStringExtra("me");
 			String[] numbers = intent.getStringArrayExtra("n");
-			String params = "";
+			String params = "?me=" + me + "&";
 			// TODO building url
 			for (int i = 0; i < numbers.length; i++){
-				if (i == 0) params += "?";
 				params += "n[]=" + numbers[i];
 				if (i + 1 < numbers.length)
 					params += "&";
