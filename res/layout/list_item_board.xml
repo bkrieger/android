@@ -1,65 +1,75 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:orientation="horizontal"
     android:padding="10dp" >
 
     <ImageView
         android:id="@+id/board_avatar"
         android:layout_width="70dp"
-        android:layout_height="70dp" />
+        android:layout_height="70dp"
+        android:layout_alignParentLeft="true" />
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" >
+    <FrameLayout
+        android:id="@+id/board_tagwrap"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_alignParentRight="true"
+        android:layout_centerInParent="true" >
+
+        <CheckBox
+            android:id="@+id/board_checkbox"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="right|center_vertical"
+            android:focusable="false"
+            android:focusableInTouchMode="false" />
 
         <ImageView
             android:id="@+id/board_tag"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentRight="true"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_gravity="center_vertical"
-            android:src="@drawable/ic_tag_food" />
+            android:src="@drawable/ic_tag_food"
+            android:visibility="gone" />
+    </FrameLayout>
 
-        <LinearLayout
-            android:id="@+id/board_wrap"
+    <RelativeLayout
+        android:id="@+id/board_wrap"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="10dp"
+        android:layout_toLeftOf="@id/board_tagwrap"
+        android:layout_toRightOf="@id/board_avatar" >
+
+        <TextView
+            android:id="@+id/board_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_marginLeft="10dp"
-            android:layout_toLeftOf="@id/board_tag"
+            android:layout_alignParentTop="true"
+            android:text="Brandon Krieger"
+            android:textColor="@color/happ_purple"
+            android:textSize="18dp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:id="@+id/board_message"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/board_name"
             android:paddingBottom="20dp"
-            android:orientation="vertical" >
-
-            <TextView
-                android:id="@+id/board_name"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Brandon Krieger"
-                android:textColor="@color/happ_purple"
-                android:textSize="18dp"
-                android:textStyle="bold" />
-
-            <TextView
-                android:id="@+id/board_message"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="What&apos;s up?"
-                android:textColor="@color/black"
-                android:textSize="14dp" />
-        </LinearLayout>
+            android:text="What&apos;s up?"
+            android:textColor="@color/black"
+            android:textSize="14dp" />
 
         <TextView
             android:id="@+id/board_timestamp"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
-            android:layout_below="@id/board_tag"
-            android:layout_marginLeft="10dp"
             android:text="12:45pm"
             android:textColor="@color/gray"
             android:textSize="14dp" />
     </RelativeLayout>
 
-</LinearLayout>
+</RelativeLayout>

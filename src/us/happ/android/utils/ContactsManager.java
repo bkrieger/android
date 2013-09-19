@@ -1,5 +1,8 @@
 package us.happ.android.utils;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.HashMap;
 
 import us.happ.android.service.ServiceHelper;
@@ -7,12 +10,16 @@ import us.happ.android.service.ServiceHelper;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
+import android.content.res.AssetFileDescriptor;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.os.Build;
 import android.provider.Contacts.People;
 import android.provider.ContactsContract;
+import android.provider.ContactsContract.Contacts;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 
@@ -54,8 +61,9 @@ public class ContactsManager {
 			String name = cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.DISPLAY_NAME));
 			String phoneNo = clearnNumber(cur.getString(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.NUMBER)));
 			int photoId = cur.getInt(cur.getColumnIndex(Phone.PHOTO_ID));
-			contact = new Contact(name, photoId);
-            map.put(phoneNo, contact);
+			int contactId = cur.getInt(cur.getColumnIndex(ContactsContract.CommonDataKinds.Phone.CONTACT_ID));
+			contact = new Contact(name, contactId, photoId);
+			map.put(phoneNo, contact);
 		}
 		
 		cur.close();
@@ -71,7 +79,21 @@ public class ContactsManager {
 		return number;
 	}
 	
-	final Bitmap fetchThumbnail(final int thumbnailId) {
+	// TODO
+	// scale this image?
+	public InputStream openDisplayPhoto(long contactId) {
+	     Uri contactUri = ContentUris.withAppendedId(Contacts.CONTENT_URI, contactId);
+	     Uri displayPhotoUri = Uri.withAppendedPath(contactUri, Contacts.Photo.DISPLAY_PHOTO);
+	     try {
+	         AssetFileDescriptor fd =
+	             mContentResolver.openAssetFileDescriptor(displayPhotoUri, "r");
+	         return fd.createInputStream();
+	     } catch (IOException e) {
+	         return null;
+	     }
+	 }
+	
+	final private Bitmap fetchThumbnail(final int thumbnailId) {
 
 	    final Uri uri = ContentUris.withAppendedId(ContactsContract.Data.CONTENT_URI, thumbnailId);
 	    final Cursor cursor = mContentResolver.query(uri, PHOTO_BITMAP_PROJECTION, null, null, null);
@@ -94,20 +116,26 @@ public class ContactsManager {
 	
 	class Contact {
 		String name;
+		int id;
 		int photoId;
 		private Bitmap avatar;
 		
-		public Contact(String name, int photoId){
+		public Contact(String name, int contactId, int photoId){
 			this.name = name;
+			this.id = contactId;
 			this.photoId = photoId;
 		}
 		
 		public Bitmap getAvatar(){
 			if (avatar == null){
-				avatar = fetchThumbnail(photoId);
+				if (Build.VERSION.SDK_INT >= 14)
+					avatar = BitmapFactory.decodeStream(openDisplayPhoto(id));
+				else
+					avatar = fetchThumbnail(photoId);
 			}
 			return avatar;
 		}
+		
 	}
 	
 }

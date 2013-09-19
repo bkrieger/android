@@ -58,6 +58,7 @@ public class ComposeActivity extends ActionBarActivity {
 //		    @Override
 //		    public void onGlobalLayout() {
 //		        int heightDiff = contentView.getRootView().getHeight() - contentView.getHeight();
+//		        
 //		        if (heightDiff > 300) { // if more than 300 pixels, its probably a keyboard...
 //		            Log.i("keyboard", "shown");
 //		            
@@ -67,7 +68,7 @@ public class ComposeActivity extends ActionBarActivity {
 //		            
 //		            int marginTop = height - heightDiff - contentView.getHeight();
 //		            
-//		            Log.i("marginTop", marginTop+"");
+//		            Log.i("marginTop", contentView.getHeight()+"");
 //
 //		            
 //		        }
@@ -91,7 +92,7 @@ public class ComposeActivity extends ActionBarActivity {
 		});
 
 		setTag(Tag.CHILL);
-		setDuration(Duration.TWO_HOURS);
+		setDuration(Duration.FOUR_HOURS);
 	}
 
 	@Override

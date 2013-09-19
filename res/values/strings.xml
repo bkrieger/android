@@ -6,7 +6,7 @@
     <string name="action_submit">Send</string>
     
     <string name="mood_title">I\'m in the mood to</string>
-    <string name="duration_title">in the next</string>
+    <string name="duration_title">for the next</string>
     
     <string name="me">Me</string>
     <string name="tag_line">What\'s Happening?</string>
@@ -17,5 +17,8 @@
 
     <string name="toast_post_success">Sent!</string>
     <string name="toast_post_error">Error submitting. Please try again.</string>
-
+    
+    <string name="drawer_open">Open side navigation</string>
+    <string name="drawer_close">Close side navigation</string>
+    
 </resources>

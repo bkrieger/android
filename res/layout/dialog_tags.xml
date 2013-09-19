@@ -9,17 +9,16 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/happ_purple"
-        android:textColor="@color/white"
         android:gravity="center"
-        android:textSize="20dp"
         android:padding="10dp"
-        android:text="@string/mood_title" />
-    
+        android:text="@string/mood_title"
+        android:textColor="@color/white"
+        android:textSize="20dp" />
+
     <ListView
         android:id="@android:id/list"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"/>
-
-    
+        android:layout_height="wrap_content"
+        android:background="@color/white" />
 
 </LinearLayout>

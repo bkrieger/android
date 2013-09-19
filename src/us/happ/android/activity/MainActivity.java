@@ -13,12 +13,14 @@ import us.happ.android.service.APIService;
 import us.happ.android.service.ServiceHelper;
 import us.happ.android.service.ServiceReceiver;
 import us.happ.android.utils.ContactsManager;
+import us.happ.android.utils.Happ;
 import us.happ.android.utils.Media;
 import us.happ.android.utils.SmoothInterpolator;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.AssetFileDescriptor;
+import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
@@ -26,17 +28,24 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
+import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
 import android.util.Log;
+import android.view.Gravity;
+import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.Transformation;
+import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.FrameLayout.LayoutParams;
@@ -56,6 +65,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	// constants
 	private final static int HIPPO_HEIGHT = 58; // 48 + 10
+	private final static int FOOTER_HEIGHT = 48; 
 	
 	// flags
 	private boolean INITIALIZED = false;
@@ -80,6 +90,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private View hippoDynamic;
 	private View stripView;
 	private View sadHippoView;
+	
+	private int footerHeight;
+
+	private ActionBarDrawerToggle mDrawerToggle;
+
+	private View mFooter;
+	private TextView mFooterText;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -104,6 +121,22 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		holder.tagLine = mHeader.findViewById(R.id.board_tagline);
 		mHeader.setTag(holder);
 		
+		// footer
+		mFooter = findViewById(R.id.actionbar_footer);
+		footerHeight = (int) Media.pxFromDp(this, FOOTER_HEIGHT);
+		mFooterText = (TextView) mFooter.findViewById(R.id.actionbar_footer_text);
+		mFooter.setOnClickListener(new OnClickListener(){
+
+			@Override
+			public void onClick(View v) {
+				final String number = Happ.implode(mListAdapter.getCheckedNumbers(), ",");  	
+		   	 	Intent callIntent = new Intent(Intent.ACTION_VIEW);
+		        callIntent.setData(Uri.parse("smsto:" + number));
+		        startActivity(callIntent);
+			}
+			
+		});
+		
 		// dancing hippo
 		hippoStatic = header.findViewById(R.id.hippo_static);
 		hippoDynamic = header.findViewById(R.id.hippo_dynamic);
@@ -117,10 +150,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-            	 final String number = ((Mood) adapterView.getItemAtPosition(position)).getNumber();   	
-            	 Intent callIntent = new Intent(Intent.ACTION_VIEW);
-                 callIntent.setData(Uri.parse("sms:" + number));
-                 startActivity(callIntent);
+            	onBoardItemClick(position-1); // -1 for header
             }
         });
 		
@@ -137,7 +167,40 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         
         // Action Bar
         actionbar = getSupportActionBar();
+        actionbar.setDisplayHomeAsUpEnabled(true);
         actionbar.setDisplayShowTitleEnabled(false);
+        
+        // Navigation drawer
+        View mDrawer = findViewById(R.id.drawer);
+        mDrawer.setOnTouchListener(new OnTouchListener(){
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true;
+			}
+        });
+        
+        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerToggle = new ActionBarDrawerToggle(
+                this,                  /* host Activity */
+                mDrawerLayout,         /* DrawerLayout object */
+                R.drawable.ic_drawer,  /* nav drawer icon to replace 'Up' caret */
+                R.string.drawer_open,  /* "open drawer" description */
+                R.string.drawer_close  /* "close drawer" description */
+                ) {
+
+            /** Called when a drawer has settled in a completely closed state. */
+            public void onDrawerClosed(View view) {
+            	
+            }
+
+            /** Called when a drawer has settled in a completely open state. */
+            public void onDrawerOpened(View drawerView) {
+            	
+            }
+        };
+
+        // Set the drawer toggle as the DrawerListener
+        mDrawerLayout.setDrawerListener(mDrawerToggle);
         
         // Progress dialog
         mProgressDialog = new ProgressDialog(this);
@@ -150,6 +213,20 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         new fetchContactsTask().execute("");
 	}
 	
+	@Override
+    protected void onPostCreate(Bundle savedInstanceState) {
+        super.onPostCreate(savedInstanceState);
+        // Sync the toggle state after onRestoreInstanceState has occurred.
+        mDrawerToggle.syncState();
+    }
+	
+	@Override
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
+	
+	// TODO onPostCreate instead?
 	// Fetching contacts asynchronously
 	private class fetchContactsTask extends AsyncTask<String, Void, String> {
 
@@ -196,7 +273,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	}
 	
 	@Override
-    public boolean onOptionsItemSelected(MenuItem item) {    
+    public boolean onOptionsItemSelected(MenuItem item) {   
+		
+		if (mDrawerToggle.onOptionsItemSelected(item))
+          return true;
+		
     	switch (item.getItemId()) {        
           case android.R.id.home:
         	  return true;
@@ -207,6 +288,18 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         	  return super.onOptionsItemSelected(item);    
     	}
     }
+	
+	@Override
+	public boolean onKeyDown(int keyCode, KeyEvent event) {
+		if ((keyCode == KeyEvent.KEYCODE_BACK)) { // Back key pressed
+			if (mListAdapter.isCheckboxShown()){
+				mListAdapter.hideCheckbox();
+				animateHideFooter();
+				return true;
+			}
+		}
+		return super.onKeyDown(keyCode, event);
+	}
 	
 	public void compose(){
 		Intent intent = new Intent(this, ComposeActivity.class);
@@ -243,14 +336,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	private void updateHeader(String message, int tagId){
 		ViewHolder holder = (ViewHolder) mHeader.getTag();
-		if (message == null){
-			holder.meWrap.setVisibility(View.GONE);
-			holder.tagLine.setVisibility(View.VISIBLE);
-		} else {
+		
+		Happ.showViewIf(holder.tagLine, holder.meWrap, message == null);
+		if (message != null){
 			holder.message.setText(message);
 			holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(tagId)));
-			holder.meWrap.setVisibility(View.VISIBLE);
-			holder.tagLine.setVisibility(View.GONE);
 		}
 	}
 
@@ -278,19 +368,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				JSONArray contacts = data.getJSONArray("contacts");
 				
 				// Update me
-				if (me.getString("_id") != null){
+				if (me.has("_id")){
 					updateHeader(me.getString("message"), me.getInt("tag"));
 				} else {
 					updateHeader(null, 0);
 				}
 				
-				if (contacts.length() == 0){
-					stripView.setVisibility(View.GONE);
-					sadHippoView.setVisibility(View.VISIBLE);
-				} else {
-					stripView.setVisibility(View.VISIBLE);
-					sadHippoView.setVisibility(View.GONE);
-				}
+				Happ.showViewIf(sadHippoView, stripView, contacts.length() == 0);
 				
 				JSONObject d;
 				Mood m;
@@ -361,7 +445,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		 
 		 if (startPadding == 0) return;
 		 
-		 if (!refresh){
+		 if (!refresh || startPadding < hippoHeight){
 			 BounceAnimation a = new BounceAnimation(startPadding, 0);
 			 a.setInterpolator(new SmoothInterpolator());
 			 a.setDuration(500);
@@ -418,6 +502,10 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			final int y = (int) event.getY();
 			
 		    switch (event.getAction()) {
+		    	case MotionEvent.ACTION_CANCEL:
+		    		allowPullToRefresh = true;
+					resetHeaderPadding(true);
+					break;
 		    	case MotionEvent.ACTION_UP:
 		    		allowPullToRefresh = true;
 					resetHeaderPadding(true);
@@ -437,5 +525,65 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		}
 
 	};
+	
+	public void onBoardItemClick(int position){
+		boolean wasCheckShown = mListAdapter.isCheckboxShown();
+    	mListAdapter.check(position);
+    	if (!wasCheckShown && mListAdapter.isCheckboxShown()){
+    		animateShowFooter();
+    	} else if (wasCheckShown && !mListAdapter.isCheckboxShown()){
+    		animateHideFooter();
+    	}
+    	
+    	mFooterText.setText("Text " + Happ.implode(mListAdapter.getCheckedNames(), ", "));
+    	
+	}
+	
+	public void animateShowFooter(){
+		mFooter.setVisibility(View.VISIBLE);
+		TranslateAnimation a = new TranslateAnimation (0, 0, footerHeight, 0);
+		a.setFillEnabled(true);
+		a.setFillAfter(true);
+	 	a.setInterpolator(new SmoothInterpolator());
+	 	a.setDuration(500);
+	 	a.setAnimationListener(new AnimationListener(){
 
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				mListView.setPadding(0, 0, 0, footerHeight);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {}
+
+			@Override
+			public void onAnimationStart(Animation animation) {}
+	 		
+	 	});
+	 	mFooter.startAnimation(a);
+	}
+	
+	public void animateHideFooter(){
+		TranslateAnimation a = new TranslateAnimation (0, 0, 0, footerHeight);
+		a.setInterpolator(new SmoothInterpolator());
+		a.setFillEnabled(true);
+		a.setFillAfter(true);
+		a.setAnimationListener(new AnimationListener(){
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				mFooter.setVisibility(View.GONE);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {}
+
+			@Override
+			public void onAnimationStart(Animation animation) {}
+
+		});
+	 	a.setDuration(500);
+	 	mFooter.startAnimation(a);
+	 	mListView.setPadding(0, 0, 0, 0);
+	}
 }

@@ -7,6 +7,7 @@
     
     <color name="happ_purple">#FFAA0470</color>
     <color name="happ_purple_dark">#FF870359</color>
+    <color name="happ_purple_highlight">#E339A7</color>
     
     <color name="board_strip">#22AA0470</color>
     
@@ -14,4 +15,7 @@
     <color name="light_purple">#EDC9E1</color>
     <color name="btn_selector">#AAAA0470</color>
     <color name="compose_hint">#55000000</color>
+    
+    <color name="list_selector_start">#22AA0470</color>
+    <color name="list_selector_end">#55AA0470</color>
 </resources>

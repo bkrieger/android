@@ -22,6 +22,7 @@ public class Mood {
 	private int duration;
 	private Date timestamp;
 	private int resId;
+	private boolean checked;
 	
 	public Mood(String number, String message, long timestamp, int duration, int tagId) {
 		this.number = number;
@@ -29,6 +30,7 @@ public class Mood {
 		this.timestamp = new Date(timestamp);
 		this.duration = duration;
 		this.setResId(map.get(tagId));
+		this.checked = false;
 	}
 	
 	public static int resIdFromTag(int tagId){
@@ -74,5 +76,13 @@ public class Mood {
 
 	public void setResId(int resId) {
 		this.resId = resId;
+	}
+	
+	public void setChecked(boolean checked){
+		this.checked = checked;
+	}
+	
+	public boolean getChecked(){
+		return this.checked;
 	}
 }
