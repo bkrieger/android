@@ -12,6 +12,7 @@ import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.Display;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -19,32 +20,62 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.MeasureSpec;
+import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import us.happ.android.adapter.TagsAdapter;
 import us.happ.android.model.Tag;
 import us.happ.android.model.Duration;
+import us.happ.android.utils.Happ;
+import us.happ.android.view.PickerListView;
 
 public class ComposeActivity extends ActionBarActivity {
 
+	private Context mContext;
+	
 	private ActionBar actionbar;
 	private EditText mComposeET;
 
 	private Tag tag;
 	private Duration duration;
+	private TextView mMoodTextView;
+	private TextView mDurationTextView;
+
+	private PickerListView mListView;
+
+	private TagsAdapter mTagsAdapter;
+	private ArrayAdapter<String> mDurationAdapter;
+	
+	// flags
+	private boolean keyboardInitialized = false;
+
+	private int actionbarHeight;
+	private int statusbarHeight;
+
+	private static final int PICKER_MOOD = 0x01;
+	private static final int PICKER_DURATION = 0x02;
+	
+	private int pickerId;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_compose);
+		
+		mContext = this;
 
 		actionbar = getSupportActionBar();
 		actionbar.setHomeButtonEnabled(true);
@@ -53,27 +84,35 @@ public class ComposeActivity extends ActionBarActivity {
 		actionbar.setDisplayShowTitleEnabled(true);
 		actionbar.setDisplayShowHomeEnabled(false);
 		
-//		final View contentView = findViewById(android.R.id.content);
-//		contentView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-//		    @Override
-//		    public void onGlobalLayout() {
-//		        int heightDiff = contentView.getRootView().getHeight() - contentView.getHeight();
-//		        
-//		        if (heightDiff > 300) { // if more than 300 pixels, its probably a keyboard...
-//		            Log.i("keyboard", "shown");
-//		            
-//		            Display display = getWindowManager().getDefaultDisplay(); 
-//		            int width = display.getWidth();  // deprecated
-//		            int height = display.getHeight();  // deprecated
-//		            
-//		            int marginTop = height - heightDiff - contentView.getHeight();
-//		            
-//		            Log.i("marginTop", contentView.getHeight()+"");
-//
-//		            
-//		        }
-//		     }
-//		});
+		
+		actionbarHeight = Happ.getActionBarHeight(this);
+		statusbarHeight = Happ.getStatusBarHeight(this);
+		
+		final View contentView = findViewById(android.R.id.content);
+		contentView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		    @Override
+		    public void onGlobalLayout() {
+		    	if (keyboardInitialized) return;
+		    	
+		        int heightDiff = contentView.getRootView().getHeight() - statusbarHeight - actionbarHeight - contentView.getHeight();
+		        
+		        if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
+		            Log.i("keyboard", "shown");
+		            keyboardInitialized = true; 
+		            
+		            View v = contentView.findViewById(R.id.activity_compose);
+		            
+		            int width = v.getWidth() - v.getPaddingLeft()*2;
+		            
+		            int marginTop = contentView.getHeight();
+		        
+		            mListView.setDimen(width,  heightDiff - v.getPaddingTop());
+		            LayoutParams params = (LayoutParams) mListView.getLayoutParams();
+		            params.topMargin = marginTop-mListView.getTop();
+		            
+		        }
+		     }
+		});
 		
 		mComposeET = (EditText) findViewById(R.id.compose_message);
 		mComposeET.setOnEditorActionListener(new OnEditorActionListener(){
@@ -91,6 +130,47 @@ public class ComposeActivity extends ActionBarActivity {
 			
 		});
 
+		mMoodTextView = (TextView) findViewById(R.id.mood_value);
+		mDurationTextView = (TextView) findViewById(R.id.duration_value);
+		
+		mMoodTextView.setOnFocusChangeListener(new OnFocusChangeListener(){
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (!hasFocus) return;
+				
+				InputMethodManager imm = (InputMethodManager)getSystemService(
+					      Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(mComposeET.getWindowToken(), 0);
+					
+				onClickMood();
+			}
+			
+		});
+		
+		mDurationTextView.setOnFocusChangeListener(new OnFocusChangeListener(){
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (!hasFocus) return;
+				
+				InputMethodManager imm = (InputMethodManager)getSystemService(
+					      Context.INPUT_METHOD_SERVICE);
+					imm.hideSoftInputFromWindow(mComposeET.getWindowToken(), 0);
+					
+				onClickDuration();
+			}
+			
+		});
+		
+		mListView = (PickerListView) findViewById(android.R.id.list);
+		mTagsAdapter = new TagsAdapter(this, 0, Tag.values());
+		String[] durations = new String[Duration.values().length];
+		for (int i = 0; i < Duration.values().length; i++){
+			durations[i] = Duration.values()[i].label;
+		}
+		mDurationAdapter = new ArrayAdapter<String>(this, R.layout.list_item_dialog_duration, durations);
+		
 		setTag(Tag.CHILL);
 		setDuration(Duration.FOUR_HOURS);
 	}
@@ -126,73 +206,39 @@ public class ComposeActivity extends ActionBarActivity {
 		}
 		return super.onKeyDown(keyCode, event);
 	}
-
-	public void onClickMood(View v) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		
-		LayoutInflater inflater = getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.dialog_tags, null);
-		builder.setView(dialogView);
-		ListView mListView = (ListView) dialogView.findViewById(android.R.id.list);
-		TagsAdapter adapter = new TagsAdapter(this, 0, Tag.values());
-		mListView.setAdapter(adapter);
-		
-		final AlertDialog dialog = builder.create();
-		
-		mListView.setOnItemClickListener(new OnItemClickListener(){
-
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-				setTag(Tag.values()[position]);
-				dialog.dismiss();
-			}
-			
-		});
-
-		dialog.show();
-	}
-
-	public void onClickDuration(View v) {
-		AlertDialog.Builder builder = new AlertDialog.Builder(this);
-		
-		LayoutInflater inflater = getLayoutInflater();
-		View dialogView = inflater.inflate(R.layout.dialog_tags, null);
-		builder.setView(dialogView);
-		ListView mListView = (ListView) dialogView.findViewById(android.R.id.list);
-		((TextView) dialogView.findViewById(R.id.dialog_header)).setText(getResources().getString(R.string.duration_title));
-		
-		String[] durations = new String[Duration.values().length];
-		for (int i = 0; i < Duration.values().length; i++){
-			durations[i] = Duration.values()[i].label;
+	
+	public void setPicker(int position){
+		if (pickerId == PICKER_MOOD){
+			setTag(Tag.values()[position]);
+		} else if (pickerId == PICKER_DURATION){
+			setDuration(Duration.values()[position]);
 		}
-		mListView.setAdapter(new ArrayAdapter<String>(this, R.layout.list_item_dialog_duration, durations));
-		
-		final AlertDialog dialog = builder.create();
-		
-		mListView.setOnItemClickListener(new OnItemClickListener(){
-
-			@Override
-			public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-				setDuration(Duration.values()[position]);
-				dialog.dismiss();
-			}
-			
-		});
-
-		dialog.show();
-
 	}
 
-	private void setTag(Tag tag) {
-		this.tag = tag;
-		Button button = (Button) findViewById(R.id.mood_value);
-		button.setText(tag.label);
+	private void onClickMood(){
+		if (pickerId != PICKER_MOOD){
+			mListView.setAdapter(mTagsAdapter);
+			pickerId = PICKER_MOOD;
+		}
 	}
 	
-	private void setDuration(Duration duration) {
+	private void onClickDuration() {
+		if (pickerId != PICKER_DURATION){
+			mListView.setAdapter(mDurationAdapter);
+			pickerId = PICKER_DURATION;
+		}
+	}
+
+	public void setTag(Tag tag) {
+		this.tag = tag;
+		if (mMoodTextView != null)
+			mMoodTextView.setText(tag.label);
+	}
+	
+	public void setDuration(Duration duration) {
 		this.duration = duration;
-		TextView textView = (TextView) findViewById(R.id.duration_value);
-		textView.setText(duration.label);
+		if (mDurationTextView != null)
+			mDurationTextView.setText(duration.label);
 	}
 	
 	public void submit() {

@@ -50,9 +50,10 @@
                 android:id="@+id/actionbar_footer_submit"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:padding="10dp"
                 android:layout_alignParentRight="true"
+                android:layout_centerInParent="true"
+                android:background="@drawable/ab_item_background"
+                android:padding="10dp"
                 android:src="@drawable/ic_action_submit" />
 
             <TextView

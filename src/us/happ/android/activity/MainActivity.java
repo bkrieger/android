@@ -33,6 +33,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
+import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -125,7 +126,15 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		mFooter = findViewById(R.id.actionbar_footer);
 		footerHeight = (int) Media.pxFromDp(this, FOOTER_HEIGHT);
 		mFooterText = (TextView) mFooter.findViewById(R.id.actionbar_footer_text);
-		mFooter.setOnClickListener(new OnClickListener(){
+		View mFooterSubmit = mFooter.findViewById(R.id.actionbar_footer_submit);
+		// Absorbs touch events
+		mFooter.setOnTouchListener(new OnTouchListener(){
+			@Override
+			public boolean onTouch(View v, MotionEvent event) {
+				return true;
+			}
+        });
+		mFooterSubmit.setOnClickListener(new OnClickListener(){
 
 			@Override
 			public void onClick(View v) {
