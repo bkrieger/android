@@ -3,7 +3,7 @@
 
     <item
         android:id="@+id/action_submit"
-        android:icon="@drawable/ic_action_submit"
+        android:icon="@drawable/btn_submit"
         happ:showAsAction="always"
         android:title="@string/action_submit"/>
 

@@ -20,6 +20,7 @@ import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.FrameLayout.LayoutParams;
 
 public class PickerListView extends ListView {
 
@@ -76,7 +77,6 @@ public class PickerListView extends ListView {
 		});
 	}
 	
-	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	private void smoothScroll(){
 		int pos = positionChosen + 1 - getFirstVisiblePosition();
 		int offset = getChildAt(pos).getTop() - (height-childHeight)/2;
@@ -87,6 +87,14 @@ public class PickerListView extends ListView {
 			a.setPosition(positionChosen + 1, offset);
 			startAnimation(a);
 		}
+	}
+	
+	public void setChosen(int position){
+		setSelectionFromTop(position + 1, (int) ((height-childHeight)/2)); // adjust for header
+	}
+	
+	public int getChildHeight(){
+		return childHeight;
 	}
 	
 	public int getSelectedPosition(int firstVisibleId){

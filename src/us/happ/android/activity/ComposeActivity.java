@@ -10,6 +10,8 @@ import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -31,10 +33,12 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
+import us.happ.android.adapter.DurationAdapter;
 import us.happ.android.adapter.TagsAdapter;
 import us.happ.android.model.Tag;
 import us.happ.android.model.Duration;
@@ -50,13 +54,16 @@ public class ComposeActivity extends ActionBarActivity {
 
 	private Tag tag;
 	private Duration duration;
+	private int chosen_tag_position;
+	private int chosen_duration_position;
+	
 	private TextView mMoodTextView;
 	private TextView mDurationTextView;
 
 	private PickerListView mListView;
 
 	private TagsAdapter mTagsAdapter;
-	private ArrayAdapter<String> mDurationAdapter;
+	private DurationAdapter mDurationAdapter;
 	
 	// flags
 	private boolean keyboardInitialized = false;
@@ -68,6 +75,8 @@ public class ComposeActivity extends ActionBarActivity {
 	private static final int PICKER_DURATION = 0x02;
 	
 	private int pickerId;
+
+	private MenuItem mActionSubmit;
 
 
 	@Override
@@ -129,6 +138,36 @@ public class ComposeActivity extends ActionBarActivity {
 			}
 			
 		});
+		
+		mComposeET.setOnFocusChangeListener(new OnFocusChangeListener(){
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (!hasFocus){
+					InputMethodManager imm = (InputMethodManager)getSystemService(
+						      Context.INPUT_METHOD_SERVICE);
+						imm.hideSoftInputFromWindow(mComposeET.getWindowToken(), 0);	
+				} else {
+					mListView.setVisibility(View.GONE);
+				}
+			}
+			
+		});
+		
+		mComposeET.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				mActionSubmit.setEnabled(s.length() > 0);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			
+		});
 
 		mMoodTextView = (TextView) findViewById(R.id.mood_value);
 		mDurationTextView = (TextView) findViewById(R.id.duration_value);
@@ -137,13 +176,14 @@ public class ComposeActivity extends ActionBarActivity {
 
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if (!hasFocus) return;
-				
-				InputMethodManager imm = (InputMethodManager)getSystemService(
-					      Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(mComposeET.getWindowToken(), 0);
-					
-				onClickMood();
+				if (hasFocus) {
+					mListView.setVisibility(View.VISIBLE);
+					if (pickerId != PICKER_MOOD){
+						mListView.setAdapter(mTagsAdapter);
+						mListView.setChosen(chosen_tag_position);
+						pickerId = PICKER_MOOD;
+					}
+				}
 			}
 			
 		});
@@ -152,33 +192,35 @@ public class ComposeActivity extends ActionBarActivity {
 
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {
-				if (!hasFocus) return;
-				
-				InputMethodManager imm = (InputMethodManager)getSystemService(
-					      Context.INPUT_METHOD_SERVICE);
-					imm.hideSoftInputFromWindow(mComposeET.getWindowToken(), 0);
-					
-				onClickDuration();
+				if (hasFocus) {
+					mListView.setVisibility(View.VISIBLE);
+					if (pickerId != PICKER_DURATION){
+						mListView.setAdapter(mDurationAdapter);
+						mListView.setChosen(chosen_duration_position);
+						pickerId = PICKER_DURATION;
+					}
+				}
 			}
 			
 		});
 		
 		mListView = (PickerListView) findViewById(android.R.id.list);
 		mTagsAdapter = new TagsAdapter(this, 0, Tag.values());
-		String[] durations = new String[Duration.values().length];
-		for (int i = 0; i < Duration.values().length; i++){
-			durations[i] = Duration.values()[i].label;
-		}
-		mDurationAdapter = new ArrayAdapter<String>(this, R.layout.list_item_dialog_duration, durations);
+		mDurationAdapter = new DurationAdapter(this, 0, Duration.values());
 		
+		// Should have a better way of doing this
 		setTag(Tag.CHILL);
+		chosen_tag_position = 0;
 		setDuration(Duration.FOUR_HOURS);
+		chosen_duration_position = 4;
 	}
 
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.compose, menu);
+		mActionSubmit = menu.findItem(R.id.action_submit);
+		mActionSubmit.setEnabled(false);
 		return true;
 	}
 
@@ -210,22 +252,10 @@ public class ComposeActivity extends ActionBarActivity {
 	public void setPicker(int position){
 		if (pickerId == PICKER_MOOD){
 			setTag(Tag.values()[position]);
+			chosen_tag_position = position;
 		} else if (pickerId == PICKER_DURATION){
 			setDuration(Duration.values()[position]);
-		}
-	}
-
-	private void onClickMood(){
-		if (pickerId != PICKER_MOOD){
-			mListView.setAdapter(mTagsAdapter);
-			pickerId = PICKER_MOOD;
-		}
-	}
-	
-	private void onClickDuration() {
-		if (pickerId != PICKER_DURATION){
-			mListView.setAdapter(mDurationAdapter);
-			pickerId = PICKER_DURATION;
+			chosen_duration_position = position;
 		}
 	}
 
@@ -242,8 +272,14 @@ public class ComposeActivity extends ActionBarActivity {
 	}
 	
 	public void submit() {
-
+	
 		String message = mComposeET.getText().toString();
+		
+		if (message.length() == 0){
+			Toast.makeText(this, "Please enter a message", Toast.LENGTH_SHORT).show();
+			return;
+		}
+		
 		Intent intent = new Intent();
 
 		if (message.length() > 0) {

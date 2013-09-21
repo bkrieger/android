@@ -98,6 +98,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
 	private View mFooter;
 	private TextView mFooterText;
+	private View mFooterSubmit;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -126,7 +127,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		mFooter = findViewById(R.id.actionbar_footer);
 		footerHeight = (int) Media.pxFromDp(this, FOOTER_HEIGHT);
 		mFooterText = (TextView) mFooter.findViewById(R.id.actionbar_footer_text);
-		View mFooterSubmit = mFooter.findViewById(R.id.actionbar_footer_submit);
+		mFooterSubmit = mFooter.findViewById(R.id.actionbar_footer_submit);
 		// Absorbs touch events
 		mFooter.setOnTouchListener(new OnTouchListener(){
 			@Override
@@ -134,6 +135,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				return true;
 			}
         });
+		
 		mFooterSubmit.setOnClickListener(new OnClickListener(){
 
 			@Override
@@ -540,8 +542,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
     	mListAdapter.check(position);
     	if (!wasCheckShown && mListAdapter.isCheckboxShown()){
     		animateShowFooter();
+    		mFooterSubmit.setEnabled(true);
     	} else if (wasCheckShown && !mListAdapter.isCheckboxShown()){
     		animateHideFooter();
+    		mFooterSubmit.setEnabled(false);
+    		
     	}
     	
     	mFooterText.setText("Text " + Happ.implode(mListAdapter.getCheckedNames(), ", "));
