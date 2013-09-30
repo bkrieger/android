@@ -81,7 +81,7 @@
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="250dp"
+            android:layout_height="400dp"
             android:orientation="vertical" >
 
             <TextView
@@ -101,6 +101,8 @@
                 android:gravity="center_vertical"
                 android:paddingLeft="20dp"
                 android:text="Friends"
+                android:clickable="true"
+                android:onClick="onClickFriends"
                 android:textColor="@color/white"
                 android:textSize="16dp" />
 
@@ -121,6 +123,24 @@
                 android:gravity="center_vertical"
                 android:paddingLeft="18dp"
                 android:text="Preferences"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="18dp"
+                android:text="Privacy Policy"
+                android:textColor="@color/white"
+                android:textSize="16dp" />
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:gravity="center_vertical"
+                android:paddingLeft="18dp"
+                android:text="Terms"
                 android:textColor="@color/white"
                 android:textSize="16dp" />
         </LinearLayout>

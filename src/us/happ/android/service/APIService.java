@@ -71,6 +71,12 @@ public class APIService extends IntentService {
 			String duration = intent.getStringExtra("duration");
 			params = "?id="+ number + "&msg=" + msg + "&tag="+ tag + "&duration=" + duration;
 			
+			String[] numbers2 = intent.getStringArrayExtra("n");
+			// TODO building url
+			for (int i = 0; i < numbers2.length; i++){
+				params += "&n[]=" + numbers2[i];
+			}
+			
 			Log.i("url", params);
 			results = HttpCaller.postRequest(this, "/moods" + params);
 			

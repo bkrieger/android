@@ -18,10 +18,9 @@ import android.util.Log;
 public class HttpCaller {
 	private static final String TAG ="HttpCaller";
 	
-//	public static final String HOST_IP = "158.130.107.180";
-//	public static final String HOST_IP = "174.141.144.253";
-	public static final String HOST_IP = "54.221.209.211";
-	public static final String HOST = "http://" + HOST_IP + ":3000/api";
+	public static final String HOST_IP = "www.happ.us";
+	public static final String API_VERSION = "/v1";
+	public static final String HOST = "http://" + HOST_IP + ":3000/api" + API_VERSION;
 	
 	public static String getRequest(Context context, String path) {
 		HttpClient httpclient = new DefaultHttpClient();

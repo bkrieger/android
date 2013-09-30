@@ -58,7 +58,8 @@ import android.widget.Toast;
 public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver{
 	
 	// Activity results flags
-	private static final int ID_COMPOSE = 1;
+	private static final int ACTIVITY_COMPOSE = 1;
+	private static final int ACTIVITY_FRIENDS = 2;
 	
 	// receiver flags
 	private int getMoodsId = -1;
@@ -86,26 +87,28 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	// Views
 	private View mHeader;
 	private View mHippo;
-	private int hippoHeight;
 	private View hippoStatic;
 	private View hippoDynamic;
 	private View stripView;
 	private View sadHippoView;
 	
+	private int hippoHeight;
 	private int footerHeight;
-
-	private ActionBarDrawerToggle mDrawerToggle;
 
 	private View mFooter;
 	private TextView mFooterText;
 	private View mFooterSubmit;
+
+	private ActionBarDrawerToggle mDrawerToggle;
+	private DrawerLayout mDrawerLayout;
+	private View mDrawer;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-        mContactsManager = new ContactsManager(this);
+        mContactsManager = ContactsManager.getInstance(this);
 		
         // Sad hippo
         stripView = findViewById(R.id.main_strip);
@@ -182,7 +185,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         actionbar.setDisplayShowTitleEnabled(false);
         
         // Navigation drawer
-        View mDrawer = findViewById(R.id.drawer);
+        mDrawer = findViewById(R.id.drawer);
         mDrawer.setOnTouchListener(new OnTouchListener(){
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -190,7 +193,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			}
         });
         
-        DrawerLayout mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
+        mDrawerLayout = (DrawerLayout) findViewById(R.id.drawer_layout);
         mDrawerToggle = new ActionBarDrawerToggle(
                 this,                  /* host Activity */
                 mDrawerLayout,         /* DrawerLayout object */
@@ -201,7 +204,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
             /** Called when a drawer has settled in a completely closed state. */
             public void onDrawerClosed(View view) {
-            	
+
             }
 
             /** Called when a drawer has settled in a completely open state. */
@@ -263,7 +266,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	private void fetch(){
 		Bundle extras = new Bundle();
-        String[] numbers = mContactsManager.getAllContacts();
+        String[] numbers = mContactsManager.getAllFriends();
 		extras.putStringArray("n", numbers);
 		extras.putString("me", mPhoneNumber);
         extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
@@ -314,17 +317,22 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	public void compose(){
 		Intent intent = new Intent(this, ComposeActivity.class);
-		startActivityForResult(intent, ID_COMPOSE);
+		startActivityForResult(intent, ACTIVITY_COMPOSE);
 		overridePendingTransition(R.anim.slide_up, R.anim.fade_out);
 	}
 	
 	public void onHeaderClick(View v){
 		compose();
+		// TODO refactor. Duplicate code to onKeyDown
+		if (mListAdapter.isCheckboxShown()){
+			mListAdapter.hideCheckbox();
+			animateHideFooter();
+		}
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-		if (requestCode == ID_COMPOSE && resultCode == 1){
+		if (requestCode == ACTIVITY_COMPOSE && resultCode == 1){
 
 			Toast.makeText(this, "Sending..", Toast.LENGTH_SHORT).show();
 			
@@ -335,6 +343,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			updateHeader(msg, tag);
 			
 			Bundle extras = new Bundle();
+			String[] numbers = mContactsManager.getAllFriends();
+			extras.putStringArray("n", numbers);
 			extras.putString("number", mPhoneNumber+"");
 			extras.putString("msg", msg);
 			extras.putString("tag", tag+"");
@@ -546,7 +556,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
     	} else if (wasCheckShown && !mListAdapter.isCheckboxShown()){
     		animateHideFooter();
     		mFooterSubmit.setEnabled(false);
-    		
     	}
     	
     	mFooterText.setText("Text " + Happ.implode(mListAdapter.getCheckedNames(), ", "));
@@ -599,5 +608,10 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	 	a.setDuration(500);
 	 	mFooter.startAnimation(a);
 	 	mListView.setPadding(0, 0, 0, 0);
+	}
+	
+	public void onClickFriends(View v){
+		Intent intent = new Intent(this, FriendsActivity.class);
+		startActivityForResult(intent, ACTIVITY_FRIENDS);
 	}
 }
