@@ -24,14 +24,10 @@ public class Happ {
 		StringBuilder sb = new StringBuilder();
 		
 		for (int i = 0; i < arr.length; ++i) {
-			if (i == 0) {
-				sb.append(arr[i]);
-			} else {
-				sb.append(separator).append(arr[i]);
-			}
+			sb.append(arr[i]).append(separator);
 		}
 		
-		return sb.toString();
+		return sb.substring(0, sb.length() - 1);
 
 	}
 	

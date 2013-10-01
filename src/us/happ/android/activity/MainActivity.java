@@ -1,175 +1,84 @@
 package us.happ.android.activity;
 
-import java.util.ArrayList;
-
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import us.happ.android.R;
-import us.happ.android.adapter.HBAdapter;
-import us.happ.android.model.Mood;
+import us.happ.android.fragment.BoardFragment;
+import us.happ.android.fragment.FriendsFragment;
+import us.happ.android.fragment.HappFragment;
 import us.happ.android.service.APIService;
 import us.happ.android.service.ServiceHelper;
 import us.happ.android.service.ServiceReceiver;
 import us.happ.android.utils.ContactsManager;
-import us.happ.android.utils.Happ;
-import us.happ.android.utils.Media;
-import us.happ.android.utils.SmoothInterpolator;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.AssetFileDescriptor;
 import android.content.res.Configuration;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.telephony.TelephonyManager;
-import android.text.method.ScrollingMovementMethod;
 import android.util.Log;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
-import android.view.animation.Animation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.animation.Transformation;
-import android.view.animation.TranslateAnimation;
-import android.widget.AdapterView;
-import android.widget.AdapterView.OnItemClickListener;
-import android.widget.FrameLayout.LayoutParams;
-import android.widget.ImageView;
-import android.widget.ListView;
-import android.widget.TextView;
 import android.widget.Toast;
 
-public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver{
-	
+public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver {
+
 	// Activity results flags
-	private static final int ACTIVITY_COMPOSE = 1;
-	private static final int ACTIVITY_FRIENDS = 2;
+	private static final int ACTIVITY_COMPOSE = 0x01;
 	
 	// receiver flags
 	private int getMoodsId = -1;
 	private int postMoodsId = -1;
 	
-	// constants
-	private final static int HIPPO_HEIGHT = 58; // 48 + 10
-	private final static int FOOTER_HEIGHT = 48; 
+	// Fragments
+	private BoardFragment mBoardFragment;
+	private FriendsFragment mFriendsFragment;
+
 	
-	// flags
-	private boolean INITIALIZED = false;
-	private boolean refreshing = false;
-	private boolean allowPullToRefresh = true;
+	// Fragment IDs
+	private static final int FRAGMENT_BOARD = 0x01;
+	private static final int FRAGMENT_FRIENDS = 0x02;
+	private int fragmentId;
+	private HappFragment mFragment;
 	
 	private ServiceReceiver mReceiver;
-	private ListView mListView;
-	private HBAdapter mListAdapter;
-	private ServiceHelper mServiceHelper;
-	private ContactsManager mContactsManager;
-	private ActionBar actionbar;
-	private ProgressDialog mProgressDialog;
-	
 	private String mPhoneNumber;
-	
-	// Views
-	private View mHeader;
-	private View mHippo;
-	private View hippoStatic;
-	private View hippoDynamic;
-	private View stripView;
-	private View sadHippoView;
-	
-	private int hippoHeight;
-	private int footerHeight;
-
-	private View mFooter;
-	private TextView mFooterText;
-	private View mFooterSubmit;
-
-	private ActionBarDrawerToggle mDrawerToggle;
-	private DrawerLayout mDrawerLayout;
+	private ActionBar actionbar;
 	private View mDrawer;
+	private DrawerLayout mDrawerLayout;
+	private ActionBarDrawerToggle mDrawerToggle;
+	private ProgressDialog mProgressDialog;
+	private ContactsManager mContactsManager;
+	private ServiceHelper mServiceHelper;
+
+	private FragmentTransaction mFragmentTransaction;
 
 	@Override
-	protected void onCreate(Bundle savedInstanceState) {
+	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		
-        mContactsManager = ContactsManager.getInstance(this);
+		mContactsManager = ContactsManager.getInstance(this);
 		
-        // Sad hippo
-        stripView = findViewById(R.id.main_strip);
-        sadHippoView = findViewById(R.id.main_sad_hippo);
-        
-		// Set up lists
-		mListView = (ListView) findViewById(android.R.id.list);
-		View header = getLayoutInflater().inflate(R.layout.list_header_board, null, true);
-		mListView.addHeaderView(header, null, false);
-		mHeader = header.findViewById(R.id.board_header);
-		ViewHolder holder = new ViewHolder();
-		holder.tag = (ImageView) mHeader.findViewById(R.id.board_tag);
-		holder.message = (TextView) mHeader.findViewById(R.id.board_message);
-		holder.meWrap = mHeader.findViewById(R.id.board_mewrap);
-		holder.tagLine = mHeader.findViewById(R.id.board_tagline);
-		mHeader.setTag(holder);
+		mFragmentTransaction = getSupportFragmentManager().beginTransaction();
 		
-		// footer
-		mFooter = findViewById(R.id.actionbar_footer);
-		footerHeight = (int) Media.pxFromDp(this, FOOTER_HEIGHT);
-		mFooterText = (TextView) mFooter.findViewById(R.id.actionbar_footer_text);
-		mFooterSubmit = mFooter.findViewById(R.id.actionbar_footer_submit);
-		// Absorbs touch events
-		mFooter.setOnTouchListener(new OnTouchListener(){
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				return true;
-			}
-        });
-		
-		mFooterSubmit.setOnClickListener(new OnClickListener(){
-
-			@Override
-			public void onClick(View v) {
-				final String number = Happ.implode(mListAdapter.getCheckedNumbers(), ",");  	
-		   	 	Intent callIntent = new Intent(Intent.ACTION_VIEW);
-		        callIntent.setData(Uri.parse("smsto:" + number));
-		        startActivity(callIntent);
-			}
-			
-		});
-		
-		// dancing hippo
-		hippoStatic = header.findViewById(R.id.hippo_static);
-		hippoDynamic = header.findViewById(R.id.hippo_dynamic);
-		
-		mHippo = header.findViewById(R.id.hippo);
-		mListAdapter = new HBAdapter(this, 0, mContactsManager); // TODO don't pass in contactsManager
-		mListView.setAdapter(mListAdapter);
-		
-		hippoHeight = (int) Media.pxFromDp(this, HIPPO_HEIGHT);
-		
-		mListView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-            	onBoardItemClick(position-1); // -1 for header
-            }
-        });
-		
-		// pull to refresh
-		mListView.setOnTouchListener(pullToRefreshListener);
+		mBoardFragment = new BoardFragment();
+		fragmentId = FRAGMENT_BOARD;
+		mFragment = mBoardFragment;
+		mFragmentTransaction.add(R.id.content_frame, mBoardFragment);
+		mFragmentTransaction.commit();
 		
 		// Setup receivers
         mReceiver = new ServiceReceiver(new Handler());
@@ -209,7 +118,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
-            	
+
             }
         };
 
@@ -219,12 +128,15 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         // Progress dialog
         mProgressDialog = new ProgressDialog(this);
         
-        // Fetch
+        // Service
         mServiceHelper = ServiceHelper.getInstance();
-        refreshing = true;
-        mProgressDialog.setMessage(getResources().getString(R.string.dialog_retrieve_contacts));
-    	mProgressDialog.show();
-        new fetchContactsTask().execute("");
+		
+        // Previously done in async task
+        if (!mContactsManager.hasFetchedContacts()){
+	        new fetchContactsTask().execute("");
+	        mProgressDialog.setMessage(getResources().getString(R.string.dialog_retrieve_contacts));
+	    	mProgressDialog.show();
+        }
 	}
 	
 	@Override
@@ -234,14 +146,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         mDrawerToggle.syncState();
     }
 	
-	@Override
-    public void onConfigurationChanged(Configuration newConfig) {
-        super.onConfigurationChanged(newConfig);
-        mDrawerToggle.onConfigurationChanged(newConfig);
-    }
-	
-	// TODO onPostCreate instead?
-	// Fetching contacts asynchronously
 	private class fetchContactsTask extends AsyncTask<String, Void, String> {
 
         @Override
@@ -252,8 +156,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
         @Override
         protected void onPostExecute(String results) {
-        	mProgressDialog.setMessage(MainActivity.this.getResources().getString(R.string.dialog_retrieve_moods));
-        	fetch();
+        	if (fragmentId != FRAGMENT_BOARD)
+        		mProgressDialog.dismiss();
         }
 
         @Override
@@ -262,29 +166,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         @Override
         protected void onProgressUpdate(Void... values) {}
         
-	}   
+	}
 	
-	private void fetch(){
-		Bundle extras = new Bundle();
-        String[] numbers = mContactsManager.getAllFriends();
-		extras.putStringArray("n", numbers);
-		extras.putString("me", mPhoneNumber);
-        extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
-        getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
-	}
-
-	public void onResume(){
-		super.onResume();
-		if (INITIALIZED)
-			fetch();
-	}
-
 	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.main, menu);
-		return true;
-	}
+    public void onConfigurationChanged(Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        mDrawerToggle.onConfigurationChanged(newConfig);
+    }
 	
 	@Override
     public boolean onOptionsItemSelected(MenuItem item) {   
@@ -299,48 +187,34 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         	  compose();
         	  return true;
           default:            
-        	  return super.onOptionsItemSelected(item);    
+        	  return super.onOptionsItemSelected(item);
     	}
     }
 	
 	@Override
-	public boolean onKeyDown(int keyCode, KeyEvent event) {
-		if ((keyCode == KeyEvent.KEYCODE_BACK)) { // Back key pressed
-			if (mListAdapter.isCheckboxShown()){
-				mListAdapter.hideCheckbox();
-				animateHideFooter();
-				return true;
-			}
-		}
-		return super.onKeyDown(keyCode, event);
+	public void onBackPressed(){
+		if (mFragment.onBackPressed()) return;
+		super.onBackPressed();
 	}
 	
 	public void compose(){
+		mBoardFragment.closeFooter(false);
 		Intent intent = new Intent(this, ComposeActivity.class);
 		startActivityForResult(intent, ACTIVITY_COMPOSE);
 		overridePendingTransition(R.anim.slide_up, R.anim.fade_out);
-	}
-	
-	public void onHeaderClick(View v){
-		compose();
-		// TODO refactor. Duplicate code to onKeyDown
-		if (mListAdapter.isCheckboxShown()){
-			mListAdapter.hideCheckbox();
-			animateHideFooter();
-		}
 	}
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode == ACTIVITY_COMPOSE && resultCode == 1){
 
-			Toast.makeText(this, "Sending..", Toast.LENGTH_SHORT).show();
+			Toast.makeText(this, getResources().getString(R.string.toast_post_progress), Toast.LENGTH_SHORT).show();
 			
 			String msg = data.getStringExtra("compose_msg");
 			int tag = data.getIntExtra("compose_tag", 1);
 			String duration = data.getStringExtra("compose_duration");
 			
-			updateHeader(msg, tag);
+			mBoardFragment.setHeader(msg, tag);
 			
 			Bundle extras = new Bundle();
 			String[] numbers = mContactsManager.getAllFriends();
@@ -354,72 +228,26 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	        postMoodsId = mServiceHelper.startService(this, ServiceHelper.POST_MOODS, extras);
 		}
 	}
-	
-	private void updateHeader(String message, int tagId){
-		ViewHolder holder = (ViewHolder) mHeader.getTag();
-		
-		Happ.showViewIf(holder.tagLine, holder.meWrap, message == null);
-		if (message != null){
-			holder.message.setText(message);
-			holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(tagId)));
-		}
+    	
+	public void startFetchService(){
+		Bundle extras = new Bundle();
+		String[] numbers = mContactsManager.getAllFriends();
+		extras.putStringArray("n", numbers);
+		extras.putString("me", mPhoneNumber);
+		extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
+		getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
 	}
-
+	
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 		String results = resultData.getString(APIService.RESULTS);
-		if (results == null) {
-			resetHeaderPadding(false);
-			return;
-		}
-		Log.i("results", results);
-		
 		int taskId = resultData.getInt(APIService.TASK_ID);
 		
 		if (taskId == getMoodsId){
-			INITIALIZED = true;
-			refreshing = false;
+			mBoardFragment.onFetchResult(results);
 			mProgressDialog.dismiss();
-			ArrayList<Mood> moods = new ArrayList<Mood>();
-			
-			try {
-				JSONObject jResults = new JSONObject(results);
-				JSONObject data = jResults.getJSONObject("data");
-				JSONObject me = data.getJSONObject("me");
-				JSONArray contacts = data.getJSONArray("contacts");
-				
-				// Update me
-				if (me.has("_id")){
-					updateHeader(me.getString("message"), me.getInt("tag"));
-				} else {
-					updateHeader(null, 0);
-				}
-				
-				Happ.showViewIf(sadHippoView, stripView, contacts.length() == 0);
-				
-				JSONObject d;
-				Mood m;
-				for (int i = 0; i < contacts.length(); i++){
-					d = (JSONObject) contacts.get(i);
-					
-					m = new Mood(
-							d.getString("_id"), 
-							d.getString("message"), 
-							d.getLong("timestamp"), 
-							d.getInt("duration"),
-							d.getInt("tag")
-						);
-					moods.add(m);
-				}
-				
-			} catch (JSONException e){}
-
-			mListAdapter.updateData(moods);
-
 			getMoodsId = -1;
-			resetHeaderPadding(false);
 		} else if (taskId == postMoodsId){
-			
 			try {
 				JSONObject jResults = new JSONObject(results);
 				if (jResults.getInt("status") == 200)
@@ -430,188 +258,75 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			
 			postMoodsId = -1;
 		}
+		
+		if (results != null) Log.i("results", results);
 	}
 	
-	class ViewHolder {
-		TextView message;
-		ImageView tag;
-		View meWrap;
-		View tagLine;
+	public void setProgressDialog(String msg){
+		mProgressDialog.setMessage(msg);
+		mProgressDialog.show();
 	}
 	
-	// Pull to refresh stuffs
-	private int mLastMotionY;
-	private void applyHeaderPadding(MotionEvent ev) {
-		// clever hack :D
-		if (mListView.getFirstVisiblePosition() > 0 || mListView.getChildAt(0).getTop() != 0) return;
-		
-		int topPadding = (int) ((ev.getY() - mLastMotionY) / 2);
-		
-		if (topPadding < 0) topPadding = 0;
-		
-		LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
-		lp.setMargins(0, topPadding, 0, 0);
-		mHeader.setLayoutParams(lp);
-		
-		lp = (LayoutParams) mHippo.getLayoutParams();
-		lp.setMargins(0, -1*hippoHeight + topPadding, 0, 0);
-		mHippo.setLayoutParams(lp);
-
-	}
-	
-	private void resetHeaderPadding(boolean refresh) {
-
-		 LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
-		 int startPadding = lp.topMargin;
-		 
-		 if (startPadding == 0) return;
-		 
-		 if (!refresh || startPadding < hippoHeight){
-			 BounceAnimation a = new BounceAnimation(startPadding, 0);
-			 a.setInterpolator(new SmoothInterpolator());
-			 a.setDuration(500);
-			 mHeader.startAnimation(a);
-			 hippoDynamic.setVisibility(View.GONE);
-			 hippoStatic.setVisibility(View.VISIBLE);
-		 } else {
-			 BounceAnimation a = new BounceAnimation(startPadding, hippoHeight);
-			 a.setInterpolator(new SmoothInterpolator());
-			 a.setDuration(500);
-			 mHeader.startAnimation(a);
-			 hippoDynamic.setVisibility(View.VISIBLE);
-			 hippoStatic.setVisibility(View.GONE);
-			 refreshing = true;
-			 fetch();
-		 }
-	 }
-	 
-	 private class BounceAnimation extends Animation {
-		 private int startPadding;
-		 private int endPadding;
-		 
-		 public BounceAnimation(int startPadding, final int endPadding){
-			 this.startPadding = startPadding;
-			 this.endPadding = endPadding;
-		 }
-		 
-		 @Override
-		 protected void applyTransformation(float interpolatedTime, Transformation t) {
-			 
-			 int padding = (int) (endPadding + (startPadding-endPadding)*(1 - interpolatedTime));
-			 
-			 LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
-			 lp.setMargins(0, padding, 0, 0);
-			 mHeader.setLayoutParams(lp);
-			 
-			 lp = (LayoutParams) mHippo.getLayoutParams();
-			 lp.setMargins(0, -1*hippoHeight + padding, 0, 0);
-			 mHippo.setLayoutParams(lp);
-	     }
-		 
-		 @Override
-		 public boolean willChangeBounds(){
-			 return true;
-		 }
-	}
-	 
-	OnTouchListener pullToRefreshListener = new OnTouchListener(){
-		
-		@Override
-		public boolean onTouch(View v, MotionEvent event) {
-			if (refreshing) return false;
-			
-			final int y = (int) event.getY();
-			
-		    switch (event.getAction()) {
-		    	case MotionEvent.ACTION_CANCEL:
-		    		allowPullToRefresh = true;
-					resetHeaderPadding(true);
-					break;
-		    	case MotionEvent.ACTION_UP:
-		    		allowPullToRefresh = true;
-					resetHeaderPadding(true);
-					break;
-	            case MotionEvent.ACTION_DOWN:
-	                mLastMotionY = y;
-	                allowPullToRefresh = mListView.getChildAt(0).getTop() == 0;
-	                break;
-	            case MotionEvent.ACTION_MOVE:
-	            	if (allowPullToRefresh && mListView.getChildAt(0).getTop() < 0)
-	            		allowPullToRefresh = false;
-	            	if (allowPullToRefresh)
-	            		applyHeaderPadding(event);
-	                break;
-		    }
-			return false;
-		}
-
-	};
-	
-	public void onBoardItemClick(int position){
-		boolean wasCheckShown = mListAdapter.isCheckboxShown();
-    	mListAdapter.check(position);
-    	if (!wasCheckShown && mListAdapter.isCheckboxShown()){
-    		animateShowFooter();
-    		mFooterSubmit.setEnabled(true);
-    	} else if (wasCheckShown && !mListAdapter.isCheckboxShown()){
-    		animateHideFooter();
-    		mFooterSubmit.setEnabled(false);
+	/**
+	 * Menu clicks
+	 */
+	public void switchFragment(int id){
+    	if (fragmentId == id) {
+    		mDrawerLayout.closeDrawers();
+    		return;
     	}
     	
-    	mFooterText.setText("Text " + Happ.implode(mListAdapter.getCheckedNames(), ", "));
+    	mFragmentTransaction = getSupportFragmentManager().beginTransaction();
     	
+    	if (fragmentId == FRAGMENT_BOARD){
+    		mFragmentTransaction.detach(mFragment);
+    	} else {
+    		mFragmentTransaction.remove(mFragment);
+    	}
+    	
+    	switch (id) {
+    		case FRAGMENT_BOARD:
+    			if (mBoardFragment == null)
+    				mBoardFragment = new BoardFragment();
+    			mFragment = mBoardFragment;
+    			break;
+    		case FRAGMENT_FRIENDS:
+    			if (mFriendsFragment == null)
+    				mFriendsFragment = new FriendsFragment();
+    			mFragment = mFriendsFragment;
+    			break;
+    		default:
+    			return;
+    	}
+    	
+    	if (id == FRAGMENT_BOARD){
+    		mFragmentTransaction.attach(mFragment);
+    	} else {
+    		mFragmentTransaction.add(R.id.content_frame, mFragment);
+    	}
+    	
+    	fragmentId = id;
+    	scheduleSwitchFragment();
 	}
 	
-	public void animateShowFooter(){
-		mFooter.setVisibility(View.VISIBLE);
-		TranslateAnimation a = new TranslateAnimation (0, 0, footerHeight, 0);
-		a.setFillEnabled(true);
-		a.setFillAfter(true);
-	 	a.setInterpolator(new SmoothInterpolator());
-	 	a.setDuration(500);
-	 	a.setAnimationListener(new AnimationListener(){
-
-			@Override
-			public void onAnimationEnd(Animation animation) {
-				mListView.setPadding(0, 0, 0, footerHeight);
-			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {}
-
-			@Override
-			public void onAnimationStart(Animation animation) {}
-	 		
-	 	});
-	 	mFooter.startAnimation(a);
-	}
+	private final Handler drawerHandler = new Handler();
 	
-	public void animateHideFooter(){
-		TranslateAnimation a = new TranslateAnimation (0, 0, 0, footerHeight);
-		a.setInterpolator(new SmoothInterpolator());
-		a.setFillEnabled(true);
-		a.setFillAfter(true);
-		a.setAnimationListener(new AnimationListener(){
-
+	private void scheduleSwitchFragment(){
+		drawerHandler.removeCallbacksAndMessages(null);
+		drawerHandler.postDelayed(new Runnable(){
 			@Override
-			public void onAnimationEnd(Animation animation) {
-				mFooter.setVisibility(View.GONE);
+			public void run(){
+				mFragmentTransaction.commit();
 			}
-
-			@Override
-			public void onAnimationRepeat(Animation animation) {}
-
-			@Override
-			public void onAnimationStart(Animation animation) {}
-
-		});
-	 	a.setDuration(500);
-	 	mFooter.startAnimation(a);
-	 	mListView.setPadding(0, 0, 0, 0);
+		}, 250);
+		mDrawerLayout.closeDrawers();
+	}
+    
+	public void onClickBoard(View v){
+		switchFragment(FRAGMENT_BOARD);
 	}
 	
 	public void onClickFriends(View v){
-		Intent intent = new Intent(this, FriendsActivity.class);
-		startActivityForResult(intent, ACTIVITY_FRIENDS);
+		switchFragment(FRAGMENT_FRIENDS);
 	}
 }

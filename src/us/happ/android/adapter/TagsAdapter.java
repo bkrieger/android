@@ -1,26 +1,17 @@
 package us.happ.android.adapter;
 
-import java.util.Date;
-
 import us.happ.android.R;
-import us.happ.android.adapter.HBAdapter.ViewHolder;
 import us.happ.android.model.Mood;
 import us.happ.android.model.Tag;
-import us.happ.android.utils.Media;
 import us.happ.android.view.PickerListView;
 import android.content.Context;
 import android.graphics.BitmapFactory;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.MeasureSpec;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class TagsAdapter extends ArrayAdapter<Tag>{

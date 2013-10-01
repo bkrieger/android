@@ -2,6 +2,7 @@ package us.happ.android.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -29,6 +30,9 @@ public class ContactsManager {
 	private HashSet<String> blockedNumbers;
 	private String[] cachedFriends;
 	private boolean friendsIsDirty = true;
+	private boolean hasFetchedContacts = false;
+	
+	private ArrayList<FetchContactsListener> listeners;
 	
 	private static final String[] PHOTO_BITMAP_PROJECTION = new String[] {
 	    ContactsContract.CommonDataKinds.Photo.PHOTO
@@ -38,6 +42,7 @@ public class ContactsManager {
 		map = new HashMap<String, Contact>();
 		mContext = context;
 		mContentResolver = mContext.getContentResolver();
+		listeners = new ArrayList<FetchContactsListener>();
 	}
 	
 	public static synchronized ContactsManager getInstance(Context context){
@@ -56,7 +61,6 @@ public class ContactsManager {
 		Set<String> set = map.keySet();
 		if (friendsIsDirty || cachedFriends == null){
 			blockedNumbers = Storage.getBlockedNumbers(mContext);
-			Log.i(set.size()+"", blockedNumbers.size()+"");
 			cachedFriends = new String[set.size() - blockedNumbers.size()];
 			int i = 0;
 			for (String s: set){
@@ -96,6 +100,12 @@ public class ContactsManager {
 		}
 		
 		cur.close();
+		
+		// callbacks
+		hasFetchedContacts  = true;
+		for (int i = 0; i < listeners.size(); i ++){
+			listeners.get(i).onContactsFetched();
+		}
 	}
 	
 	public static String clearnNumber(String number){
@@ -141,6 +151,18 @@ public class ContactsManager {
 	        cursor.close();
 	    }
 
+	}
+	
+	public boolean hasFetchedContacts(){
+		return hasFetchedContacts;
+	}
+	
+	public void addFetchContactsListener(FetchContactsListener listener){
+		listeners.add(listener);
+	}
+	
+	public interface FetchContactsListener {
+		public void onContactsFetched();
 	}
 	
 	class Contact {

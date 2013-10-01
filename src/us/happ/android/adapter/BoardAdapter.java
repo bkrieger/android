@@ -8,7 +8,7 @@ import java.util.Date;
 import java.util.LinkedHashMap;
 
 import us.happ.android.R;
-import us.happ.android.activity.MainActivity;
+import us.happ.android.activity.MainActivity2;
 import us.happ.android.model.Mood;
 import us.happ.android.utils.BitmapCache;
 import us.happ.android.utils.ContactsManager;
@@ -28,7 +28,7 @@ import android.widget.CheckBox;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-public class HBAdapter extends ArrayAdapter<Mood> {
+public class BoardAdapter extends ArrayAdapter<Mood> {
 	
 	private ArrayList<Mood> data;
 	private LayoutInflater inflater;
@@ -39,11 +39,11 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 	
 	private LinkedHashMap<String, String> checkedContacts;
 	
-	public HBAdapter(Context context, int resource, ContactsManager contactsManager) {
+	public BoardAdapter(Context context, int resource) {
 		super(context, resource);
 		inflater = LayoutInflater.from(context);
 		data = new ArrayList<Mood>();
-		mContactsManager = contactsManager;
+		mContactsManager = ContactsManager.getInstance(context);
 		mContext = context;
 		mBitmapCache = new BitmapCache();
 		checkedContacts = new LinkedHashMap<String, String>();
@@ -78,16 +78,6 @@ public class HBAdapter extends ArrayAdapter<Mood> {
 			holder.checkbox = (CheckBox) v.findViewById(R.id.board_checkbox);
 			holder.timestamp = (TextView) v.findViewById(R.id.board_timestamp);
 			v.setTag(holder);
-			
-			holder.checkbox.setOnClickListener(new OnClickListener(){
-
-				@Override
-				public void onClick(View v) {
-					int position = (Integer) v.getTag();
-					((MainActivity) mContext).onBoardItemClick(position);
-				}
-				
-			});
 		} else {
 			v = convertView;
 			holder = (ViewHolder) v.getTag();

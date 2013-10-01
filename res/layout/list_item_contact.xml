@@ -14,6 +14,7 @@
         android:layout_alignParentRight="true"
         android:layout_gravity="center_vertical"
         android:focusable="false"
+        android:clickable="false"
         android:focusableInTouchMode="false" />
 
     <LinearLayout

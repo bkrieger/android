@@ -7,70 +7,8 @@
     <FrameLayout
         android:id="@+id/content_frame"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:background="@drawable/bg_linen" >
-
-        <FrameLayout
-            android:id="@+id/main_strip"
-            android:layout_width="4dp"
-            android:layout_height="match_parent"
-            android:layout_marginLeft="43dp"
-            android:background="@color/board_strip"
-            android:visibility="gone" />
-
-        <FrameLayout
-            android:id="@+id/main_sad_hippo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" >
-
-            <ImageView
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:src="@drawable/sad_hippo" />
-        </FrameLayout>
-
-        <ListView
-            android:id="@android:id/list"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:divider="@null"
-            android:dividerHeight="0dp"
-            android:listSelector="@drawable/list_selector" />
-
-        <RelativeLayout
-            android:id="@+id/actionbar_footer"
-            android:layout_width="match_parent"
-            android:layout_height="48dp"
-            android:layout_gravity="bottom"
-            android:background="@color/happ_purple"
-            android:visibility="gone" >
-
-            <ImageView
-                android:id="@+id/actionbar_footer_submit"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_alignParentRight="true"
-                android:layout_centerInParent="true"
-                android:background="@drawable/ab_item_background"
-                android:padding="10dp"
-                android:src="@drawable/ic_action_submit" />
-
-            <TextView
-                android:id="@+id/actionbar_footer_text"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_alignParentLeft="true"
-                android:layout_toLeftOf="@id/actionbar_footer_submit"
-                android:ellipsize="start"
-                android:gravity="left|center_vertical"
-                android:padding="10dp"
-                android:singleLine="true"
-                android:text="Text Alex"
-                android:textColor="@color/white"
-                android:textSize="18dp" />
-        </RelativeLayout>
-    </FrameLayout>
+        android:layout_height="match_parent"/>
+        
 
     <FrameLayout
         android:id="@+id/drawer"
@@ -91,6 +29,8 @@
                 android:gravity="center_vertical"
                 android:paddingLeft="20dp"
                 android:text="Happening Board"
+                android:clickable="true"
+                android:onClick="onClickBoard"
                 android:textColor="@color/happ_purple_highlight"
                 android:textSize="16dp" />
 
