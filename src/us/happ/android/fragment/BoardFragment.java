@@ -86,13 +86,13 @@ public class BoardFragment extends HappFragment {
 		mContext = (MainActivity) getActivity();
 		mListAdapter = new BoardAdapter(mContext, 0);
 		
+		setHasOptionsMenu(true);
+		
 	}
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 		mView = inflater.inflate(R.layout.fragment_board, null, false);
-		
-		setHasOptionsMenu(true);
 		
 		// Sad hippo
         stripView = mView.findViewById(R.id.main_strip);
@@ -198,7 +198,9 @@ public class BoardFragment extends HappFragment {
 	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+		menu.clear();
 		inflater.inflate(R.menu.board, menu);
+		super.onCreateOptionsMenu(menu, inflater);
 	}
 	
 	private void fetch(){

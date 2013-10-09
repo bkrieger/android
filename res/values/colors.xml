@@ -9,6 +9,8 @@
     <color name="happ_purple_dark">#FF870359</color>
     <color name="happ_purple_highlight">#E339A7</color>
     
+    <color name="menu_selected">#22000000</color>
+    
     <color name="board_strip">#22AA0470</color>
     
     <color name="board_bg">#EDC9E1</color>

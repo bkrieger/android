@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="400dp"
+    android:orientation="vertical" >
+
+    <TextView
+        android:id="@+id/menu_happening"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/menu_selectable"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:onClick="onClickBoard"
+        android:paddingLeft="20dp"
+        android:text="@string/menu_happening"
+        android:textColor="@color/white"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/menu_selectable"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:onClick="onClickFriends"
+        android:paddingLeft="20dp"
+        android:text="@string/menu_friends"
+        android:textColor="@color/white"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/menu_selectable"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="18dp"
+        android:text="Filter"
+        android:textColor="@color/white"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/menu_selectable"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="18dp"
+        android:text="Preferences"
+        android:textColor="@color/white"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/menu_selectable"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="18dp"
+        android:text="Privacy Policy"
+        android:textColor="@color/white"
+        android:textSize="16dp" />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/menu_selectable"
+        android:clickable="true"
+        android:gravity="center_vertical"
+        android:paddingLeft="18dp"
+        android:text="Terms"
+        android:textColor="@color/white"
+        android:textSize="16dp" />
+
+</LinearLayout>

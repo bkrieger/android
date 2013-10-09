@@ -3,12 +3,10 @@ package us.happ.android.adapter;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
 import us.happ.android.R;
-import us.happ.android.activity.MainActivity2;
 import us.happ.android.model.Mood;
 import us.happ.android.utils.BitmapCache;
 import us.happ.android.utils.ContactsManager;
@@ -17,11 +15,8 @@ import us.happ.android.utils.Media;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.CheckBox;

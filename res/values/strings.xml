@@ -24,4 +24,7 @@
     <string name="drawer_open">Open side navigation</string>
     <string name="drawer_close">Close side navigation</string>
     
+    <string name="menu_happening">What\'s Happening</string>
+    <string name="menu_friends">Friends</string>
+    
 </resources>

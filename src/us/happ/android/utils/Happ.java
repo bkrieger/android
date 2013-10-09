@@ -20,6 +20,7 @@ public class Happ {
 	public static String implode(String[] arr, String separator) {
 
 		if (arr.length == 0) return "";
+		int separatorLength = separator.length();
 		
 		StringBuilder sb = new StringBuilder();
 		
@@ -27,7 +28,7 @@ public class Happ {
 			sb.append(arr[i]).append(separator);
 		}
 		
-		return sb.substring(0, sb.length() - 1);
+		return sb.substring(0, sb.length() - separatorLength);
 
 	}
 	

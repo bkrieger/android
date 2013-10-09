@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver {
@@ -64,6 +65,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private ServiceHelper mServiceHelper;
 
 	private FragmentTransaction mFragmentTransaction;
+	
+	private TextView selectedMenuItem;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
@@ -74,6 +77,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		
 		mFragmentTransaction = getSupportFragmentManager().beginTransaction();
 		
+		// Default view = happening board
+		selectMenuItem((TextView) findViewById(R.id.menu_happening));
 		mBoardFragment = new BoardFragment();
 		fragmentId = FRAGMENT_BOARD;
 		mFragment = mBoardFragment;
@@ -321,12 +326,22 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		}, 250);
 		mDrawerLayout.closeDrawers();
 	}
-    
+	
+	// Menus
+	private void selectMenuItem(TextView v){
+		if (selectedMenuItem != null){
+			selectedMenuItem.setTextColor(getResources().getColor(R.color.white));
+		}
+		selectedMenuItem = v;
+		v.setTextColor(getResources().getColor(R.color.happ_purple_highlight));
+	}
 	public void onClickBoard(View v){
 		switchFragment(FRAGMENT_BOARD);
+		selectMenuItem((TextView) v);
 	}
 	
 	public void onClickFriends(View v){
 		switchFragment(FRAGMENT_FRIENDS);
+		selectMenuItem((TextView) v);
 	}
 }
