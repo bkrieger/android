@@ -5,10 +5,12 @@
         <item name="android:selectableItemBackground">@drawable/ab_item_background</item>
 		<item name="android:editTextStyle">@style/EditTextAppTheme</item>
         <item name="android:checkboxStyle">@style/CheckBoxAppTheme</item>
+    	<item name="android:actionMenuTextColor">@color/white</item>
         
         <!-- Support Library Compatability -->
         <item name="actionBarStyle">@style/HappActionBar</item>
         <item name="selectableItemBackground">@drawable/ab_item_background</item>
+        <item name="actionMenuTextColor">@color/white</item>
         
     </style>
 
@@ -17,7 +19,7 @@
         <item name="android:titleTextStyle">@style/TitleTextStyle</item>
         <item name="android:icon">@drawable/ic_happ</item>
         <item name="android:windowContentOverlay">@null</item>
-
+        
         <!-- Support Library Compatability -->
         <item name="background">@color/happ_purple</item>
         <item name="titleTextStyle">@style/TitleTextStyle</item>

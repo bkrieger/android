@@ -3,6 +3,7 @@ package us.happ.android.view;
 import us.happ.android.utils.Media;
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.webkit.WebView;
 
 public class GifWebView extends WebView {

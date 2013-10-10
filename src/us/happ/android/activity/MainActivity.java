@@ -31,6 +31,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
+import android.view.Window;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -67,10 +68,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private FragmentTransaction mFragmentTransaction;
 	
 	private TextView selectedMenuItem;
+	private TextView menuHappening;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
+		
+		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
+        
 		setContentView(R.layout.activity_main);
 		
 		mContactsManager = ContactsManager.getInstance(this);
@@ -78,7 +83,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		mFragmentTransaction = getSupportFragmentManager().beginTransaction();
 		
 		// Default view = happening board
-		selectMenuItem((TextView) findViewById(R.id.menu_happening));
+		menuHappening = (TextView) findViewById(R.id.menu_happening);
+		selectMenuItem(menuHappening);
 		mBoardFragment = new BoardFragment();
 		fragmentId = FRAGMENT_BOARD;
 		mFragment = mBoardFragment;
@@ -142,6 +148,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	        mProgressDialog.setMessage(getResources().getString(R.string.dialog_retrieve_contacts));
 	    	mProgressDialog.show();
         }
+        
 	}
 	
 	@Override
@@ -188,9 +195,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
     	switch (item.getItemId()) {        
           case android.R.id.home:
         	  return true;
-          case R.id.action_compose:
-        	  compose();
-        	  return true;
           default:            
         	  return super.onOptionsItemSelected(item);
     	}
@@ -198,6 +202,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	@Override
 	public void onBackPressed(){
+		if (fragmentId != FRAGMENT_BOARD){
+			switchFragment(FRAGMENT_BOARD);
+			selectMenuItem(menuHappening);
+			return;
+		}
 		if (mFragment.onBackPressed()) return;
 		super.onBackPressed();
 	}
@@ -264,6 +273,8 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			postMoodsId = -1;
 		}
 		
+		hideSpinner();
+		
 		if (results != null) Log.i("results", results);
 	}
 	
@@ -311,7 +322,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
     	}
     	
     	fragmentId = id;
-    	scheduleSwitchFragment();
+    	if (mDrawerLayout.isDrawerOpen(mDrawer)){
+    		scheduleSwitchFragment();
+    	} else {
+    		mFragmentTransaction.commit();
+    	}
 	}
 	
 	private final Handler drawerHandler = new Handler();
@@ -335,9 +350,22 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		selectedMenuItem = v;
 		v.setTextColor(getResources().getColor(R.color.happ_purple_highlight));
 	}
-	public void onClickBoard(View v){
+	
+	public void showSpinner(){
+        setSupportProgressBarIndeterminateVisibility(Boolean.TRUE);
+	}
+	
+	public void hideSpinner(){
+        setSupportProgressBarIndeterminateVisibility(Boolean.FALSE);
+	}
+	
+	public void returnToBoard(){
 		switchFragment(FRAGMENT_BOARD);
-		selectMenuItem((TextView) v);
+		selectMenuItem(menuHappening);
+	}
+	
+	public void onClickBoard(View v){
+		returnToBoard();
 	}
 	
 	public void onClickFriends(View v){

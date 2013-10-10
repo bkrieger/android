@@ -31,6 +31,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -203,6 +204,18 @@ public class BoardFragment extends HappFragment {
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 	
+
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {   
+    	switch (item.getItemId()) {        
+    	case R.id.action_compose:
+    	  	  mContext.compose();
+    	  	  return true;
+          default:            
+        	  return super.onOptionsItemSelected(item);
+    	}
+    }
+	
 	private void fetch(){
 		refreshing = true;
 		mContext.startFetchService();
@@ -256,6 +269,7 @@ public class BoardFragment extends HappFragment {
 		super.onResume();
 		if (mContactsManager.hasFetchedContacts()){
 			fetch();
+			mContext.showSpinner();
 		} else {
 			mContactsManager.addFetchContactsListener(new FetchContactsListener(){
 				@Override

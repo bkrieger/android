@@ -12,6 +12,9 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -31,24 +34,13 @@ public class FriendsFragment extends HappFragment{
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		
-		LayoutInflater inflater = getActivity().getLayoutInflater();
-		mView = inflater.inflate(R.layout.fragment_friends, null, false);
-		
 		mContext = (MainActivity) getActivity();
+		setHasOptionsMenu(true);
 		
-		mListView = (ListView) mView.findViewById(android.R.id.list);
 		mCursor = mContext.getContentResolver().query(Phone.CONTENT_URI, null, null, null, Phone.DISPLAY_NAME);
 		blockedNumbers = Storage.getBlockedNumbers(mContext);
 		mListAdapter = new ContactsAdapter(mContext, mCursor, blockedNumbers);
-		mListView.setAdapter(mListAdapter);
-		mListView.setFastScrollEnabled(true);
-		mListView.setVerticalScrollBarEnabled(false);
-		mListView.setOnItemClickListener(new OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-            	mListAdapter.check(position);
-            }
-        });
+		
 		
 		// Action bar
 //		actionbar = getSupportActionBar();
@@ -62,8 +54,40 @@ public class FriendsFragment extends HappFragment{
 	
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
+
+		mView = inflater.inflate(R.layout.fragment_friends, null, false);
+		
+		mListView = (ListView) mView.findViewById(android.R.id.list);
+		mListView.setAdapter(mListAdapter);
+		mListView.setFastScrollEnabled(true);
+		mListView.setVerticalScrollBarEnabled(false);
+		mListView.setOnItemClickListener(new OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
+            	mListAdapter.check(position);
+            }
+        });
+		
 		return mView;
 	}
+	
+	@Override
+	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
+		menu.clear();
+		inflater.inflate(R.menu.friends, menu);
+		super.onCreateOptionsMenu(menu, inflater);
+	}
+	
+	@Override
+    public boolean onOptionsItemSelected(MenuItem item) {   
+    	switch (item.getItemId()) {        
+    	case R.id.action_friends_done:
+    			mContext.returnToBoard();
+    	  	  return true;
+          default:            
+        	  return super.onOptionsItemSelected(item);
+    	}
+    }
 	
 	@Override
 	public void onPause(){
@@ -74,6 +98,12 @@ public class FriendsFragment extends HappFragment{
 	@Override
 	public boolean onBackPressed() {
 		return false;
+	}
+	
+	@Override
+	public void onDestroy(){
+		mCursor.close();
+		super.onDestroy();
 	}
 
 }

@@ -6,6 +6,7 @@
     
     <string name="action_compose">Compose</string>
     <string name="action_submit">Send</string>
+    <string name="action_done">Done</string>
     
     <string name="mood_title">I\'m in the mood to</string>
     <string name="duration_title">for the next</string>
