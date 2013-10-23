@@ -4,7 +4,6 @@
     android:layout_height="match_parent"
     android:paddingBottom="10dp"
     android:paddingLeft="10dp"
-    android:paddingRight="10dp"
     android:paddingTop="10dp" >
 
     <CheckBox
@@ -29,7 +28,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Brandon Krieger"
-            android:textColor="@color/happ_purple"
+            android:textColor="@color/black"
             android:textSize="18dp" />
 
         <TextView

@@ -5,7 +5,7 @@ import org.json.JSONObject;
 
 import us.happ.android.R;
 import us.happ.android.fragment.BoardFragment;
-import us.happ.android.fragment.FriendsFragment;
+import us.happ.android.fragment.ContactsFragment;
 import us.happ.android.fragment.HappFragment;
 import us.happ.android.service.APIService;
 import us.happ.android.service.ServiceHelper;
@@ -20,7 +20,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
 import android.support.v4.app.ActionBarDrawerToggle;
-import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
@@ -46,7 +45,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	// Fragments
 	private BoardFragment mBoardFragment;
-	private FriendsFragment mFriendsFragment;
+	private ContactsFragment mFriendsFragment;
 
 	
 	// Fragment IDs
@@ -308,7 +307,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
     			break;
     		case FRAGMENT_FRIENDS:
     			if (mFriendsFragment == null)
-    				mFriendsFragment = new FriendsFragment();
+    				mFriendsFragment = new ContactsFragment();
     			mFragment = mFriendsFragment;
     			break;
     		default:

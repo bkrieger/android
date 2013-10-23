@@ -19,7 +19,7 @@ import android.widget.TextView;
 
 public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 
-	private static final CharSequence alphabet = " ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final CharSequence alphabet = " #ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private LayoutInflater mInflater;
 	private AlphabetIndexer mIndexer;
 	private HashSet<String> blockedNumbers;
@@ -80,7 +80,7 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 		}
 		notifyDataSetChanged();
 	}
-
+	
 	@Override
 	public int getPositionForSection(int section) {
 		return mIndexer.getPositionForSection(section);

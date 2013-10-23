@@ -19,8 +19,8 @@
     <color name="btn_selector">#AAAA0470</color>
     <color name="compose_hint">#55000000</color>
     
-    <color name="list_selector_start">#22AA0470</color>
-    <color name="list_selector_end">#55AA0470</color>
+    <color name="list_selector_start">#33AA0470</color>
+    <color name="list_selector_end">#44AA0470</color>
     
     <color name="picker_bg">#03AA0470</color>
     <color name="picker_border">#11303030</color>

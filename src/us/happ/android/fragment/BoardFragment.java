@@ -265,6 +265,12 @@ public class BoardFragment extends HappFragment {
 	}
 	
 	@Override
+	public void onPause(){
+		super.onPause();
+		mContext.hideSpinner();
+	}
+	
+	@Override
 	public void onResume(){
 		super.onResume();
 		if (mContactsManager.hasFetchedContacts()){

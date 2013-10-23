@@ -6,7 +6,10 @@ import us.happ.android.R;
 import us.happ.android.activity.MainActivity;
 import us.happ.android.adapter.ContactsAdapter;
 import us.happ.android.utils.Storage;
+import android.annotation.SuppressLint;
 import android.database.Cursor;
+import android.graphics.Canvas;
+import android.os.Build.VERSION;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.Fragment;
@@ -21,7 +24,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.AdapterView.OnItemClickListener;
 
-public class FriendsFragment extends HappFragment{
+public class ContactsFragment extends HappFragment{
 
 	private View mView;
 	private ListView mListView;
@@ -55,16 +58,18 @@ public class FriendsFragment extends HappFragment{
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
-		mView = inflater.inflate(R.layout.fragment_friends, null, false);
+		mView = inflater.inflate(R.layout.fragment_contacts, null, false);
 		
 		mListView = (ListView) mView.findViewById(android.R.id.list);
+		View header = getActivity().getLayoutInflater().inflate(R.layout.list_header_contacts, null, true);
+		mListView.addHeaderView(header, null, false);
 		mListView.setAdapter(mListAdapter);
 		mListView.setFastScrollEnabled(true);
 		mListView.setVerticalScrollBarEnabled(false);
 		mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-            	mListAdapter.check(position);
+            	mListAdapter.check(position - 1); // subtract 1 for the header
             }
         });
 		
