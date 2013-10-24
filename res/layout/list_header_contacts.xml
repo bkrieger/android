@@ -4,33 +4,64 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <TextView
+    <FrameLayout
         android:id="@+id/contacts_hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="left"
         android:padding="10dp"
-        android:text="@string/contacts_hint"
-        android:textColor="@color/black"
-        android:textSize="14dp"
-        android:visibility="visible" />
+        android:visibility="visible" >
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="left"
+            android:paddingBottom="14dp"
+            android:text="@string/contacts_hint"
+            android:textColor="@color/black"
+            android:textSize="14dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="bottom"
+            android:gravity="right"
+            android:text="@string/dismiss"
+            android:textColor="@color/happ_purple"
+            android:textSize="14dp" />
+    </FrameLayout>
 
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
-        android:background="@color/gray" />
+        android:background="@color/divider" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/contacts_reset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="left"
-        android:padding="10dp"
-        android:text="@string/contacts_reset"
-        android:textColor="@color/happ_purple"
-        android:textSize="20dp"
-        android:visibility="visible" />
-    
+        android:orientation="horizontal"
+        android:padding="10dp" >
+
+        <TextView
+            android:id="@+id/contacts_counter"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="left"
+            android:text="235/235"
+            android:textColor="@color/happ_purple"
+            android:textSize="20dp" />
+
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="right"
+            android:text="@string/contacts_checkall"
+            android:textColor="@color/happ_purple"
+            android:textSize="20dp" />
+    </LinearLayout>
+
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"

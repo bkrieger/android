@@ -13,7 +13,7 @@ import android.widget.ListView;
 
 public class ContactsListView extends ListView {
 
-	private static final String sections = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	private static final String sections = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private Paint textPaint;
 	private int topMargin;
 	private int paddingRight;

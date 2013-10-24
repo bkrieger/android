@@ -30,6 +30,7 @@
     <string name="menu_friends">Friends</string>
     
     <string name="contacts_hint">We\'ve automatically added everyone in your contacts to your friends list. Only friends can see your status.</string>
-    <string name="contacts_reset">Reset friends</string>
+    <string name="contacts_checkall">check all</string>
+    <string name="dismiss">Dismiss</string>
     
 </resources>
