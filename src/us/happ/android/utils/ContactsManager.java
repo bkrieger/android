@@ -92,7 +92,7 @@ public class ContactsManager {
 		
 		while (cur.moveToNext()){
 			String name = cur.getString(cur.getColumnIndex(Phone.DISPLAY_NAME));
-			String phoneNo = clearnNumber(cur.getString(cur.getColumnIndex(Phone.NUMBER)));
+			String phoneNo = cleanNumber(cur.getString(cur.getColumnIndex(Phone.NUMBER)));
 			int photoId = cur.getInt(cur.getColumnIndex(Phone.PHOTO_ID));
 			int contactId = cur.getInt(cur.getColumnIndex(Phone.CONTACT_ID));
 			contact = new Contact(name, contactId, photoId);
@@ -108,7 +108,7 @@ public class ContactsManager {
 		}
 	}
 	
-	public static String clearnNumber(String number){
+	public static String cleanNumber(String number){
 		
 		number = number.replaceAll("[^\\d.]", "");
 		

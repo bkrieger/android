@@ -111,7 +111,7 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 		holder.name.setText(name);
 		holder.number.setText(number);
 		
-		holder.checkbox.setChecked(!blockedNumbers.contains(ContactsManager.clearnNumber(number)));
+		holder.checkbox.setChecked(!blockedNumbers.contains(ContactsManager.cleanNumber(number)));
 		
 		if (c.getPosition() == 0 || mIndexer.getSectionForPosition(c.getPosition()) != mIndexer.getSectionForPosition(c.getPosition() - 1)){
 			holder.divider.setVisibility(View.GONE);
@@ -146,12 +146,17 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 	
 	public void check(int position){
 		mCursor.moveToPosition(position);
-		String number = ContactsManager.clearnNumber(mCursor.getString(mCursor.getColumnIndex(Phone.NUMBER)));
+		String number = ContactsManager.cleanNumber(mCursor.getString(mCursor.getColumnIndex(Phone.NUMBER)));
 		if (blockedNumbers.contains(number)){
 			blockedNumbers.remove(number);
 		} else {
 			blockedNumbers.add(number);
 		}
+		notifyDataSetChanged();
+	}
+	
+	public void resetChecks(){
+		blockedNumbers.clear();
 		notifyDataSetChanged();
 	}
 	

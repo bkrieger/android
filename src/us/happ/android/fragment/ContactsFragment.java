@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
@@ -83,6 +84,14 @@ public class ContactsFragment extends HappFragment{
 		mListView.addHeaderView(header, null, false);
 		counterView = (TextView) header.findViewById(R.id.contacts_counter);
 		updateCounter();
+		View resetView = header.findViewById(R.id.contacts_reset);
+		resetView.setOnClickListener(new OnClickListener(){
+			@Override
+			public void onClick(View v) {
+				mListAdapter.resetChecks();
+				updateCounter();
+			}
+		});
 		
 		mListView.setAdapter(mListAdapter);
 		mListView.setFastScrollEnabled(true);
