@@ -17,6 +17,7 @@ import us.happ.android.utils.ContactsManager.FetchContactsListener;
 import us.happ.android.utils.Happ;
 import us.happ.android.utils.Media;
 import us.happ.android.utils.SmoothInterpolator;
+import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
@@ -27,6 +28,7 @@ import android.os.Message;
 import android.os.Parcelable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -79,6 +81,7 @@ public class BoardFragment extends HappFragment {
 	private ContactsManager mContactsManager;
 	private String myMessage;
 	private int myTagId;
+	private ActionBar actionbar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -89,6 +92,8 @@ public class BoardFragment extends HappFragment {
 		
 		setHasOptionsMenu(true);
 		
+		// Action bar
+		actionbar = mContext.getSupportActionBar();
 	}
 	
 	@Override
@@ -273,6 +278,7 @@ public class BoardFragment extends HappFragment {
 	@Override
 	public void onResume(){
 		super.onResume();
+		actionbar.setDisplayShowTitleEnabled(false);
 		if (mContactsManager.hasFetchedContacts()){
 			fetch();
 			mContext.showSpinner();

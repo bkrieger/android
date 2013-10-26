@@ -3,7 +3,7 @@
 
     <string name="app_name">Happ</string>
     <string name="title_friends">My Friends</string>
-    <string name="copyright">v2.0.0 &#169; 2013 Happ</string>
+    <string name="copyright">&#169; 2013 Happ</string>
     
     <string name="action_compose">Compose</string>
     <string name="action_submit">Send</string>

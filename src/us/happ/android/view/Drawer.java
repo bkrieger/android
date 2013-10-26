@@ -3,10 +3,12 @@ package us.happ.android.view;
 
 import us.happ.android.R;
 import android.content.Context;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 public class Drawer extends ViewGroup {
 
@@ -17,6 +19,13 @@ public class Drawer extends ViewGroup {
 		super(context, attrs);
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.drawer, this);
+		
+		try {
+			String versionCode = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+			((TextView) findViewById(R.id.copyright)).setText("v" + versionCode + " " + context.getResources().getString(R.string.copyright));
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Override

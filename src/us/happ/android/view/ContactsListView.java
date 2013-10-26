@@ -1,19 +1,16 @@
 package us.happ.android.view;
 
 import us.happ.android.R;
+import us.happ.android.adapter.ContactsAdapter;
 import us.happ.android.utils.Media;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.util.AttributeSet;
-import android.util.Log;
-import android.view.View;
-import android.view.View.MeasureSpec;
 import android.widget.ListView;
 
 public class ContactsListView extends ListView {
 
-	private static final String sections = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private Paint textPaint;
 	private int topMargin;
 	private int paddingRight;
@@ -43,7 +40,7 @@ public class ContactsListView extends ListView {
 		
 		height = MeasureSpec.getSize(heightMeasureSpec);
 		width = (int) MeasureSpec.getSize(widthMeasureSpec);
-		indexSize = (height - 2*topMargin) / sections.length();
+		indexSize = (height - 2*topMargin) / ContactsAdapter.alphabet.length();
 		
 		super.onMeasure(widthMeasureSpec, heightMeasureSpec);
 	}
@@ -52,8 +49,8 @@ public class ContactsListView extends ListView {
 	protected void onDraw(Canvas canvas){
 		super.onDraw(canvas);
 	 
-	    for (int i = 0; i < sections.length(); i++){
-	    	String s = Character.toString(sections.charAt(i));
+	    for (int i = 0; i < ContactsAdapter.alphabet.length(); i++){
+	    	String s = Character.toString(ContactsAdapter.alphabet.charAt(i));
 	    	
 	        canvas.drawText(
 	        		s,

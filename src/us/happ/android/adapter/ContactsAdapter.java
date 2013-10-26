@@ -21,7 +21,7 @@ import android.widget.TextView;
 
 public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 
-	private static final CharSequence alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	public static final CharSequence alphabet = "#ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 	private LayoutInflater mInflater;
 	private AlphabetIndexer mIndexer;
 	private HashSet<String> blockedNumbers;
@@ -32,6 +32,7 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 	private static final int TYPE_NORMAL = 1;
 	
 	private LinkedHashMap<Integer, String> sectionsIndexer;
+	private LinkedHashMap<Integer, Integer> rSectionsIndexer;
 
 	public ContactsAdapter(Context context, Cursor c, HashSet<String> blockedNumbers) {
 		super(context, c, 0);
@@ -42,21 +43,35 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 		this.blockedNumbers = blockedNumbers;
 		
 		sectionsIndexer = new LinkedHashMap<Integer, String>();
+		rSectionsIndexer = new LinkedHashMap<Integer, Integer>();
 		calculateSectionHeaders();
 	}
 	
 	private void calculateSectionHeaders(){
 		sectionsIndexer.clear();
+		rSectionsIndexer.clear();
 		String prev = "";
 		int count = 0;
 		int i = 0;
+		int a = -1;
 		
 		mCursor.moveToPosition(-1);
 		while(mCursor.moveToNext()){
-			String letter = mCursor.getString(mCursor.getColumnIndex(Phone.DISPLAY_NAME)).substring(0,1).toUpperCase();
+			String l = mCursor.getString(mCursor.getColumnIndex(Phone.DISPLAY_NAME)).substring(0,1);
+			String letter;
+			if (!Character.isLetter(l.charAt(0))){
+				letter = "#";
+			} else {
+				letter = mCursor.getString(mCursor.getColumnIndex(Phone.DISPLAY_NAME)).substring(0,1).toUpperCase();
+			}
 			
 			if (!prev.equals(letter)){
 				sectionsIndexer.put(i + count, letter);
+				do {
+					a += 1;
+					rSectionsIndexer.put(a, i + count);
+				} while (a < alphabet.length() && !alphabet.subSequence(a, a + 1).equals(letter));
+
 				prev = letter;
 				count ++;
 			}
@@ -200,15 +215,16 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 	
 	@Override
 	public int getPositionForSection(int section) {
-		return mIndexer.getPositionForSection(section) + section;
+		return rSectionsIndexer.get(section);
 	}
 
 	@Override
 	public int getSectionForPosition(int position) {
 		
-        for (int i = 0; i < alphabet.length(); i ++) {
-            if (position < getPositionForSection(i))
-            	return i - 1;
+		for (int i = 0; i < alphabet.length(); i ++) {
+        	if (position < getPositionForSection(i)){
+        		return i - 1;
+            }
         }
         
         return alphabet.length() - 1;

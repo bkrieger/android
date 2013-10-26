@@ -84,7 +84,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		
 		// TODO
 		// lazy load
-		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(1000*60*60*4); // 4 hours
+		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(m.getDuration()*1000);
 		if (decay < 0) decay = 0;
 		// Check cache first
 		Bitmap bitmap = mBitmapCache.getBitmapFromMemCache(m.getNumber());

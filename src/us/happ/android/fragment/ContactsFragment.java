@@ -15,6 +15,7 @@ import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
+import android.support.v7.app.ActionBar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -44,6 +45,7 @@ public class ContactsFragment extends HappFragment{
 	private View sectionOverlay;
 	private TextView sectionOverlayText;
 	private TextView counterView;
+	private ActionBar actionbar;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -59,18 +61,15 @@ public class ContactsFragment extends HappFragment{
 		
 		
 		// Action bar
-//		actionbar = getSupportActionBar();
-//		actionbar.setHomeButtonEnabled(true);
-//		actionbar.setDisplayHomeAsUpEnabled(true);
-//		actionbar.setTitle(getResources().getString(R.string.title_friends));
-//		actionbar.setDisplayShowTitleEnabled(true);
-//		actionbar.setDisplayShowHomeEnabled(false);
-		
+		actionbar = mContext.getSupportActionBar();
+
 	}
 	
 	@Override
-	public void onAttach(Activity activity){
-		super.onAttach(activity);
+	public void onResume(){
+		super.onResume();
+		actionbar.setTitle(getResources().getString(R.string.title_friends));
+		actionbar.setDisplayShowTitleEnabled(true);
 	}
 	
 	@Override
