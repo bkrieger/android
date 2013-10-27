@@ -10,26 +10,18 @@ import us.happ.android.R;
 import us.happ.android.activity.MainActivity;
 import us.happ.android.adapter.BoardAdapter;
 import us.happ.android.model.Mood;
-import us.happ.android.service.ServiceHelper;
-import us.happ.android.service.ServiceReceiver;
 import us.happ.android.utils.ContactsManager;
 import us.happ.android.utils.ContactsManager.FetchContactsListener;
 import us.happ.android.utils.Happ;
 import us.happ.android.utils.Media;
 import us.happ.android.utils.SmoothInterpolator;
-import android.app.Activity;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
-import android.os.Parcelable;
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -38,17 +30,17 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnTouchListener;
+import android.view.ViewGroup;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.animation.Transformation;
 import android.view.animation.TranslateAnimation;
-import android.view.animation.Animation.AnimationListener;
-import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
+import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.FrameLayout.LayoutParams;
 
 public class BoardFragment extends HappFragment {
 
@@ -317,30 +309,46 @@ public class BoardFragment extends HappFragment {
 	 */
 	OnTouchListener pullToRefreshListener = new OnTouchListener(){
 		
+		private boolean pullTriggered;
+		private boolean shouldIntercept;
+		
 		@Override
 		public boolean onTouch(View v, MotionEvent event) {
-			if (refreshing) return false;
+			if (refreshing) {
+				allowPullToRefresh = false;
+				return false;
+			}
 			
 			final int y = (int) event.getY();
 			
 		    switch (event.getAction()) {
 		    	case MotionEvent.ACTION_CANCEL:
+		    		if (allowPullToRefresh) 
+						resetHeaderPadding(true);
 		    		allowPullToRefresh = true;
-					resetHeaderPadding(true);
 					break;
 		    	case MotionEvent.ACTION_UP:
+		    		if (allowPullToRefresh) 
+						resetHeaderPadding(true);
 		    		allowPullToRefresh = true;
-					resetHeaderPadding(true);
 					break;
 	            case MotionEvent.ACTION_DOWN:
+	            	mListView.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
 	                mLastMotionY = y;
-	                allowPullToRefresh = mListView.getChildAt(0).getTop() == 0;
+	                allowPullToRefresh = mListView.getChildAt(0).getTop() == 0 && mListView.getFirstVisiblePosition() == 0;
+	                pullTriggered = false;
+	                shouldIntercept = false;
 	                break;
 	            case MotionEvent.ACTION_MOVE:
-	            	if (allowPullToRefresh && mListView.getChildAt(0).getTop() < 0)
+	            	if (!pullTriggered && allowPullToRefresh && y < mLastMotionY)
 	            		allowPullToRefresh = false;
-	            	if (allowPullToRefresh)
-	            		applyHeaderPadding(event);
+	            	if (allowPullToRefresh){
+	            		boolean scrollUp = applyHeaderPadding(event);
+		            	pullTriggered = true;
+		            	mListView.setOverScrollMode(View.OVER_SCROLL_NEVER);
+		            	shouldIntercept = shouldIntercept || scrollUp;
+		            	return shouldIntercept;
+	            	}
 	                break;
 		    }
 			return false;
@@ -349,22 +357,25 @@ public class BoardFragment extends HappFragment {
 	};
 	
 	private int mLastMotionY;
-	private void applyHeaderPadding(MotionEvent ev) {
-		// clever hack :D
-		if (mListView.getFirstVisiblePosition() > 0 || mListView.getChildAt(0).getTop() != 0) return;
+	private boolean applyHeaderPadding(MotionEvent ev) {
+
+//		// clever hack :D
+//		if (mListView.getFirstVisiblePosition() > 0 || mListView.getChildAt(0).getTop() != 0) return;
 		
 		int topPadding = (int) ((ev.getY() - mLastMotionY) / 2);
 		
 		if (topPadding < 0) topPadding = 0;
-		
+
 		LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
+		int oldPadding = lp.topMargin;
 		lp.setMargins(0, topPadding, 0, 0);
 		mHeader.setLayoutParams(lp);
 		
 		lp = (LayoutParams) mHippo.getLayoutParams();
 		lp.setMargins(0, -1*hippoHeight + topPadding, 0, 0);
 		mHippo.setLayoutParams(lp);
-
+		
+		return oldPadding > topPadding;
 	}
 	
 	private void resetHeaderPadding(boolean refresh) {
@@ -372,6 +383,7 @@ public class BoardFragment extends HappFragment {
 		 LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
 		 int startMargin = lp.topMargin;
 		 
+		 mListView.smoothScrollToPosition(0);
 		 if (startMargin == 0) return;
 		 
 		 boolean shouldRefresh = refresh && startMargin >= hippoHeight;
