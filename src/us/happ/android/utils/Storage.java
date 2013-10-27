@@ -10,6 +10,7 @@ public class Storage {
 	private static final String PREFERENCES_FILE = "Happ";
 	
 	private static final String KEY_BLOCKED_NUMBERS = "blocked numbers";
+	private static final String KEY_TOTAL_HAPPS = "total happs";
 	
 	public static HashSet<String> getBlockedNumbers(Context context){
 		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
@@ -38,6 +39,17 @@ public class Storage {
 
         ContactsManager.getInstance(context).setFriendsDirty(true);
 
+	}
+	
+	public static int getTotalHapps(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getInt(KEY_TOTAL_HAPPS, 0);
+	}
+	
+	public static void incTotalHapps(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		int totalHapps = sp.getInt(KEY_TOTAL_HAPPS, 0);
+		sp.edit().putInt(KEY_TOTAL_HAPPS, totalHapps + 1).commit();
 	}
 	
 }

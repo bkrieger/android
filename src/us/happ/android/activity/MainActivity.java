@@ -11,6 +11,8 @@ import us.happ.android.service.APIService;
 import us.happ.android.service.ServiceHelper;
 import us.happ.android.service.ServiceReceiver;
 import us.happ.android.utils.ContactsManager;
+import us.happ.android.utils.Storage;
+import us.happ.android.view.Drawer;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -57,7 +59,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private ServiceReceiver mReceiver;
 	private String mPhoneNumber;
 	private ActionBar actionbar;
-	private View mDrawer;
+	private Drawer mDrawer;
 	private DrawerLayout mDrawerLayout;
 	private ActionBarDrawerToggle mDrawerToggle;
 	private ProgressDialog mProgressDialog;
@@ -104,7 +106,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         actionbar.setDisplayShowTitleEnabled(false);
         
         // Navigation drawer
-        mDrawer = findViewById(R.id.drawer);
+        mDrawer = (Drawer) findViewById(R.id.drawer);
         mDrawer.setOnTouchListener(new OnTouchListener(){
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -263,10 +265,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		} else if (taskId == postMoodsId){
 			try {
 				JSONObject jResults = new JSONObject(results);
-				if (jResults.getInt("status") == 200)
+				if (jResults.getInt("status") == 200){
 					Toast.makeText(this, getResources().getString(R.string.toast_post_success), Toast.LENGTH_SHORT).show();
-				else
+					Storage.incTotalHapps(this);
+					mDrawer.updateTotalHapps();
+				} else {
 					Toast.makeText(this, getResources().getString(R.string.toast_post_error), Toast.LENGTH_SHORT).show();
+				}
 			} catch (JSONException e){}
 			
 			postMoodsId = -1;

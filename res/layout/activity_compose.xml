@@ -4,31 +4,37 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent" >
 
+    <us.happ.android.view.ComposeEditText
+        android:id="@+id/compose_message"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@null"
+        android:gravity="left|top"
+        android:hint="@string/hint_compose"
+        android:imeOptions="actionSend"
+        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+        android:maxLength="50"
+        android:padding="10dp"
+        android:textColorHint="@color/compose_hint"
+        android:color="@color/black" />
+
     <LinearLayout
+        android:id="@+id/compose_options"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        android:padding="10dp" >
+        android:padding="10dp"
+        android:visibility="gone" >
 
-        <EditText
-            android:id="@+id/compose_message"
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="15dp"
-            android:layout_marginTop="15dp"
-            android:hint="@string/hint_compose"
-            android:imeOptions="actionSend"
-            android:inputType="textCapSentences|textAutoCorrect"
-            android:maxLength="40"
-            android:singleLine="true"
-            android:textColorHint="@color/compose_hint"
-            android:color="@color/black" />
+            android:layout_height="1dp"
+            android:background="@color/divider" />
 
         <TextView
             android:id="@+id/mood_value"
             android:layout_width="match_parent"
-            android:layout_height="40dp"
-            android:layout_marginTop="10dp"
+            android:layout_height="48dp"
             android:background="@drawable/spinner"
             android:clickable="true"
             android:focusable="true"
@@ -47,8 +53,7 @@
 
             <TextView
                 android:layout_width="0px"
-                android:layout_height="40dp"
-                android:layout_marginTop="10dp"
+                android:layout_height="48dp"
                 android:layout_weight="1"
                 android:gravity="right|center_vertical"
                 android:text="@string/duration_title"
@@ -58,9 +63,8 @@
             <TextView
                 android:id="@+id/duration_value"
                 android:layout_width="0px"
-                android:layout_height="40dp"
+                android:layout_height="48dp"
                 android:layout_marginLeft="10dp"
-                android:layout_marginTop="10dp"
                 android:layout_weight="2"
                 android:background="@drawable/spinner"
                 android:clickable="true"

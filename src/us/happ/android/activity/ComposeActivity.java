@@ -19,8 +19,11 @@ import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -62,6 +65,8 @@ public class ComposeActivity extends ActionBarActivity {
 
 	private MenuItem mActionSubmit;
 
+	private View optionsView;
+
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -102,7 +107,23 @@ public class ComposeActivity extends ActionBarActivity {
 		            mListView.setDimen(width,  heightDiff - v.getPaddingTop());
 		            LayoutParams params = (LayoutParams) mListView.getLayoutParams();
 		            params.topMargin = marginTop-mListView.getTop();
+		            mListView.setLayoutParams(params);
 		            
+		            // Positioning options
+		            optionsView.setVisibility(View.VISIBLE);
+		            optionsView.measure(
+		            		MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+		            		MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+		            int optionsHeight = optionsView.getMeasuredHeight();
+		            params = (LayoutParams) optionsView.getLayoutParams();
+		            params.topMargin = marginTop - optionsHeight;
+		            optionsView.setLayoutParams(params);
+		            Animation anim = new AlphaAnimation(0.00f, 1.00f);
+		            anim.setDuration(500);
+		            optionsView.startAnimation(anim);
+		            
+		            // Setting height of EditText
+		            mComposeET.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
 		        }
 		     }
 		});
@@ -187,6 +208,9 @@ public class ComposeActivity extends ActionBarActivity {
 			}
 			
 		});
+		
+		// Option buttons
+		optionsView = findViewById(R.id.compose_options);
 		
 		mListView = (PickerListView) findViewById(android.R.id.list);
 		mTagsAdapter = new TagsAdapter(this, 0, Tag.values());

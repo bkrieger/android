@@ -100,7 +100,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		}
 		
 		// checkboxes
-		Happ.showViewIf(holder.checkbox, holder.tag, showCheckbox);
+		Happ.showViewIf(holder.checkbox, holder.tag, showCheckbox && m.getChecked());
 		
 		holder.checkbox.setChecked(m.getChecked());
 		

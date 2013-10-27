@@ -147,6 +147,7 @@ public class BoardFragment extends HappFragment {
 				smsIntent.setType("vnd.android-dir/mms-sms");
 				smsIntent.setData(Uri.parse("smsto:" + number));
 		        startActivity(smsIntent);
+		        closeFooter(false);
 			}
 			
 		});
@@ -158,6 +159,7 @@ public class BoardFragment extends HappFragment {
 		mHippo = header.findViewById(R.id.hippo);
 		
 		mListView.setAdapter(mListAdapter);
+		mListAdapter.hideCheckbox();
 		
 		hippoHeight = (int) Media.pxFromDp(mContext, HIPPO_HEIGHT);
 		
@@ -273,6 +275,11 @@ public class BoardFragment extends HappFragment {
 	public void onPause(){
 		super.onPause();
 		mContext.hideSpinner();
+	}
+	
+	@Override
+	public void onDetach(){
+		super.onDetach();
 	}
 	
 	@Override

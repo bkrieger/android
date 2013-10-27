@@ -2,6 +2,7 @@ package us.happ.android.view;
 
 
 import us.happ.android.R;
+import us.happ.android.utils.Storage;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
 import android.util.AttributeSet;
@@ -12,13 +13,22 @@ import android.widget.TextView;
 
 public class Drawer extends ViewGroup {
 
+	private Context mContext;
+	private TextView totalHappsView;
 	private int height;
 	private int width;
+	private TextView totalHappsTextView;
 
 	public Drawer(Context context, AttributeSet attrs) {
 		super(context, attrs);
+		
+		mContext = context;
+		
 		LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 		inflater.inflate(R.layout.drawer, this);
+		
+		totalHappsView = (TextView) findViewById(R.id.menu_total_happs_count);
+		totalHappsTextView = (TextView) findViewById(R.id.menu_total_happs);
 		
 		try {
 			String versionCode = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
@@ -26,6 +36,18 @@ public class Drawer extends ViewGroup {
 		} catch (NameNotFoundException e) {
 			e.printStackTrace();
 		}
+		
+		updateTotalHapps();
+	}
+	
+	public void updateTotalHapps(){
+		int totalHapps = Storage.getTotalHapps(mContext);
+		if (totalHapps == 1){
+			totalHappsTextView.setText(mContext.getResources().getString(R.string.total_happs_s));
+		} else {
+			totalHappsTextView.setText(mContext.getResources().getString(R.string.total_happs_pl));
+		}
+		totalHappsView.setText(Storage.getTotalHapps(mContext)+"");
 	}
 	
 	@Override

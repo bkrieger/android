@@ -33,4 +33,7 @@
     <string name="contacts_checkall">check all</string>
     <string name="dismiss">Dismiss</string>
     
+    <string name="total_happs_s">Total Happ</string>
+    <string name="total_happs_pl">Total Happs</string>
+    
 </resources>
