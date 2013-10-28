@@ -15,6 +15,7 @@ import us.happ.android.utils.Media;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -86,15 +87,17 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		// lazy load
 		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(m.getDuration()*1000);
 		if (decay < 0) decay = 0;
+		
 		// Check cache first
-		Bitmap bitmap = mBitmapCache.getBitmapFromMemCache(m.getNumber());
-
+		Bitmap bitmap = mBitmapCache.getBitmapFromMemCache(m.getNumber(), decay);
+		if (bitmap == null)
+		Log.i(mContactsManager.getName(m.getNumber()), " avatar is null");
 		if (bitmap == null){
 			// TODO use workers
 			Bitmap b = Media.getRoundedCornerBitmap(
 					mContext, mContactsManager.getAvatar(m.getNumber()), decay, Long.parseLong(m.getNumber()));
 			holder.avatar.setImageBitmap(b);
-			mBitmapCache.addBitmapToMemoryCache(m.getNumber(), b);
+			mBitmapCache.addBitmapToMemoryCache(m.getNumber(), b, decay);
 		} else {
 			holder.avatar.setImageBitmap(bitmap);
 		}
