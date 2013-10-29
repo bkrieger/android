@@ -42,6 +42,9 @@ public class PickerListView extends ListView {
 		mContext = context;
 		paint = new Paint();
 		selectorBorderStroke = (int) Media.pxFromDp(context, SELECTOR_BORDER_STROKE);
+		paint.setColor(mContext.getResources().getColor(R.color.happ_purple));
+		paint.setAlpha(200);
+		paint.setStrokeWidth(selectorBorderStroke);
 		childHeight = (int) Media.pxFromDp(context, LIST_ITEM_HEIGHT);
 		
 		setOnScrollListener(new OnScrollListener(){
@@ -144,8 +147,6 @@ public class PickerListView extends ListView {
 	@Override
 	protected void onDraw(Canvas canvas){
 		super.onDraw(canvas);
-		paint.setColor(mContext.getResources().getColor(R.color.happ_purple));
-		paint.setStrokeWidth(selectorBorderStroke);
 		canvas.drawLine(0, (height - childHeight)/2, width, (height - childHeight)/2, paint);
 		canvas.drawLine(0, (height + childHeight)/2, width, (height + childHeight)/2, paint);
 	}

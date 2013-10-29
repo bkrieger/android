@@ -3,5 +3,5 @@
     android:layout_width="match_parent"
     android:layout_height="48dp"
     android:gravity="center"
-    android:textColor="@color/happ_purple"
+    android:textColor="@color/black"
     android:textSize="18dp" />

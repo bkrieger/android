@@ -7,14 +7,24 @@ import us.happ.android.R;
 
 public class Mood {
 	
-	private static final HashMap<Integer, Integer> map;
+	private static final HashMap<Integer, Integer> moodIconMap;
 	static {
-		map = new HashMap<Integer, Integer>();
-		map.put(1, R.drawable.ic_tag_chill);
-		map.put(2, R.drawable.ic_tag_food);
-		map.put(3, R.drawable.ic_tag_movie);
-		map.put(4, R.drawable.ic_tag_party);
-		map.put(5, R.drawable.ic_tag_sport);
+		moodIconMap = new HashMap<Integer, Integer>();
+		moodIconMap.put(1, R.drawable.ic_tag_chill);
+		moodIconMap.put(2, R.drawable.ic_tag_food);
+		moodIconMap.put(3, R.drawable.ic_tag_movie);
+		moodIconMap.put(4, R.drawable.ic_tag_party);
+		moodIconMap.put(5, R.drawable.ic_tag_sport);
+	}
+
+	private static final HashMap<Integer, Integer> moodIconInverseMap;
+	static {
+		moodIconInverseMap = new HashMap<Integer, Integer>();
+		moodIconInverseMap.put(1, R.drawable.ic_tag_chill_i);
+		moodIconInverseMap.put(2, R.drawable.ic_tag_food_i);
+		moodIconInverseMap.put(3, R.drawable.ic_tag_movie_i);
+		moodIconInverseMap.put(4, R.drawable.ic_tag_party_i);
+		moodIconInverseMap.put(5, R.drawable.ic_tag_sport_i);
 	}
 
 	private String number;
@@ -29,12 +39,19 @@ public class Mood {
 		this.message = message;
 		this.timestamp = new Date(timestamp);
 		this.duration = duration;
-		this.setResId(map.get(tagId));
+		this.setResId(moodIconMap.get(tagId));
 		this.checked = false;
 	}
 	
 	public static int resIdFromTag(int tagId){
-		return map.get(tagId);
+		return resIdFromTag(tagId, false);
+	}
+	
+	public static int resIdFromTag(int tagId, boolean inverse){
+		if (inverse){
+			return moodIconInverseMap.get(tagId);
+		}
+		return moodIconMap.get(tagId);
 	}
 	
 	// Getters and Setters
