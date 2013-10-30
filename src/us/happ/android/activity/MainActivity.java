@@ -37,7 +37,9 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 public class MainActivity extends ActionBarActivity implements ServiceReceiver.Receiver {
-
+	
+	private boolean activityDestroyed = false;
+	
 	// Activity results flags
 	private static final int ACTIVITY_COMPOSE = 0x01;
 	
@@ -255,11 +257,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
+		if (activityDestroyed) return;
+		
 		String results = resultData.getString(APIService.RESULTS);
 		int taskId = resultData.getInt(APIService.TASK_ID);
 		
 		if (taskId == getMoodsId){
-			mBoardFragment.onFetchResult(results);
+			if (fragmentId == FRAGMENT_BOARD)
+				mBoardFragment.onFetchResult(results);
 			mProgressDialog.dismiss();
 			getMoodsId = -1;
 		} else if (taskId == postMoodsId){
@@ -285,6 +290,12 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	public void setProgressDialog(String msg){
 		mProgressDialog.setMessage(msg);
 		mProgressDialog.show();
+	}
+	
+	@Override
+	public void onDestroy(){
+		activityDestroyed = true;
+		super.onDestroy();
 	}
 	
 	/**
