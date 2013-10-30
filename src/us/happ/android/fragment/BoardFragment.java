@@ -277,7 +277,8 @@ public class BoardFragment extends HappFragment {
 	@Override
 	public void onResume(){
 		super.onResume();
-		actionbar.setDisplayShowTitleEnabled(false);
+		// Weird issue that actionbar is null if device is low on memory or after crash
+		if (actionbar != null) actionbar.setDisplayShowTitleEnabled(false);
 		if (mContactsManager.hasFetchedContacts()){
 			fetch();
 			mContext.showSpinner();

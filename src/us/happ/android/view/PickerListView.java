@@ -37,6 +37,9 @@ public class PickerListView extends ListView {
 	
 	private int positionChosen;
 	
+	private SmoothScrollAnimation mSmoothScrollAnimation;
+	private boolean isTouched;
+	
 	public PickerListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		mContext = context;
@@ -64,7 +67,7 @@ public class PickerListView extends ListView {
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				switch(scrollState){
 				case OnScrollListener.SCROLL_STATE_IDLE:
-					smoothScroll();
+					if (!isTouched) smoothScroll();
 		            break;
 				}
 			}
@@ -82,13 +85,14 @@ public class PickerListView extends ListView {
 	
 	private void smoothScroll(){
 		int pos = positionChosen + 1 - getFirstVisiblePosition();
+		if (getChildAt(pos) == null) return;
 		int offset = getChildAt(pos).getTop() - (height-childHeight)/2;
 		if (offset != 0){
-			SmoothScrollAnimation a = (new SmoothScrollAnimation());
-			a.setInterpolator(new SmoothInterpolator());
-			a.setDuration(500);
-			a.setPosition(positionChosen + 1, offset);
-			startAnimation(a);
+			mSmoothScrollAnimation = (new SmoothScrollAnimation());
+			mSmoothScrollAnimation.setInterpolator(new SmoothInterpolator());
+			mSmoothScrollAnimation.setDuration(500);
+			mSmoothScrollAnimation.setPosition(positionChosen + 1, offset);
+			startAnimation(mSmoothScrollAnimation);
 		}
 	}
 	
@@ -174,6 +178,13 @@ public class PickerListView extends ListView {
 		switch(ev.getAction()){
 		case MotionEvent.ACTION_DOWN:
 			clearAnimation();
+			isTouched = true;
+			break;
+		case MotionEvent.ACTION_CANCEL:
+			isTouched = false;
+			break;
+		case MotionEvent.ACTION_UP:
+			isTouched = false;
 			break;
 		}
 		return super.onTouchEvent(ev);

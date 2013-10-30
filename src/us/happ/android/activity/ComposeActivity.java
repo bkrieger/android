@@ -71,6 +71,13 @@ public class ComposeActivity extends ActionBarActivity {
 	private MenuItem mActionSubmit;
 
 	private View optionsView;
+	private TextView mCounterView;
+	
+	private boolean newlineDetected = false;
+	private String replacedText;
+	private int nextCursorPosition;
+	
+	private static final int MAX_LENGTH = 50;
 
 
 	@Override
@@ -94,6 +101,7 @@ public class ComposeActivity extends ActionBarActivity {
 		final int colorWhite = getResources().getColor(R.color.white);
 		final int colorBlack = getResources().getColor(R.color.black);
 		final int colorPurple = getResources().getColor(R.color.happ_purple);
+		final int colorGray = getResources().getColor(R.color.gray);
 		
 		final View contentView = findViewById(android.R.id.content);
 		contentView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
@@ -133,10 +141,15 @@ public class ComposeActivity extends ActionBarActivity {
 		            
 		            // Setting height of EditText
 		            mComposeET.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
+		            
+		            // Counter
+		            mCounterView.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
+		            mCounterView.setVisibility(View.VISIBLE);
 		        }
 		     }
 		});
 		
+		mCounterView = (TextView) findViewById(R.id.compose_counter);
 		mComposeET = (EditText) findViewById(R.id.compose_message);
 		mComposeET.setOnEditorActionListener(new OnEditorActionListener(){
 
@@ -168,22 +181,41 @@ public class ComposeActivity extends ActionBarActivity {
 			
 		});
 		
+		// Prevents pasting of newline characters
 		mComposeET.addTextChangedListener(new TextWatcher(){
 
 			@Override
 			public void afterTextChanged(Editable s) {
 				mActionSubmit.setEnabled(s.length() > 0);
+				if (s.length() < MAX_LENGTH){
+					mCounterView.setTextColor(colorGray);
+				} else {
+					mCounterView.setTextColor(colorPurple);
+				}
+				mCounterView.setText((MAX_LENGTH - s.length()) + "");
+				if (newlineDetected){
+					newlineDetected = false;
+					mComposeET.setText(replacedText);
+					mComposeET.setSelection(nextCursorPosition);
+				}
 			}
 
 			@Override
 			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
 			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			public void onTextChanged(CharSequence s, int start, int before, int count) {
+				if (s.toString().contains("\n")){
+					newlineDetected = true;
+					replacedText = s.toString().replaceAll("\n", " ");
+					nextCursorPosition = start + count;
+				}
+			}
 			
 		});
 
 		final View moodWrapper = findViewById(R.id.mood_wrapper);
+		final View durationWrapper = findViewById(R.id.duration_wrapper);
 		mMoodIconView = (ImageView) findViewById(R.id.mood_icon);
 		mMoodTextView = (TextView) findViewById(R.id.mood_value);
 		mDurationTextView = (TextView) findViewById(R.id.duration_value);
@@ -213,7 +245,7 @@ public class ComposeActivity extends ActionBarActivity {
 			
 		});
 		
-		mDurationTextView.setOnFocusChangeListener(new OnFocusChangeListener(){
+		durationWrapper.setOnFocusChangeListener(new OnFocusChangeListener(){
 
 			@Override
 			public void onFocusChange(View v, boolean hasFocus) {

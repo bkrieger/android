@@ -59,7 +59,6 @@ public class ContactsFragment extends HappFragment{
 		blockedNumbers = Storage.getBlockedNumbers(mContext);
 		mListAdapter = new ContactsAdapter(mContext, mCursor, blockedNumbers);
 		
-		
 		// Action bar
 		actionbar = mContext.getSupportActionBar();
 
@@ -68,8 +67,10 @@ public class ContactsFragment extends HappFragment{
 	@Override
 	public void onResume(){
 		super.onResume();
-		actionbar.setTitle(getResources().getString(R.string.title_friends));
-		actionbar.setDisplayShowTitleEnabled(true);
+		if (actionbar != null){
+			actionbar.setTitle(getResources().getString(R.string.title_friends));
+			actionbar.setDisplayShowTitleEnabled(true);
+		}
 	}
 	
 	@Override
