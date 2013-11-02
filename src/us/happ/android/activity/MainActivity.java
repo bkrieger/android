@@ -151,7 +151,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	        mProgressDialog.setMessage(getResources().getString(R.string.dialog_retrieve_contacts));
 	    	mProgressDialog.show();
         }
-        
 	}
 	
 	@Override

@@ -8,6 +8,8 @@ import us.happ.android.adapter.ContactsAdapter;
 import us.happ.android.utils.Storage;
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.os.Build.VERSION;
@@ -46,6 +48,7 @@ public class ContactsFragment extends HappFragment{
 	private TextView sectionOverlayText;
 	private TextView counterView;
 	private ActionBar actionbar;
+	private AlertDialog mDialog;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -61,7 +64,24 @@ public class ContactsFragment extends HappFragment{
 		
 		// Action bar
 		actionbar = mContext.getSupportActionBar();
-
+		
+		// Alert Dialog
+		AlertDialog.Builder dialogBuilder = new AlertDialog.Builder(mContext);
+		dialogBuilder.setTitle("Check All");
+		dialogBuilder
+			.setMessage("Warning: Doing this will select all your contacts as friends")
+			.setPositiveButton("Confirm", new DialogInterface.OnClickListener(){
+				public void onClick(DialogInterface dialog, int id){
+					mListAdapter.resetChecks();
+					updateCounter();
+				}
+			})
+			.setNegativeButton("Cancel", new DialogInterface.OnClickListener(){
+				public void onClick(DialogInterface dialog, int id){
+					dialog.cancel();
+				}
+			});
+		mDialog = dialogBuilder.create();
 	}
 	
 	@Override
@@ -88,8 +108,7 @@ public class ContactsFragment extends HappFragment{
 		resetView.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mListAdapter.resetChecks();
-				updateCounter();
+				mDialog.show();
 			}
 		});
 		

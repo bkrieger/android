@@ -7,7 +7,7 @@ import android.app.Application;
 
 @ReportsCrashes(
       formKey = "", // This is required for backward compatibility but not used
-      formUri = "http://happ.us/dev/err-android"
+      formUri = "http://www.happ.us/dev/err-android"
 )
 public class HappApplication extends Application {
 	
