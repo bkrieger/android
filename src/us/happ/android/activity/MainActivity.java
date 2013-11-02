@@ -80,6 +80,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		supportRequestWindowFeature(Window.FEATURE_INDETERMINATE_PROGRESS);
         
 		setContentView(R.layout.activity_main);
+		getWindow().setBackgroundDrawable(null); // optimization to reduce overdraw
 		
 		mContactsManager = ContactsManager.getInstance(this);
 		

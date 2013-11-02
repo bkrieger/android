@@ -3,9 +3,12 @@ package us.happ.android.adapter;
 import us.happ.android.R;
 import us.happ.android.model.Mood;
 import us.happ.android.model.Tag;
+import us.happ.android.utils.Media;
 import us.happ.android.view.PickerListView;
 import android.content.Context;
 import android.graphics.BitmapFactory;
+import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -19,12 +22,16 @@ public class TagsAdapter extends ArrayAdapter<Tag>{
 	private LayoutInflater inflater;
 	private Context mContext;
 	private android.widget.AbsListView.LayoutParams layoutParams;
+	private int padding;
+	private Rect mRect;
 
 	public TagsAdapter(Context context, int resource, Tag[] tags) {
 		super(context, resource);
 		this.tags = tags;
 		inflater = LayoutInflater.from(context);
 		mContext = context;
+		
+		padding = (int) Media.pxFromDp(context, 10);
 	}
 
 	@Override
@@ -45,30 +52,33 @@ public class TagsAdapter extends ArrayAdapter<Tag>{
 	@Override
 	public View getView(int position, View convertView, ViewGroup parent) {
 		View v;
-		ViewHolder holder;
+		TextView tagView;
 		if (convertView == null){
 			v = inflater.inflate(R.layout.list_item_picker_tags, parent, false);
 			
 			// TODO fix this. Should just get it from the inflate (parent)
-			if (layoutParams == null)
-				layoutParams = new AbsListView.LayoutParams(parent.getWidth(), ((PickerListView) parent).getChildHeight());
-			
-			v.setLayoutParams(layoutParams);
+			if (layoutParams == null){
+				int height = ((PickerListView) parent).getChildHeight();
+				layoutParams = new AbsListView.LayoutParams(parent.getWidth(), height);
+				mRect = new Rect(0, 0, height - padding, height - padding);
 
-			holder = new ViewHolder();
-			holder.title = (TextView) v.findViewById(R.id.picker_tags_title);
-			holder.icon = (ImageView) v.findViewById(R.id.picker_tags_icon);
-			v.setTag(holder);
+			}
+			v.setLayoutParams(layoutParams);
+			
+			tagView = (TextView) v.findViewById(R.id.picker_tag);
+			v.setTag(tagView);
 		} else {
 			v = convertView;
-			holder = (ViewHolder) v.getTag();
+			tagView = (TextView) v.getTag();
 		}
 		
 		Tag t = tags[position];
-	
-		holder.title.setText(t.label);
-		holder.icon.setImageBitmap(BitmapFactory.decodeResource(mContext.getResources(), Mood.resIdFromTag(t.valueForPost)));
-				
+		
+		tagView.setText(t.label);
+		Drawable d = mContext.getResources().getDrawable(Mood.resIdFromTag(t.valueForPost));
+		d.setBounds(mRect);
+		tagView.setCompoundDrawables(d, null, null, null);
+		
 		return v;
 		
 	}

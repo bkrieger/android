@@ -84,6 +84,7 @@ public class ComposeActivity extends ActionBarActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_compose);
+		getWindow().setBackgroundDrawable(null); // optimization to reduce overdraw
 		
 		mContext = this;
 
@@ -236,7 +237,7 @@ public class ComposeActivity extends ActionBarActivity {
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, true)));
 				} else {
-					moodWrapper.setBackgroundColor(colorWhite);
+					moodWrapper.setBackgroundResource(0);
 					mMoodTextView.setTextColor(colorBlack);
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, false)));
@@ -260,7 +261,7 @@ public class ComposeActivity extends ActionBarActivity {
 					mDurationTextView.setBackgroundColor(colorPurple);
 				} else {
 					mDurationTextView.setTextColor(colorBlack);
-					mDurationTextView.setBackgroundColor(colorWhite);
+					mDurationTextView.setBackgroundResource(0);
 				}
 			}
 			
