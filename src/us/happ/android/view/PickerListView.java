@@ -55,6 +55,7 @@ public class PickerListView extends ListView {
 
 			@Override
 			public void run() {
+				scrolling = true;
 				smoothScrollBy(mScrollOffset, 500);
 			}
 			
@@ -100,9 +101,8 @@ public class PickerListView extends ListView {
 	private void smoothScroll(){
 		int pos = positionChosen + 1 - getFirstVisiblePosition();
 		if (getChildAt(pos) == null) return;
-		final int offset = getChildAt(pos).getTop() - (height-childHeight)/2;
-		if (offset != 0){
-			mScrollOffset = offset;
+		mScrollOffset = getChildAt(pos).getTop() - (height-childHeight)/2;
+		if (mScrollOffset != 0){
 			mHandler.postDelayed(mRunnable, 20);
 		}
 	}
@@ -172,7 +172,8 @@ public class PickerListView extends ListView {
 			case MotionEvent.ACTION_DOWN:
 				isTouched = true;
 				mHandler.removeCallbacks(mRunnable);
-				smoothScrollBy(1, 1);
+				if (scrolling)
+					smoothScrollBy(1, 1); // cancels scrolling
 				break;
 			case MotionEvent.ACTION_UP:
 			case MotionEvent.ACTION_CANCEL:
