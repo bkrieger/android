@@ -5,22 +5,17 @@ package us.happ.android.view;
 import us.happ.android.R;
 import us.happ.android.activity.ComposeActivity;
 import us.happ.android.utils.Media;
-import us.happ.android.utils.SmoothInterpolator;
-import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Canvas;
 import android.graphics.Paint;
-import android.os.Build;
+import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.Transformation;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ListView;
-import android.widget.FrameLayout.LayoutParams;
 
 public class PickerListView extends ListView {
 
@@ -36,9 +31,13 @@ public class PickerListView extends ListView {
 	private int childHeight;
 	
 	private int positionChosen;
+
+	private boolean scrolling;
 	
-	private SmoothScrollAnimation mSmoothScrollAnimation;
-	private boolean isTouched;
+	private Handler mHandler;
+	private int mScrollOffset;
+	private Runnable mRunnable;
+	private boolean isTouched = false;
 	
 	public PickerListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -49,6 +48,17 @@ public class PickerListView extends ListView {
 		paint.setAlpha(200);
 		paint.setStrokeWidth(selectorBorderStroke);
 		childHeight = (int) Media.pxFromDp(context, LIST_ITEM_HEIGHT);
+		
+		mHandler = new Handler();
+		
+		mRunnable = new Runnable(){
+
+			@Override
+			public void run() {
+				smoothScrollBy(mScrollOffset, 500);
+			}
+			
+		};
 		
 		setOnScrollListener(new OnScrollListener(){
 
@@ -67,8 +77,12 @@ public class PickerListView extends ListView {
 			public void onScrollStateChanged(AbsListView view, int scrollState) {
 				switch(scrollState){
 				case OnScrollListener.SCROLL_STATE_IDLE:
-					if (!isTouched) smoothScroll();
+					if (scrolling && !isTouched) smoothScroll();
+					scrolling = false;
 		            break;
+				case OnScrollListener.SCROLL_STATE_TOUCH_SCROLL:
+					scrolling = true;
+					break;
 				}
 			}
 			
@@ -86,13 +100,10 @@ public class PickerListView extends ListView {
 	private void smoothScroll(){
 		int pos = positionChosen + 1 - getFirstVisiblePosition();
 		if (getChildAt(pos) == null) return;
-		int offset = getChildAt(pos).getTop() - (height-childHeight)/2;
+		final int offset = getChildAt(pos).getTop() - (height-childHeight)/2;
 		if (offset != 0){
-			mSmoothScrollAnimation = (new SmoothScrollAnimation());
-			mSmoothScrollAnimation.setInterpolator(new SmoothInterpolator());
-			mSmoothScrollAnimation.setDuration(500);
-			mSmoothScrollAnimation.setPosition(positionChosen + 1, offset);
-			startAnimation(mSmoothScrollAnimation);
+			mScrollOffset = offset;
+			mHandler.postDelayed(mRunnable, 20);
 		}
 	}
 	
@@ -155,45 +166,26 @@ public class PickerListView extends ListView {
 		canvas.drawLine(0, (height + childHeight)/2, width, (height + childHeight)/2, paint);
 	}
 	
-	class SmoothScrollAnimation extends Animation {
-		private int position;
-		private int startPosition;
-		
-		public void setPosition(int position, int startPosition){
-			this.position = position;
-			this.startPosition = startPosition;
-		}
-		
-		@Override
-		protected void applyTransformation(float interpolatedTime, Transformation t) {
-			// TODO this keeps calling measure and layouts OPTIMIZE
-			PickerListView.this.setSelectionFromTop(position, (int) ((height-childHeight)/2 + startPosition*(1 - interpolatedTime)));
-	    }
-		
-	}
-	
 	@Override
 	public boolean onTouchEvent(MotionEvent ev){
-
 		switch(ev.getAction()){
-		case MotionEvent.ACTION_DOWN:
-			clearAnimation();
-			isTouched = true;
-			break;
-		case MotionEvent.ACTION_CANCEL:
-			isTouched = false;
-			break;
-		case MotionEvent.ACTION_UP:
-			isTouched = false;
-			break;
+			case MotionEvent.ACTION_DOWN:
+				isTouched = true;
+				mHandler.removeCallbacks(mRunnable);
+				smoothScrollBy(1, 1);
+				break;
+			case MotionEvent.ACTION_UP:
+			case MotionEvent.ACTION_CANCEL:
+				isTouched = false;
+				break;
 		}
+		
 		return super.onTouchEvent(ev);
 	}
 
 	@Override
 	protected void layoutChildren(){
 		super.layoutChildren();
-		
 		for(int i = 0; i < getChildCount(); i++){
 			View child = getChildAt(i);
 			

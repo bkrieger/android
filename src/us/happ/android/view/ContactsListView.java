@@ -57,7 +57,7 @@ public class ContactsListView extends ListView {
 	        		width - rightMargin - textPaint.measureText(s)/2, 
 	                paddingTop + topMargin + indexSize * (i + 1), 
 	                textPaint);
-	    } 
+	    }
 	     
 	}
 	
