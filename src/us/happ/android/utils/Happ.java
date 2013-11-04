@@ -1,10 +1,16 @@
 package us.happ.android.utils;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.os.Build;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 
 public class Happ {
+	
+	public final static boolean HAS_HARDWARE_ACCELERATION = Build.VERSION.SDK_INT >= 11;
 
 	public static void showViewIf(View viewShown, View viewHidden,
 			boolean condition) {
@@ -48,6 +54,41 @@ public class Happ {
 			result = context.getResources().getDimensionPixelSize(resourceId);
 		}
 		return result;
+	}
+	
+	public static void startAnimationWithHardwareAcceleration(final View v, Animation anim){
+		hardwareAccelerate(v);
+		anim.setAnimationListener(new AnimationListener(){
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				Happ.stopHardwareAcceleration(v);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {}
+
+			@Override
+			public void onAnimationStart(Animation animation) {}
+        	
+        });
+		v.startAnimation(anim);
+	}
+	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static boolean hardwareAccelerate(View v){
+		if (Happ.HAS_HARDWARE_ACCELERATION){
+			v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
+			return true;
+		}
+		return false;
+	}
+	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+	public static void stopHardwareAcceleration(View v){
+		if (Happ.HAS_HARDWARE_ACCELERATION){
+			v.setLayerType(View.LAYER_TYPE_NONE, null);
+		}
 	}
 
 }

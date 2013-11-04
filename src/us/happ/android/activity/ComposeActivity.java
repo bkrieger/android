@@ -8,6 +8,7 @@ import us.happ.android.model.Mood;
 import us.happ.android.model.Tag;
 import us.happ.android.utils.Happ;
 import us.happ.android.view.PickerListView;
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Color;
@@ -25,8 +26,10 @@ import android.view.View;
 import android.view.View.MeasureSpec;
 import android.view.View.OnFocusChangeListener;
 import android.view.ViewTreeObserver.OnGlobalLayoutListener;
+import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
@@ -95,7 +98,25 @@ public class ComposeActivity extends ActionBarActivity {
 		actionbar.setDisplayShowTitleEnabled(true);
 		actionbar.setDisplayShowHomeEnabled(false);
 		
+		mComposeET = (EditText) findViewById(R.id.compose_message);
 		
+		// Delaying the keyboard (lags on older devices)
+		mComposeET.setFocusable(false);
+		mComposeET.setFocusableInTouchMode(false);
+		mComposeET.setEnabled(false);
+		
+		// Delay view initialization until animation is over
+		Handler handler = new Handler();
+		Runnable r = new Runnable(){
+			@Override
+			public void run() {
+				initView();	
+			}
+		};
+		handler.postDelayed(r, getResources().getInteger(android.R.integer.config_longAnimTime));
+	}
+	
+	private void initView(){
 		actionbarHeight = Happ.getActionBarHeight(this);
 		statusbarHeight = Happ.getStatusBarHeight(this);
 		
@@ -115,6 +136,9 @@ public class ComposeActivity extends ActionBarActivity {
 		        if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
 		            Log.i("keyboard", "shown");
 		            keyboardInitialized = true; 
+		            
+		            // We do not need adjustResize anymore (which was causing rendering issues behind keyboard)
+		            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
 		            
 		            View v = contentView.findViewById(R.id.activity_compose);
 		            
@@ -136,9 +160,13 @@ public class ComposeActivity extends ActionBarActivity {
 		            params = (LayoutParams) optionsView.getLayoutParams();
 		            params.topMargin = marginTop - optionsHeight;
 		            optionsView.setLayoutParams(params);
+		            
+		            // TODO improve performance (high process time of animation)
+		            // TODO explore options other than alpha animation + hardware Acceleration
+		    		// Maybe paint a white layer on top of the view to cover it?
 		            Animation anim = new AlphaAnimation(0.00f, 1.00f);
 		            anim.setDuration(500);
-		            optionsView.startAnimation(anim);
+		            Happ.startAnimationWithHardwareAcceleration(optionsView, anim);
 		            
 		            // Setting height of EditText
 		            mComposeET.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
@@ -146,12 +174,11 @@ public class ComposeActivity extends ActionBarActivity {
 		            // Counter
 		            mCounterView.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
 		            mCounterView.setVisibility(View.VISIBLE);
+		        
 		        }
 		     }
 		});
 		
-		mCounterView = (TextView) findViewById(R.id.compose_counter);
-		mComposeET = (EditText) findViewById(R.id.compose_message);
 		mComposeET.setOnEditorActionListener(new OnEditorActionListener(){
 
 			@Override
@@ -214,12 +241,9 @@ public class ComposeActivity extends ActionBarActivity {
 			}
 			
 		});
-
+		
 		final View moodWrapper = findViewById(R.id.mood_wrapper);
 		final View durationWrapper = findViewById(R.id.duration_wrapper);
-		mMoodIconView = (ImageView) findViewById(R.id.mood_icon);
-		mMoodTextView = (TextView) findViewById(R.id.mood_value);
-		mDurationTextView = (TextView) findViewById(R.id.duration_value);
 		
 		moodWrapper.setOnFocusChangeListener(new OnFocusChangeListener(){
 
@@ -269,36 +293,30 @@ public class ComposeActivity extends ActionBarActivity {
 		
 		// Option buttons
 		optionsView = findViewById(R.id.compose_options);
+	
+		mCounterView = (TextView) findViewById(R.id.compose_counter);
+		mMoodIconView = (ImageView) findViewById(R.id.mood_icon);
+		mMoodTextView = (TextView) findViewById(R.id.mood_value);
+		mDurationTextView = (TextView) findViewById(R.id.duration_value);	
 		
 		mListView = (PickerListView) findViewById(android.R.id.list);
 		mTagsAdapter = new TagsAdapter(this, 0, Tag.values());
 		mDurationAdapter = new DurationAdapter(this, 0, Duration.values());
-		
+
 		// Should have a better way of doing this
 		setTag(Tag.CHILL, false);
 		chosen_tag_position = 0;
 		setDuration(Duration.FOUR_HOURS);
 		chosen_duration_position = 4;
 		
-		// Delaying the keyboard (lags on older devices)
-		mComposeET.setFocusable(false);
-		mComposeET.setFocusableInTouchMode(false);
-		mComposeET.setEnabled(false);
+		// Show keyboard
+		mComposeET.setFocusable(true);
+		mComposeET.setFocusableInTouchMode(true);
+		mComposeET.setEnabled(true);
+		mComposeET.requestFocus();
+		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+		imm.showSoftInput(mComposeET, 0);
 		
-		Handler handler = new Handler();
-		Runnable r = new Runnable(){
-			@Override
-			public void run() {
-				mComposeET.setFocusable(true);
-				mComposeET.setFocusableInTouchMode(true);
-				mComposeET.setEnabled(true);
-				mComposeET.requestFocus();
-				InputMethodManager imm = (InputMethodManager)getSystemService(
-					      Context.INPUT_METHOD_SERVICE);
-				imm.showSoftInput(mComposeET, 0);	
-			}
-		};
-		handler.postDelayed(r, getResources().getInteger(android.R.integer.config_longAnimTime));
 	}
 
 	@Override

@@ -14,6 +14,7 @@
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
+        android:hardwareAccelerated="true"
         android:name="us.happ.android.HappApplication"
         android:allowBackup="true"
         android:icon="@drawable/ic_launcher"
