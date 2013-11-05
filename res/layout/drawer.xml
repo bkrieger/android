@@ -52,7 +52,8 @@
         android:clickable="true"
         android:gravity="center_vertical"
         android:paddingLeft="20dp"
-        android:text="Privacy Policy"
+        android:text="@string/menu_privacy"
+        android:onClick="onClickPrivacy"
         android:textColor="@color/white"
         android:textSize="16dp" />
 
@@ -64,7 +65,8 @@
         android:clickable="true"
         android:gravity="center_vertical"
         android:paddingLeft="20dp"
-        android:text="Terms"
+        android:text="@string/menu_terms"
+        android:onClick="onClickTerms"
         android:textColor="@color/white"
         android:textSize="16dp" />
 

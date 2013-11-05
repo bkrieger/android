@@ -6,7 +6,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedHashMap;
 
+import us.happ.android.bitmap.ImageCache.ImageCacheParams;
+import us.happ.android.bitmap.ImageLoader;
+
 import us.happ.android.R;
+import us.happ.android.bitmap.ImageResizer;
 import us.happ.android.model.Mood;
 import us.happ.android.utils.BitmapCache;
 import us.happ.android.utils.ContactsManager;
@@ -15,6 +19,7 @@ import us.happ.android.utils.Media;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -26,11 +31,14 @@ import android.widget.TextView;
 
 public class BoardAdapter extends ArrayAdapter<Mood> {
 	
+	private static final int AVATAR_HEIGHT = 70; //dp
+	private static final String IMAGE_CACHE_DIR = "images";
+	
 	private ArrayList<Mood> data;
 	private LayoutInflater inflater;
 	private ContactsManager mContactsManager;
 	private Context mContext;
-	private BitmapCache mBitmapCache;
+	private ImageLoader mImageLoader;
 	private boolean showCheckbox;
 	
 	private LinkedHashMap<String, String> checkedContacts;
@@ -41,7 +49,15 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		data = new ArrayList<Mood>();
 		mContactsManager = ContactsManager.getInstance(context);
 		mContext = context;
-		mBitmapCache = new BitmapCache();
+		
+		int avatarHeight = (int) Media.pxFromDp(context, AVATAR_HEIGHT);
+		
+		ImageCacheParams cacheParams = new ImageCacheParams(context, IMAGE_CACHE_DIR);
+        cacheParams.setMemCacheSizePercent(0.25f); // Set memory cache to 25% of app memory
+		mImageLoader = new ImageLoader(context, avatarHeight); // Size of ImageView to be calculated
+//		mImageLoader.setLoadingImage(R.drawable.ic_tag_chill);
+		mImageLoader.addImageCache(((FragmentActivity) context).getSupportFragmentManager(), cacheParams);
+
 		checkedContacts = new LinkedHashMap<String, String>();
 	}
 	
@@ -85,22 +101,15 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		
 		// TODO
 		// lazy load
-		float decay = ((float) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime()))/(m.getDuration()*1000);
+		// Decay, out of 360
+		int decay = (int) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime())*360/(m.getDuration()*1000);
 		if (decay < 0) decay = 0;
 		
 		// Check cache first
-		Bitmap bitmap = mBitmapCache.getBitmapFromMemCache(m.getNumber(), decay);
-		if (bitmap == null)
-		Log.i(mContactsManager.getName(m.getNumber()), " avatar is null");
-		if (bitmap == null){
-			// TODO use workers
-			Bitmap b = Media.getRoundedCornerBitmap(
-					mContext, mContactsManager.getAvatar(m.getNumber()), decay, Long.parseLong(m.getNumber()));
-			holder.avatar.setImageBitmap(b);
-			mBitmapCache.addBitmapToMemoryCache(m.getNumber(), b, decay);
-		} else {
-			holder.avatar.setImageBitmap(bitmap);
-		}
+		mImageLoader.loadImage(
+				new AvatarData(mContactsManager.getAvatar(m.getNumber()),
+						m.getNumber(),
+						decay), holder.avatar);
 		
 		// checkboxes
 		Happ.showViewIf(holder.checkbox, holder.tag, showCheckbox && m.getChecked());
@@ -183,6 +192,23 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		String[] names = new String[checkedContacts.size()];
 		checkedContacts.values().toArray(names);
 		return names;
+	}
+	
+	public class AvatarData {
+		public Bitmap bitmap;
+		public String number;
+		public int decay;
+		
+		public AvatarData(Bitmap bitmap, String number, int decay){
+			this.bitmap = bitmap;
+			this.number = number;
+			this.decay = decay;
+		}
+		
+		@Override
+		public String toString(){
+			return number + "-" + decay/18; // 20 projections
+		}
 	}
 	
 

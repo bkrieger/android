@@ -1,8 +1,16 @@
 package us.happ.android.utils;
 
+
+import java.util.List;
+
 import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.net.Uri;
 import android.os.Build;
+import android.os.StrictMode;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.animation.Animation;
@@ -10,7 +18,11 @@ import android.view.animation.Animation.AnimationListener;
 
 public class Happ {
 	
-	public final static boolean HAS_HARDWARE_ACCELERATION = Build.VERSION.SDK_INT >= 11;
+    public static boolean hasFroyo = Build.VERSION.SDK_INT >= Build.VERSION_CODES.FROYO;
+    public static boolean hasGingerbread = Build.VERSION.SDK_INT >= Build.VERSION_CODES.GINGERBREAD;
+    public static boolean hasHoneycomb = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB;
+    public static boolean hasHoneycombMR1 = Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB_MR1;
+    public static boolean hasJellyBean = Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN;
 
 	public static void showViewIf(View viewShown, View viewHidden,
 			boolean condition) {
@@ -75,9 +87,17 @@ public class Happ {
 		v.startAnimation(anim);
 	}
 	
+	public static boolean hasSmsService(Context context){
+	    Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse("smsto:123456789"));
+	    PackageManager pm = context.getPackageManager();
+	    List<ResolveInfo> res = pm.queryIntentActivities(intent, PackageManager.MATCH_DEFAULT_ONLY);
+	    if(res.size() > 0) return true;
+	    return false;
+	}
+	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static boolean hardwareAccelerate(View v){
-		if (Happ.HAS_HARDWARE_ACCELERATION){
+		if (Happ.hasHoneycomb){
 			v.setLayerType(View.LAYER_TYPE_HARDWARE, null);
 			return true;
 		}
@@ -86,9 +106,33 @@ public class Happ {
 	
 	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	public static void stopHardwareAcceleration(View v){
-		if (Happ.HAS_HARDWARE_ACCELERATION){
+		if (Happ.hasHoneycomb){
 			v.setLayerType(View.LAYER_TYPE_NONE, null);
 		}
 	}
+	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static void enableStrictMode() {
+        if (hasGingerbread) {
+            StrictMode.ThreadPolicy.Builder threadPolicyBuilder =
+                    new StrictMode.ThreadPolicy.Builder()
+                            .detectAll()
+                            .penaltyLog();
+            StrictMode.VmPolicy.Builder vmPolicyBuilder =
+                    new StrictMode.VmPolicy.Builder()
+                            .detectAll()
+                            .penaltyLog();
+
+            if (hasHoneycomb) {
+                threadPolicyBuilder.penaltyFlashScreen();
+                // TODO uncomment
+//                vmPolicyBuilder
+//                        .setClassInstanceLimit(ImageGridActivity.class, 1)
+//                        .setClassInstanceLimit(ImageDetailActivity.class, 1);
+            }
+            StrictMode.setThreadPolicy(threadPolicyBuilder.build());
+            StrictMode.setVmPolicy(vmPolicyBuilder.build());
+        }
+    }
 
 }

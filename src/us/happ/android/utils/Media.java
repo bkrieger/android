@@ -12,6 +12,7 @@ import android.graphics.PorterDuff.Mode;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
 import android.graphics.RectF;
+import android.util.Log;
 
 public class Media {
 	
@@ -26,7 +27,7 @@ public class Media {
 		"#FA7500",
 	};
 
-	public static Bitmap getRoundedCornerBitmap(Context context, Bitmap bitmap, float decay, long phoneNumber) {
+	public static Bitmap makeHappAvatar(Context context, Bitmap bitmap, int decay, long phoneNumber) {
 		boolean noProfile = bitmap == null;
 		
 		Bitmap output = Bitmap.createBitmap((int) pxFromDp(context, 70f), (int) pxFromDp(context, 70f), Config.ARGB_8888);
@@ -91,8 +92,8 @@ public class Media {
 	    paint.setAlpha(255);
 	    paint.setStrokeWidth((float) borderPx + onedp);
 
-	    int start = (int) (270 - decay*360);
-	    int end = (int) (decay*360);
+	    int start = 270 - decay;
+	    int end = decay;
 	    canvas.drawArc(rectF, start, end, false, paint);
 	    
 	    return output;

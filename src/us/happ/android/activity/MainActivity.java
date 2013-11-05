@@ -17,6 +17,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
@@ -386,5 +387,19 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	public void onClickFriends(View v){
 		switchFragment(FRAGMENT_FRIENDS);
 		selectMenuItem((TextView) v);
+	}
+	
+	public void onClickPrivacy(View v){
+		String url = "http://www.happ.us/terms#privacy";
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(url));
+		startActivity(i);
+	}
+	
+	public void onClickTerms(View v){
+		String url = "http://www.happ.us/terms";
+		Intent i = new Intent(Intent.ACTION_VIEW);
+		i.setData(Uri.parse(url));
+		startActivity(i);
 	}
 }

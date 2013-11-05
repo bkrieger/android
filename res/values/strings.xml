@@ -28,6 +28,8 @@
     
     <string name="menu_happening">What\'s Happening</string>
     <string name="menu_friends">Friends</string>
+    <string name="menu_terms">Terms</string>
+    <string name="menu_privacy">Privacy Policy</string>
     
     <string name="contacts_hint">We\'ve automatically added everyone in your contacts to your friends list. Only friends can see your status.</string>
     <string name="contacts_checkall">check all</string>

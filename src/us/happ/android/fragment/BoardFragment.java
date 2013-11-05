@@ -51,6 +51,7 @@ public class BoardFragment extends HappFragment {
 	// flags
 	private boolean refreshing = false;
 	private boolean allowPullToRefresh = true;
+	private boolean HAS_SMS_SERVICE;
 	
 	private View stripView;
 	private View sadHippoView;
@@ -83,6 +84,8 @@ public class BoardFragment extends HappFragment {
 		mListAdapter = new BoardAdapter(mContext, 0);
 		
 		setHasOptionsMenu(true);
+		
+		HAS_SMS_SERVICE = Happ.hasSmsService(mContext);
 		
 		// Action bar
 		actionbar = mContext.getSupportActionBar();
@@ -158,7 +161,8 @@ public class BoardFragment extends HappFragment {
 		mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
-            	onBoardItemClick(position-1); // -1 for header
+            	if (HAS_SMS_SERVICE)
+            		onBoardItemClick(position-1); // -1 for header
             }
         });
 		
@@ -336,7 +340,7 @@ public class BoardFragment extends HappFragment {
 	            case MotionEvent.ACTION_DOWN:
 	            	mListView.setOverScrollMode(View.OVER_SCROLL_IF_CONTENT_SCROLLS);
 	                mLastMotionY = y;
-	                allowPullToRefresh = mListView.getChildAt(0).getTop() == 0 && mListView.getFirstVisiblePosition() == 0;
+	                allowPullToRefresh = Math.abs(mListView.getChildAt(0).getTop()) < 5 && mListView.getFirstVisiblePosition() == 0;
 	                pullTriggered = false;
 	                shouldIntercept = false;
 	                break;
@@ -384,7 +388,6 @@ public class BoardFragment extends HappFragment {
 		 LayoutParams lp = (LayoutParams) mHeader.getLayoutParams();
 		 int startMargin = lp.topMargin;
 		 
-		 mListView.smoothScrollToPosition(0);
 		 if (startMargin == 0) return;
 		 
 		 boolean shouldRefresh = refresh && startMargin >= hippoHeight;
