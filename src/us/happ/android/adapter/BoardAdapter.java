@@ -4,6 +4,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import us.happ.android.bitmap.ImageCache.ImageCacheParams;
@@ -16,6 +17,7 @@ import us.happ.android.utils.BitmapCache;
 import us.happ.android.utils.ContactsManager;
 import us.happ.android.utils.Happ;
 import us.happ.android.utils.Media;
+import us.happ.android.view.AvatarView;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -40,6 +42,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 	private Context mContext;
 	private ImageLoader mImageLoader;
 	private boolean showCheckbox;
+	private HashMap<String, Integer> mLastSeenDecay;
 	
 	private LinkedHashMap<String, String> checkedContacts;
 	
@@ -59,6 +62,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		mImageLoader.addImageCache(((FragmentActivity) context).getSupportFragmentManager(), cacheParams);
 
 		checkedContacts = new LinkedHashMap<String, String>();
+		mLastSeenDecay = new HashMap<String, Integer>();
 	}
 	
 	@Override
@@ -83,7 +87,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		if (convertView == null){
 			v = inflater.inflate(R.layout.list_item_board, parent, false);
 			holder = new ViewHolder();
-			holder.avatar = (ImageView) v.findViewById(R.id.board_avatar);
+			holder.avatar = (AvatarView) v.findViewById(R.id.board_avatar);
 			holder.name = (TextView) v.findViewById(R.id.board_name);
 			holder.message = (TextView) v.findViewById(R.id.board_message);
 			holder.tag = (ImageView) v.findViewById(R.id.board_tag);
@@ -99,17 +103,32 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		
 		Mood m = data.get(position);
 		
-		// TODO
-		// lazy load
 		// Decay, out of 360
 		int decay = (int) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime())*360/(m.getDuration()*1000);
 		if (decay < 0) decay = 0;
 		
-		// Check cache first
+		Bitmap avatar = mContactsManager.getAvatar(m.getNumber());
 		mImageLoader.loadImage(
-				new AvatarData(mContactsManager.getAvatar(m.getNumber()),
+				new AvatarData(avatar,
 						m.getNumber(),
 						decay), holder.avatar);
+		holder.avatar.setDecay(decay);
+		holder.avatar.setHasProfile(avatar != null);
+		holder.avatar.setNumber(Long.parseLong(m.getNumber()));
+		
+		if (!mLastSeenDecay.containsKey(m.getNumber())){
+			holder.avatar.animateDecay(360);
+		} else {
+			int lastDecay = mLastSeenDecay.get(m.getNumber());
+			if (lastDecay > decay + 5){
+				holder.avatar.animateDecay(lastDecay);
+			} else if (lastDecay < decay){
+				holder.avatar.animateDecay(360);
+			} else {
+				holder.avatar.invalidate();
+			}
+		}
+		mLastSeenDecay.put(m.getNumber(), decay);
 		
 		// checkboxes
 		Happ.showViewIf(holder.checkbox, holder.tag, showCheckbox && m.getChecked());
@@ -129,7 +148,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 	}
 	
 	class ViewHolder {
-		ImageView avatar;
+		AvatarView avatar;
 		TextView name;
 		TextView message;
 		ImageView tag;
@@ -207,7 +226,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		
 		@Override
 		public String toString(){
-			return number + "-" + decay/18; // 20 projections
+			return number; // + "-" + decay/18; // 20 projections
 		}
 	}
 	

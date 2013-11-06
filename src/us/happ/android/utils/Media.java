@@ -78,23 +78,23 @@ public class Media {
 	    paint.setStrokeWidth((float) borderPx);
 	    canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
 	    
-	    int onedp;
-	    // draw time left
-	    if (noProfile){
-	    	onedp = (int) pxFromDp(context, 1);
-	    } else {
-	    	onedp = 0;
-	    }
-	    
-	    rect = new Rect(borderPx/2 + onedp, borderPx/2 + onedp, bitmapWidth + borderPx*3/2 - onedp, bitmapWidth + borderPx*3/2 - onedp);
-    	rectF = new RectF(rect);
-    	paint.setColor(profileColor);
-	    paint.setAlpha(255);
-	    paint.setStrokeWidth((float) borderPx + onedp);
-
-	    int start = 270 - decay;
-	    int end = decay;
-	    canvas.drawArc(rectF, start, end, false, paint);
+//	    int onedp;
+//	    // draw time left
+//	    if (noProfile){
+//	    	onedp = (int) pxFromDp(context, 1);
+//	    } else {
+//	    	onedp = 0;
+//	    }
+//	    
+//	    rect = new Rect(borderPx/2 + onedp, borderPx/2 + onedp, bitmapWidth + borderPx*3/2 - onedp, bitmapWidth + borderPx*3/2 - onedp);
+//    	rectF = new RectF(rect);
+//    	paint.setColor(profileColor);
+//	    paint.setAlpha(255);
+//	    paint.setStrokeWidth((float) borderPx + onedp);
+//
+//	    int start = 270 - decay;
+//	    int end = decay;
+//	    canvas.drawArc(rectF, start, end, false, paint);
 	    
 	    return output;
 	  }
@@ -108,7 +108,7 @@ public class Media {
 	    return dp * context.getResources().getDisplayMetrics().density;
 	}
 	
-	private static int generateColor(long id){
+	public static int generateColor(long id){
 		int i = (int) (id % colors.length);
 		return Color.parseColor(colors[i]);
 	}
