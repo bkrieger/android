@@ -6,6 +6,7 @@ import us.happ.android.R;
 import us.happ.android.activity.MainActivity;
 import us.happ.android.adapter.ContactsAdapter;
 import us.happ.android.utils.Storage;
+import us.happ.android.view.ContactsListView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -39,13 +40,11 @@ import android.widget.AdapterView.OnItemClickListener;
 public class ContactsFragment extends HappFragment{
 
 	private View mView;
-	private ListView mListView;
+	private ContactsListView mListView;
 	private Cursor mCursor;
 	private MainActivity mContext;
 	private HashSet<String> blockedNumbers;
 	private ContactsAdapter mListAdapter;
-	private View sectionOverlay;
-	private TextView sectionOverlayText;
 	private TextView counterView;
 	private ActionBar actionbar;
 	private AlertDialog mDialog;
@@ -98,7 +97,7 @@ public class ContactsFragment extends HappFragment{
 
 		mView = inflater.inflate(R.layout.fragment_contacts, null, false);
 		
-		mListView = (ListView) mView.findViewById(android.R.id.list);
+		mListView = (ContactsListView) mView.findViewById(android.R.id.list);
 		
 		View header = getActivity().getLayoutInflater().inflate(R.layout.list_header_contacts, null, true);
 		mListView.addHeaderView(header, null, false);
@@ -122,9 +121,6 @@ public class ContactsFragment extends HappFragment{
             	updateCounter();
             }
         });
-		
-		sectionOverlay = mView.findViewById(R.id.contact_section_overlay);
-		sectionOverlayText = (TextView) sectionOverlay.findViewById(R.id.contact_section_overlay_text);
 		
 		mListView.setOnScrollListener(mScrollListener);
 		
@@ -172,39 +168,35 @@ public class ContactsFragment extends HappFragment{
 	
 	OnScrollListener mScrollListener = new OnScrollListener(){
 
-		private int sectionOverlayHeight = 0;
 		private int currItem = -1;
 
 		@Override
 		public void onScroll(AbsListView view, int firstVisibleItem, int visibleItemCount, int totalItemCount) {
+			
 			if (firstVisibleItem == 0){
-				sectionOverlay.setVisibility(View.GONE);
+				mListView.enableOverlay(false);
 				return;
 			}
 			
-			sectionOverlay.setVisibility(View.VISIBLE);
+			mListView.enableOverlay(true);
 			
 			if (mListAdapter.isPositionASection(firstVisibleItem) && mListView.getChildAt(1)!=null){
 				
 				if (currItem != firstVisibleItem){
-					sectionOverlayText.setText(mListAdapter.getSectionTextForPosition(firstVisibleItem - 1));
+					mListView.setSectionText(mListAdapter.getSectionTextForPosition(firstVisibleItem - 1));
 				}
 				
 				int itemTop = mListView.getChildAt(1).getTop();
-				if (sectionOverlayHeight == 0) sectionOverlayHeight = sectionOverlay.getHeight();
+				int sectionOverlayHeight = mListView.getSectionHeight();
 				int marginTop = 0;
 				if (itemTop < sectionOverlayHeight){
 					marginTop = itemTop - sectionOverlayHeight;
 				}
-				FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) sectionOverlay.getLayoutParams();
-				lp.setMargins(0, marginTop, 0, 0);
-				sectionOverlay.setLayoutParams(lp);
+				mListView.setSectionTop(marginTop);
 			} else {
 				if (currItem != firstVisibleItem){
-					FrameLayout.LayoutParams lp = (FrameLayout.LayoutParams) sectionOverlay.getLayoutParams();
-					lp.setMargins(0, 0, 0, 0);
-					sectionOverlay.setLayoutParams(lp);
-					sectionOverlayText.setText(mListAdapter.getSectionTextForPosition(firstVisibleItem - 1));
+					mListView.setSectionTop(0);
+					mListView.setSectionText(mListAdapter.getSectionTextForPosition(firstVisibleItem - 1));
 				}
 			}
 

@@ -14,30 +14,4 @@
         android:paddingLeft="10dp"
         android:paddingRight="50dp" />
 
-    <LinearLayout
-        android:id="@+id/contact_section_overlay"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingLeft="10dp"
-        android:paddingRight="50dp" >
-
-        <TextView
-            android:id="@+id/contact_section_overlay_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="left"
-            android:paddingLeft="10dp"
-            android:text="A"
-            android:textColor="@color/happ_purple"
-            android:background="@color/white"
-            android:textSize="20dp"
-            android:visibility="visible" />
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="1dp"
-            android:background="@color/happ_purple" />
-    </LinearLayout>
-
 </FrameLayout>
