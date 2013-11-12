@@ -267,6 +267,9 @@ public class BoardFragment extends HappFragment {
 					holder.timestamp.setText(outputFormatter.format(myTimestamp));
 				}
 			}
+		} else {
+			holder.duration.setDecay(0);
+			holder.duration.invalidate();
 		}
 	}
 	
