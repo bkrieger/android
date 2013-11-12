@@ -1,6 +1,6 @@
 package us.happ.android.model;
 
-import java.sql.Date;
+import java.util.Date;
 import java.util.HashMap;
 
 import us.happ.android.R;
@@ -52,6 +52,10 @@ public class Mood {
 			return moodIconInverseMap.get(tagId);
 		}
 		return moodIconMap.get(tagId);
+	}
+	
+	public static float getDecay(int duration, long timestamp){
+		return (float) (timestamp + duration*1000 - new Date().getTime())/(duration*1000);
 	}
 	
 	// Getters and Setters

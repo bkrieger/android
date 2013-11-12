@@ -45,6 +45,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 	private HashMap<String, Integer> mLastSeenDecay;
 	
 	private LinkedHashMap<String, String> checkedContacts;
+	private SimpleDateFormat outputFormatter;
 	
 	public BoardAdapter(Context context, int resource) {
 		super(context, resource);
@@ -63,6 +64,8 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 
 		checkedContacts = new LinkedHashMap<String, String>();
 		mLastSeenDecay = new HashMap<String, Integer>();
+		
+		outputFormatter = new SimpleDateFormat("h:mma");
 	}
 	
 	@Override
@@ -104,7 +107,7 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		Mood m = data.get(position);
 		
 		// Decay, out of 360
-		int decay = (int) (m.getTimestamp().getTime() + m.getDuration()*1000 - new Date().getTime())*360/(m.getDuration()*1000);
+		int decay = (int) (Mood.getDecay(m.getDuration(), m.getTimestamp().getTime())*360);
 		if (decay < 0) decay = 0;
 		
 		Bitmap avatar = mContactsManager.getAvatar(m.getNumber());
@@ -140,7 +143,6 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		holder.name.setText(mContactsManager.getName(m.getNumber()));
 		holder.message.setText(m.getMessage());
 		
-		DateFormat outputFormatter = new SimpleDateFormat("h:mma");
 		holder.timestamp.setText(outputFormatter.format(m.getTimestamp()));
 		
 		return v;

@@ -225,14 +225,15 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode == ACTIVITY_COMPOSE && resultCode == 1){
-
-			Toast.makeText(this, getResources().getString(R.string.toast_post_progress), Toast.LENGTH_SHORT).show();
+			
+			// TODO remove from string
+//			Toast.makeText(this, getResources().getString(R.string.toast_post_progress), Toast.LENGTH_SHORT).show();
 			
 			String msg = data.getStringExtra("compose_msg");
 			int tag = data.getIntExtra("compose_tag", 1);
 			String duration = data.getStringExtra("compose_duration");
 			
-			mBoardFragment.setHeader(msg, tag);
+			mBoardFragment.setHeader(msg, tag, 0, Integer.parseInt(duration), true);
 			
 			Bundle extras = new Bundle();
 			String[] numbers = mContactsManager.getAllFriends();
@@ -270,11 +271,19 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			getMoodsId = -1;
 		} else if (taskId == postMoodsId){
 			try {
-				JSONObject jResults = new JSONObject(results);
-				if (jResults.getInt("status") == 200){
-					Toast.makeText(this, getResources().getString(R.string.toast_post_success), Toast.LENGTH_SHORT).show();
-					Storage.incTotalHapps(this);
-					mDrawer.updateTotalHapps();
+				if (results != null) {
+					JSONObject jResults = new JSONObject(results);
+					if (jResults.getInt("status") == 200){
+						// TODO remove from string
+	//					Toast.makeText(this, getResources().getString(R.string.toast_post_success), Toast.LENGTH_SHORT).show();
+						Storage.incTotalHapps(this);
+						mDrawer.updateTotalHapps();
+						JSONObject data = jResults.getJSONObject("data");
+						long timestamp = data.getLong("timestamp");
+						if (mBoardFragment != null){
+							mBoardFragment.onPostSuccess(timestamp);
+						}
+					}
 				} else {
 					Toast.makeText(this, getResources().getString(R.string.toast_post_error), Toast.LENGTH_SHORT).show();
 				}

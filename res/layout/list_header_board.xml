@@ -23,7 +23,7 @@
             android:layout_width="65dp"
             android:layout_height="48dp"
             android:layout_gravity="center"
-            android:visibility="gone" />
+            android:visibility="visible" />
     </FrameLayout>
 
     <LinearLayout
@@ -48,7 +48,10 @@
             android:id="@+id/board_mewrap"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="10dp"
+            android:paddingBottom="5dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="5dp"
             android:visibility="gone" >
 
             <ImageView
@@ -56,7 +59,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentRight="true"
-                android:layout_gravity="center_vertical"
+                android:layout_centerVertical="true"
                 android:src="@drawable/ic_tag_food" />
 
             <LinearLayout
@@ -72,7 +75,7 @@
                     android:layout_height="wrap_content"
                     android:text="@string/me"
                     android:textColor="@color/happ_purple"
-                    android:textSize="20dp"
+                    android:textSize="18dp"
                     android:textStyle="bold" />
 
                 <TextView
@@ -80,11 +83,20 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/black"
-                    android:textSize="16dp" />
+                    android:textSize="14dp" />
+
+                <TextView
+                    android:id="@+id/board_timestamp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="12:45PM"
+                    android:textColor="@color/gray"
+                    android:textSize="14dp" />
             </LinearLayout>
         </RelativeLayout>
 
-        <View
+        <us.happ.android.view.DurationProgressView
+            android:id="@+id/board_duration"
             android:layout_width="match_parent"
             android:layout_height="3dp"
             android:background="@color/board_strip" />

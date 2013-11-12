@@ -1,5 +1,7 @@
 package us.happ.android.fragment;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
 import org.json.JSONArray;
@@ -15,8 +17,11 @@ import us.happ.android.utils.ContactsManager.FetchContactsListener;
 import us.happ.android.utils.Happ;
 import us.happ.android.utils.Media;
 import us.happ.android.utils.SmoothInterpolator;
+import us.happ.android.view.DurationProgressView;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.graphics.BitmapFactory;
+import android.graphics.drawable.AnimationDrawable;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -75,12 +80,18 @@ public class BoardFragment extends HappFragment {
 	private String myMessage;
 	private int myTagId;
 	private ActionBar actionbar;
+	private Resources mResources;
+	private long myTimestamp;
+	private int myDuration;
+	private SimpleDateFormat outputFormatter;
+	private boolean mPostPending = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
 		super.onCreate(savedInstanceState);
 		
 		mContext = (MainActivity) getActivity();
+		mResources = getResources();
 		mListAdapter = new BoardAdapter(mContext, 0);
 		
 		setHasOptionsMenu(true);
@@ -89,6 +100,8 @@ public class BoardFragment extends HappFragment {
 		
 		// Action bar
 		actionbar = mContext.getSupportActionBar();
+		
+		outputFormatter = new SimpleDateFormat("h:mma");
 	}
 	
 	@Override
@@ -111,6 +124,8 @@ public class BoardFragment extends HappFragment {
  		holder.message = (TextView) mHeader.findViewById(R.id.board_message);
  		holder.meWrap = mHeader.findViewById(R.id.board_mewrap);
  		holder.tagLine = mHeader.findViewById(R.id.board_tagline);
+ 		holder.timestamp = (TextView) mHeader.findViewById(R.id.board_timestamp);
+ 		holder.duration = (DurationProgressView) mHeader.findViewById(R.id.board_duration);
  		mHeader.setTag(holder);
  		mHeader.setOnClickListener(new OnClickListener(){
 			@Override
@@ -118,7 +133,7 @@ public class BoardFragment extends HappFragment {
 				mContext.compose();
 			}
  		});
- 		updateHeader();
+ 		updateHeader(false);
  		
  		// footer
 		mFooter = mView.findViewById(R.id.actionbar_footer);
@@ -181,22 +196,77 @@ public class BoardFragment extends HappFragment {
 		ImageView tag;
 		View meWrap;
 		View tagLine;
+		TextView timestamp;
+		DurationProgressView duration;
 	}
 	
-	public void setHeader(String message, int tagId){
+	public void setHeader(String message, int tagId, long timestamp, int duration, boolean sending){
 		myMessage = message;
 		myTagId = tagId;
-		updateHeader();
+		myTimestamp = timestamp;
+		myDuration = duration;
+		updateHeader(sending);
+		if (sending) mPostPending = true;
+	}
+
+	public void onPostSuccess(long timestamp){
+		myTimestamp = timestamp;
+		animateHeader();
 	}
 	
-	private void updateHeader(){
+	public void onPostError(){
+		
+	}
+	
+	private void animateHeader(){
+		final ViewHolder holder = (ViewHolder) mHeader.getTag();
+		holder.timestamp.setText(outputFormatter.format(myTimestamp));
+		TranslateAnimation tAnim = new TranslateAnimation(0, 0, holder.timestamp.getHeight(), 0);
+		tAnim.setDuration(300);
+		tAnim.setAnimationListener(new AnimationListener(){
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				mPostPending = false;
+				holder.duration.setDecay(1);
+				holder.duration.animateDecay(0);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {}
+
+			@Override
+			public void onAnimationStart(Animation animation) {}
+			
+		});
+		holder.timestamp.startAnimation(tAnim);
+	}
+	
+	private void updateHeader(boolean sending){
 		
 		ViewHolder holder = (ViewHolder) mHeader.getTag();
 		
 		Happ.showViewIf(holder.tagLine, holder.meWrap, myMessage == null);
 		if (myMessage != null){
 			holder.message.setText(myMessage);
-			holder.tag.setImageBitmap(BitmapFactory.decodeResource(getResources(), Mood.resIdFromTag(myTagId)));
+			holder.tag.setImageBitmap(BitmapFactory.decodeResource(mResources, Mood.resIdFromTag(myTagId)));
+			
+			// Don't touch if post is pending
+			if(!mPostPending){
+				if (sending){
+					holder.duration.setDecay(0);
+					holder.duration.invalidate();
+					holder.timestamp.setText(mResources.getString(R.string.sending));
+				} else {
+					float decay = holder.duration.getDecay();
+					float newDecay = Mood.getDecay(myDuration, myTimestamp);
+					if (decay == 0 || decay > newDecay + 0.02){
+						holder.duration.setDecay(newDecay);
+						holder.duration.animateDecay(decay);
+					}
+					holder.timestamp.setText(outputFormatter.format(myTimestamp));
+				}
+			}
 		}
 	}
 	
@@ -240,9 +310,9 @@ public class BoardFragment extends HappFragment {
 			
 			// Update me
 			if (me.has("_id")){
-				setHeader(me.getString("message"), me.getInt("tag"));
+				setHeader(me.getString("message"), me.getInt("tag"), me.getLong("timestamp"), me.getInt("duration"), false);
 			} else {
-				setHeader(null, 0);
+				setHeader(null, 0, 0, 0, false);
 			}
 			
 			Happ.showViewIf(sadHippoView, stripView, contacts.length() == 0);
@@ -300,7 +370,7 @@ public class BoardFragment extends HappFragment {
 	private Handler fetchContactsHandler = new Handler(){
 		@Override
 		public void handleMessage(Message msg) {
-			mContext.setProgressDialog(mContext.getResources().getString(R.string.dialog_retrieve_moods));
+			mContext.setProgressDialog(mResources.getString(R.string.dialog_retrieve_moods));
 			fetch();
 		}
 	};
