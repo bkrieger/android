@@ -9,8 +9,41 @@ import android.content.SharedPreferences;
 public class Storage {
 	private static final String PREFERENCES_FILE = "Happ";
 	
+	private static final String KEY_GCM_ID = "gcm id";
+	private static final String KEY_GCMID_UPTODATE = "gcm uptodate";
+	private static final String KEY_APP_VERSION = "app version";
 	private static final String KEY_BLOCKED_NUMBERS = "blocked numbers";
 	private static final String KEY_TOTAL_HAPPS = "total happs";
+	
+	public static String getRegistrationId(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getString(KEY_GCM_ID, "");
+	}
+	
+	public static void setRegistrationId(Context context, String id){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putString(KEY_GCM_ID, id).commit();
+	}
+	
+	public static int getStoredAppVersion(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getInt(KEY_APP_VERSION, Integer.MIN_VALUE);
+	}
+	
+	public static void setStoredAppVersion(Context context, int version){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putInt(KEY_APP_VERSION, version).commit();
+	}
+	
+	public static boolean getGcmIdUpToDate(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getBoolean(KEY_GCMID_UPTODATE, false);
+	}
+	
+	public static void setGcmIdUpToDate(Context context, boolean upToDate){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putBoolean(KEY_GCMID_UPTODATE, upToDate).commit();
+	}
 	
 	public static HashSet<String> getBlockedNumbers(Context context){
 		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);

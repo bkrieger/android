@@ -26,6 +26,16 @@ public class Mood {
 		moodIconInverseMap.put(4, R.drawable.ic_tag_party_i);
 		moodIconInverseMap.put(5, R.drawable.ic_tag_sport_i);
 	}
+	
+	public static final HashMap<Integer, String> moodNotificationMap;
+	static {
+		moodNotificationMap = new HashMap<Integer, String>();
+		moodNotificationMap.put(1, "wants to chill with you.");
+		moodNotificationMap.put(2, "wants to get food with you.");
+		moodNotificationMap.put(3, "wants to watch a movie with you.");
+		moodNotificationMap.put(4, "wants to party with you.");
+		moodNotificationMap.put(5, "wants to play sports with you.");
+	}
 
 	private String number;
 	private String message;

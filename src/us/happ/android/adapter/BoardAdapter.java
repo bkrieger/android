@@ -190,6 +190,8 @@ public class BoardAdapter extends ArrayAdapter<Mood> {
 		Mood m = getItem(position);
 		addCheckedContacts(m);
 		showCheckbox = !checkedContacts.isEmpty();
+		// TODO
+		// update individual row instead of notifyDataSetChanged
 		notifyDataSetChanged();
 	}
 	

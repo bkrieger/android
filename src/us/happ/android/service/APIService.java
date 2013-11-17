@@ -86,6 +86,18 @@ public class APIService extends IntentService {
 			mServiceHelper.onReceive(ServiceHelper.SUCCESS, taskId, bundle);
 
 			break;
+		case ServiceHelper.POST_GCM_REGISTER:
+			Log.i(TAG, "POST GCM REGISTER");
+			String number1 = intent.getStringExtra("number");
+			String regid = intent.getStringExtra("regid");
+			params = "?me=" + number1 + "&os=1&token=" + regid;
+			
+			results = HttpCaller.postRequest(this,  "/registerpush" + params);
+			bundle.putString(RESULTS, results);
+			
+			mServiceHelper = ServiceHelper.getInstance();
+			mServiceHelper.onReceive(ServiceHelper.SUCCESS, taskId, bundle);
+			
 		default:
 			// No intent specified
 			break;

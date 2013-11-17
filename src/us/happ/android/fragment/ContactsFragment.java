@@ -103,6 +103,8 @@ public class ContactsFragment extends HappFragment{
 		mListView.addHeaderView(header, null, false);
 		counterView = (TextView) header.findViewById(R.id.contacts_counter);
 		updateCounter();
+		// TODO
+		// HINTVIEW animateLayoutChanges=true, remove view
 		View resetView = header.findViewById(R.id.contacts_reset);
 		resetView.setOnClickListener(new OnClickListener(){
 			@Override

@@ -43,7 +43,7 @@ public class AvatarView extends ImageView {
 	    // Animation
 	    mAnimation = new DecayAnimation();
 	    mAnimation.setInterpolator(new SmoothInterpolator());
-	    mAnimation.setDuration(1000);
+	    mAnimation.setDuration(1500);
 	    
 	    getRect();
 	}
