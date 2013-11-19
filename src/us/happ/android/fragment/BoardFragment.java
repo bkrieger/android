@@ -85,6 +85,8 @@ public class BoardFragment extends HappFragment {
 	private int myDuration;
 	private SimpleDateFormat outputFormatter;
 	private boolean mPostPending = false;
+	
+	private float myLastSeenDecay;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -230,6 +232,7 @@ public class BoardFragment extends HappFragment {
 				mPostPending = false;
 				holder.duration.setDecay(1);
 				holder.duration.animateDecay(0);
+				myLastSeenDecay = 1;
 			}
 
 			@Override
@@ -258,11 +261,14 @@ public class BoardFragment extends HappFragment {
 					holder.duration.invalidate();
 					holder.timestamp.setText(mResources.getString(R.string.sending));
 				} else {
-					float decay = holder.duration.getDecay();
 					float newDecay = Mood.getDecay(myDuration, myTimestamp);
-					if (decay == 0 || decay > newDecay + 0.02){
+					if (myLastSeenDecay == 0 || myLastSeenDecay > newDecay + 0.02){
 						holder.duration.setDecay(newDecay);
-						holder.duration.animateDecay(decay);
+						holder.duration.animateDecay(myLastSeenDecay);
+						myLastSeenDecay = newDecay;
+					} else {
+						holder.duration.setDecay(myLastSeenDecay);
+						holder.duration.invalidate();
 					}
 					holder.timestamp.setText(outputFormatter.format(myTimestamp));
 				}
