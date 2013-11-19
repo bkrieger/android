@@ -80,6 +80,16 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
 	}
 	
 	@Override
+	public boolean areAllItemsEnabled(){
+		return false;
+	}
+	
+	@Override
+	public boolean isEnabled(int position){
+		return getItemViewType(position) == TYPE_NORMAL;
+	}
+	
+	@Override
 	public View getView(int position, View convertView, ViewGroup parent){
 		int viewType = getItemViewType(position);
 		
@@ -97,7 +107,6 @@ public class ContactsAdapter extends CursorAdapter implements SectionIndexer{
             }
             
             headerText.setText(sectionsIndexer.get(position));
-            
             return convertView;
 		}
 	}
