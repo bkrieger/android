@@ -273,19 +273,22 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			int tag = data.getIntExtra("compose_tag", 1);
 			String duration = data.getStringExtra("compose_duration");
 			
-			mBoardFragment.setHeader(msg, tag, 0, Integer.parseInt(duration), true);
-			
-			Bundle extras = new Bundle();
-			String[] numbers = mContactsManager.getAllFriends();
-			extras.putStringArray("n", numbers);
-			extras.putString("number", mPhoneNumber+"");
-			extras.putString("msg", msg);
-			extras.putString("tag", tag+"");
-			extras.putString("duration", duration);
-	        extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
-	        ServiceHelper mServiceHelper = ServiceHelper.getInstance();
-	        postMoodsId = mServiceHelper.startService(this, ServiceHelper.POST_MOODS, extras);
+			startPostService(msg, tag, duration);
 		}
+	}
+	
+	public void startPostService(String msg, int tag, String duration){
+		mBoardFragment.setHeader(msg, tag, 0, Integer.parseInt(duration), true);
+		Bundle extras = new Bundle();
+		String[] numbers = mContactsManager.getAllFriends();
+		extras.putStringArray("n", numbers);
+		extras.putString("number", mPhoneNumber+"");
+		extras.putString("msg", msg);
+		extras.putString("tag", tag+"");
+		extras.putString("duration", duration);
+        extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
+        ServiceHelper mServiceHelper = ServiceHelper.getInstance();
+        postMoodsId = mServiceHelper.startService(this, ServiceHelper.POST_MOODS, extras);
 	}
     	
 	public void startFetchService(){
@@ -325,6 +328,9 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 						}
 					}
 				} else {
+					if (mBoardFragment != null){
+						mBoardFragment.onPostError();
+					}
 					Toast.makeText(this, getResources().getString(R.string.toast_post_error), Toast.LENGTH_SHORT).show();
 				}
 			} catch (JSONException e){}

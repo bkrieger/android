@@ -87,6 +87,8 @@ public class BoardFragment extends HappFragment {
 	private boolean mPostPending = false;
 	
 	private float myLastSeenDecay;
+	private boolean mPostSending = false;
+	private boolean mPostError = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -132,10 +134,15 @@ public class BoardFragment extends HappFragment {
  		mHeader.setOnClickListener(new OnClickListener(){
 			@Override
 			public void onClick(View v) {
-				mContext.compose();
+				if (mPostError){
+					// Resend message
+					mContext.startPostService(myMessage, myTagId, myDuration+"");
+				} else {
+					mContext.compose();
+				}
 			}
  		});
- 		updateHeader(false);
+ 		updateHeader();
  		
  		// footer
 		mFooter = mView.findViewById(R.id.actionbar_footer);
@@ -203,26 +210,39 @@ public class BoardFragment extends HappFragment {
 	}
 	
 	public void setHeader(String message, int tagId, long timestamp, int duration, boolean sending){
-		myMessage = message;
-		myTagId = tagId;
-		myTimestamp = timestamp;
-		myDuration = duration;
-		updateHeader(sending);
-		if (sending) mPostPending = true;
+		if (message != null || !mPostError){
+			myMessage = message;
+			myTagId = tagId;
+			myTimestamp = timestamp;
+			myDuration = duration;
+			mPostSending = sending;
+			updateHeader();
+			if (sending) mPostPending = true;
+		}
 	}
 
 	public void onPostSuccess(long timestamp){
 		myTimestamp = timestamp;
-		animateHeader();
+		mPostSending = false;
+		mPostError = false;
+		animateHeader(true);
 	}
 	
 	public void onPostError(){
+		mPostSending = false;
+		mPostError = true;
+		animateHeader(false);
 		
 	}
 	
-	private void animateHeader(){
+	private void animateHeader(final boolean success){
 		final ViewHolder holder = (ViewHolder) mHeader.getTag();
-		holder.timestamp.setText(outputFormatter.format(myTimestamp));
+		if (success){
+			holder.timestamp.setText(outputFormatter.format(myTimestamp));
+		} else {
+			// error
+			holder.timestamp.setText(mResources.getString(R.string.post_error));
+		}
 		TranslateAnimation tAnim = new TranslateAnimation(0, 0, holder.timestamp.getHeight(), 0);
 		tAnim.setDuration(300);
 		tAnim.setAnimationListener(new AnimationListener(){
@@ -230,9 +250,10 @@ public class BoardFragment extends HappFragment {
 			@Override
 			public void onAnimationEnd(Animation animation) {
 				mPostPending = false;
-				holder.duration.setDecay(1);
-				holder.duration.animateDecay(0);
-				myLastSeenDecay = 1;
+				if (success){
+					holder.duration.animateDecay(0, 1);
+					myLastSeenDecay = 1;
+				}
 			}
 
 			@Override
@@ -242,10 +263,11 @@ public class BoardFragment extends HappFragment {
 			public void onAnimationStart(Animation animation) {}
 			
 		});
+		holder.timestamp.clearAnimation();
 		holder.timestamp.startAnimation(tAnim);
 	}
 	
-	private void updateHeader(boolean sending){
+	private void updateHeader(){
 		
 		ViewHolder holder = (ViewHolder) mHeader.getTag();
 		
@@ -256,26 +278,27 @@ public class BoardFragment extends HappFragment {
 			
 			// Don't touch if post is pending
 			if(!mPostPending){
-				if (sending){
+				if (mPostSending){
 					holder.duration.setDecay(0);
-					holder.duration.invalidate();
-					holder.timestamp.setText(mResources.getString(R.string.sending));
+					holder.timestamp.setText(mResources.getString(R.string.post_sending));
+				} else if (mPostError){
+					holder.duration.setDecay(0);
+					holder.timestamp.setText(mResources.getString(R.string.post_error));
 				} else {
 					float newDecay = Mood.getDecay(myDuration, myTimestamp);
 					if (myLastSeenDecay == 0 || myLastSeenDecay > newDecay + 0.02){
-						holder.duration.setDecay(newDecay);
-						holder.duration.animateDecay(myLastSeenDecay);
+						holder.duration.animateDecay(myLastSeenDecay, newDecay);
 						myLastSeenDecay = newDecay;
 					} else {
 						holder.duration.setDecay(myLastSeenDecay);
-						holder.duration.invalidate();
 					}
 					holder.timestamp.setText(outputFormatter.format(myTimestamp));
 				}
 			}
 		} else {
+			mPostSending = false;
+			mPostError = false;
 			holder.duration.setDecay(0);
-			holder.duration.invalidate();
 		}
 	}
 	

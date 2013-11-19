@@ -54,6 +54,7 @@ public class DurationProgressView extends View {
 	public void setDecay(float decay){
 		this.decay = decay;
 		tempDecay = decay;
+		invalidate();
 	}
 	
 	class DecayAnimation extends Animation {
@@ -69,8 +70,10 @@ public class DurationProgressView extends View {
 		return decay;
 	}
 	
-	public void animateDecay(float startDecay){
+	public void animateDecay(float startDecay, float endDecay){
 		this.startDecay = startDecay;
+		decay = endDecay;
+		tempDecay = endDecay;
 		mAnimation.reset();
 		startAnimation(mAnimation);
 	}

@@ -15,7 +15,8 @@
     <string name="me">Me</string>
     <string name="tag_line">What\'s Happening?</string>
     <string name="hint_compose">What\'s happening?</string>
-    <string name="sending">sending&#8230;</string>
+    <string name="post_sending">sending&#8230;</string>
+    <string name="post_error">Error sending happ: Tap to resend</string>
     
     <string name="dialog_retrieve_moods">Finding out what\'s happening..</string>
     <string name="dialog_retrieve_contacts">Retrieving Contacts</string>
