@@ -3,6 +3,23 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
-    android:orientation="vertical" >
+    android:orientation="vertical"
+    android:padding="10dp" >
+
+    <us.happ.android.view.LabelEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Name"
+        android:inputType="textCapSentences|textNoSuggestions"
+        android:textColor="@color/black"
+        android:textSize="18dp" />
+
+    <us.happ.android.view.LabelEditText
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Email (optional)"
+        android:inputType="textEmailAddress|textNoSuggestions"
+        android:textColor="@color/black"
+        android:textSize="18dp" />
 
 </LinearLayout>

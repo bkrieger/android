@@ -15,6 +15,7 @@ public class FeedbackFragment extends HappFragment{
 
 	private MainActivity mContext;
 	private ActionBar actionbar;
+	private MenuItem mActionSubmit;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -49,6 +50,8 @@ public class FeedbackFragment extends HappFragment{
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){
 		menu.clear();
 		inflater.inflate(R.menu.feedback, menu);
+		mActionSubmit = menu.findItem(R.id.action_submit);
+		mActionSubmit.setEnabled(false);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 	
