@@ -3,6 +3,8 @@ package us.happ.android.service;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import us.happ.android.utils.Happ;
+
 import android.app.IntentService;
 import android.content.Intent;
 import android.os.Bundle;
@@ -30,9 +32,14 @@ public class APIService extends IntentService {
 		int action = intent.getIntExtra(ServiceHelper.ACTION, 0);
 		int taskId = intent.getIntExtra(ServiceHelper.TASK_ID, 0);
 		
-		ServiceHelper mServiceHelper;
+		ServiceHelper mServiceHelper = ServiceHelper.getInstance();
 		String results;
 		Bundle bundle = new Bundle();
+		
+		if (!Happ.isNetworkAvailable(getApplicationContext())){
+			mServiceHelper.onReceive(ServiceHelper.ERROR, taskId, bundle);
+			return;
+		}
 		
 		switch (action) {
 		case ServiceHelper.GET_MOODS:
@@ -52,7 +59,6 @@ public class APIService extends IntentService {
 			
 			bundle.putString(RESULTS, results);
 			
-			mServiceHelper = ServiceHelper.getInstance();
 			mServiceHelper.onReceive(ServiceHelper.SUCCESS, taskId, bundle);
 
 			break;
@@ -82,7 +88,6 @@ public class APIService extends IntentService {
 			
 			bundle.putString(RESULTS, results);
 			
-			mServiceHelper = ServiceHelper.getInstance();
 			mServiceHelper.onReceive(ServiceHelper.SUCCESS, taskId, bundle);
 
 			break;
@@ -95,7 +100,6 @@ public class APIService extends IntentService {
 			results = HttpCaller.postRequest(this,  "/registerpush" + params);
 			bundle.putString(RESULTS, results);
 			
-			mServiceHelper = ServiceHelper.getInstance();
 			mServiceHelper.onReceive(ServiceHelper.SUCCESS, taskId, bundle);
 			
 		default:

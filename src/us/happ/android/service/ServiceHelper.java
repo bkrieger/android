@@ -28,6 +28,7 @@ public class ServiceHelper{
 	
 	// Result Code
 	public static final int SUCCESS = 1;
+	public static final int ERROR = 2;
 	
 	//Status
 	public static final String STATUS_OK = "ok";

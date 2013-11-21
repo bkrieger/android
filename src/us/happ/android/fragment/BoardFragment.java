@@ -46,6 +46,7 @@ import android.widget.FrameLayout.LayoutParams;
 import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 public class BoardFragment extends HappFragment {
 
@@ -89,6 +90,7 @@ public class BoardFragment extends HappFragment {
 	private float myLastSeenDecay;
 	private boolean mPostSending = false;
 	private boolean mPostError = false;
+	private boolean mAutoFetching = false;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -328,9 +330,14 @@ public class BoardFragment extends HappFragment {
 	
 	public void onFetchResult(String results){
 		refreshing = false;
+		boolean autoFetching = mAutoFetching;
+		mAutoFetching = false;
 		resetHeaderPadding(false);
 		
-		if (results == null) return;
+		if (results == null){
+			if (!autoFetching) Toast.makeText(mContext,  mResources.getString(R.string.toast_fetch_error), Toast.LENGTH_SHORT).show();
+			return;
+		}
 		
 		ArrayList<Mood> moods = new ArrayList<Mood>();
 		
@@ -386,6 +393,7 @@ public class BoardFragment extends HappFragment {
 		// Weird issue that actionbar is null if device is low on memory or after crash
 		if (actionbar != null) actionbar.setDisplayShowTitleEnabled(false);
 		if (mContactsManager.hasFetchedContacts()){
+			mAutoFetching  = true;
 			fetch();
 			mContext.showSpinner();
 		} else {

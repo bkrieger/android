@@ -5,11 +5,13 @@ import java.util.HashSet;
 import us.happ.android.R;
 import us.happ.android.activity.MainActivity;
 import us.happ.android.adapter.ContactsAdapter;
+import us.happ.android.utils.SmoothInterpolator;
 import us.happ.android.utils.Storage;
 import us.happ.android.view.ContactsListView;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Canvas;
@@ -19,6 +21,7 @@ import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.ActionBar;
+import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -27,6 +30,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
+import android.view.animation.Animation;
+import android.view.animation.Transformation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.AnimationUtils;
+import android.view.animation.ScaleAnimation;
 import android.widget.AbsListView;
 import android.widget.AbsListView.OnScrollListener;
 import android.widget.AdapterView;
@@ -99,12 +108,26 @@ public class ContactsFragment extends HappFragment{
 		
 		mListView = (ContactsListView) mView.findViewById(android.R.id.list);
 		
-		View header = getActivity().getLayoutInflater().inflate(R.layout.list_header_contacts, null, true);
+		final ViewGroup header = (ViewGroup) getActivity().getLayoutInflater().inflate(R.layout.list_header_contacts, null, true);
 		mListView.addHeaderView(header, null, false);
 		counterView = (TextView) header.findViewById(R.id.contacts_counter);
 		updateCounter();
-		// TODO
-		// HINTVIEW animateLayoutChanges=true, remove view
+
+		// TODO change to viewstub?
+		View hintView = header.findViewById(R.id.contacts_hint);
+		if (!Storage.getHintContacts(mContext)){
+			header.removeView(hintView);
+		} else {
+			hintView.setOnClickListener(new OnClickListener(){
+				@Override
+				public void onClick(View v) {
+					v.setClickable(false);
+					fadeSlideUpAnimation(header, v);
+					Storage.setHintContacts(mContext, false);
+				}
+			});
+		}
+		
 		View resetView = header.findViewById(R.id.contacts_reset);
 		resetView.setOnClickListener(new OnClickListener(){
 			@Override
@@ -211,5 +234,77 @@ public class ContactsFragment extends HappFragment{
 		}
 		
 	};
+	
+	// TODO refactor to another file to be reused
+	// Slide up animation for the header
+	private void fadeSlideUpAnimation(final ViewGroup container, final View v){
+		Animation anim = new AlphaAnimation(1f, 0f);
+		anim.setDuration(300);
+		anim.setFillAfter(true);
+		anim.setFillEnabled(true);
+		anim.setAnimationListener(new AnimationListener(){
+
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				int index = container.indexOfChild(v);
+				int width = v.getWidth();
+				int height = v.getHeight();
+				container.removeView(v);
+				final View viewStub = new View(container.getContext());
+				container.addView(viewStub, index);
+				viewStub.setLayoutParams(new LayoutParams(width, height));
+				
+				Animation anim = new SlideUpAnimation(viewStub, height);
+				anim.setInterpolator(new SmoothInterpolator());
+				anim.setDuration(500);
+				anim.setAnimationListener(new AnimationListener(){
+
+					@Override
+					public void onAnimationEnd(Animation animation) {
+						container.removeView(viewStub);
+					}
+
+					@Override
+					public void onAnimationRepeat(Animation animation) {}
+
+					@Override
+					public void onAnimationStart(Animation animation) {}
+					
+				});
+				viewStub.startAnimation(anim);
+			}
+
+			@Override
+			public void onAnimationRepeat(Animation animation) {}
+
+			@Override
+			public void onAnimationStart(Animation animation) {}
+			
+		});
+
+		v.startAnimation(anim);
+	}
+	
+	class SlideUpAnimation extends Animation {
+		private View v;
+		private int height;
+		
+		public SlideUpAnimation(View v, int height) {
+			this.v = v;
+			this.height = height;
+		}
+		
+		@Override
+		 protected void applyTransformation(float interpolatedTime, Transformation t) {
+			 LayoutParams lp = (LayoutParams) v.getLayoutParams();
+			 lp.height = (int) (height*(1-interpolatedTime));
+			 v.setLayoutParams(lp);
+	     }
+		
+		@Override
+		public boolean willChangeBounds(){
+			return true;
+		}
+	}
 
 }

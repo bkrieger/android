@@ -261,7 +261,7 @@ public class ComposeActivity extends ActionBarActivity {
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, true)));
 				} else {
-					moodWrapper.setBackgroundResource(0);
+					moodWrapper.setBackgroundResource(R.drawable.list_selector);
 					mMoodTextView.setTextColor(colorBlack);
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, false)));
@@ -316,7 +316,17 @@ public class ComposeActivity extends ActionBarActivity {
 		mComposeET.requestFocus();
 		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(mComposeET, 0);
-		
+	}
+	
+	@Override
+	public void onResume(){
+		super.onResume();
+		// TODO
+		// Case when notification bar is dragged down before keyboard comes up
+		if (!keyboardInitialized){
+			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+			imm.showSoftInput(mComposeET, 0);
+		}
 	}
 
 	@Override

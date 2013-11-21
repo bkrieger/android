@@ -20,7 +20,7 @@
     <us.happ.android.view.ComposeEditText
         android:id="@+id/compose_message"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:background="@null"
         android:gravity="left|top"
         android:hint="@string/hint_compose"
@@ -53,6 +53,7 @@
             android:clickable="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:background="@drawable/list_selector"
             android:orientation="horizontal" >
 
             <FrameLayout
@@ -90,6 +91,7 @@
             android:clickable="true"
             android:focusable="true"
             android:focusableInTouchMode="true"
+            android:background="@drawable/list_selector"
             android:orientation="horizontal" >
 
             <TextView
@@ -100,6 +102,7 @@
                 android:paddingRight="10dp"
                 android:text="@string/duration_title"
                 android:textColor="@color/black"
+                android:background="@color/white"
                 android:textSize="16dp" />
 
             <TextView

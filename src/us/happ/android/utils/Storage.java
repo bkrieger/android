@@ -12,8 +12,12 @@ public class Storage {
 	private static final String KEY_GCM_ID = "gcm id";
 	private static final String KEY_GCMID_UPTODATE = "gcm uptodate";
 	private static final String KEY_APP_VERSION = "app version";
+	
 	private static final String KEY_BLOCKED_NUMBERS = "blocked numbers";
 	private static final String KEY_TOTAL_HAPPS = "total happs";
+	
+	// Settings
+	private static final String KEY_HINT_CONTACTS = "hint_contacts";
 	
 	public static String getRegistrationId(Context context){
 		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
@@ -83,6 +87,16 @@ public class Storage {
 		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
 		int totalHapps = sp.getInt(KEY_TOTAL_HAPPS, 0);
 		sp.edit().putInt(KEY_TOTAL_HAPPS, totalHapps + 1).commit();
+	}
+	
+	// SETTINGS
+	public static boolean getHintContacts(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getBoolean(KEY_HINT_CONTACTS, true);
+	}
+	public static void setHintContacts(Context context, boolean enabled){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putBoolean(KEY_HINT_CONTACTS, false).commit();
 	}
 	
 }

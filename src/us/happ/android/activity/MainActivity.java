@@ -266,9 +266,6 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
 		if (requestCode == ACTIVITY_COMPOSE && resultCode == 1){
 			
-			// TODO remove from string
-//			Toast.makeText(this, getResources().getString(R.string.toast_post_progress), Toast.LENGTH_SHORT).show();
-			
 			String msg = data.getStringExtra("compose_msg");
 			int tag = data.getIntExtra("compose_tag", 1);
 			String duration = data.getStringExtra("compose_duration");

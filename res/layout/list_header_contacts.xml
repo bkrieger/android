@@ -4,18 +4,21 @@
     android:layout_height="wrap_content"
     android:orientation="vertical" >
 
-    <FrameLayout
+    <LinearLayout
         android:id="@+id/contacts_hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:padding="10dp"
+        android:background="@drawable/list_selector"
+        android:orientation="vertical"
         android:visibility="visible" >
 
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:gravity="left"
-            android:paddingBottom="14dp"
+            android:paddingLeft="10dp"
+            android:paddingRight="10dp"
+            android:paddingTop="10dp"
             android:text="@string/contacts_hint"
             android:textColor="@color/black"
             android:textSize="14dp" />
@@ -25,20 +28,24 @@
             android:layout_height="wrap_content"
             android:layout_gravity="bottom"
             android:gravity="right"
+            android:paddingBottom="10dp"
+            android:paddingRight="10dp"
             android:text="@string/dismiss"
             android:textColor="@color/happ_purple"
             android:textSize="14dp" />
-    </FrameLayout>
 
-    <View
-        android:layout_width="match_parent"
-        android:layout_height="1dp"
-        android:background="@color/divider" />
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="bottom"
+            android:background="@color/divider" />
+    </LinearLayout>
 
     <LinearLayout
         android:id="@+id/contacts_reset"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:background="@drawable/list_selector"
         android:orientation="horizontal"
         android:padding="10dp" >
 
