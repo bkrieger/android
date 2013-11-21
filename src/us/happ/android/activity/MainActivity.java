@@ -12,6 +12,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import us.happ.android.R;
 import us.happ.android.fragment.BoardFragment;
 import us.happ.android.fragment.ContactsFragment;
+import us.happ.android.fragment.FeedbackFragment;
 import us.happ.android.fragment.HappFragment;
 import us.happ.android.gcm.GcmIntentService;
 import us.happ.android.service.APIService;
@@ -66,13 +67,16 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private int postMoodsId = -1;
 	private int postGcmRegisterId = -1;
 	
+	// TODO should I keep a copy of all fragments? leak?
 	// Fragments
 	private BoardFragment mBoardFragment;
 	private ContactsFragment mFriendsFragment;
+	private FeedbackFragment mFeedbackFragment;
 	
 	// Fragment IDs
 	private static final int FRAGMENT_BOARD = 0x01;
 	private static final int FRAGMENT_FRIENDS = 0x02;
+	private static final int FRAGMENT_FEEDBACK = 0x03;
 	private int fragmentId;
 	private HappFragment mFragment;
 	
@@ -297,6 +301,10 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
 	}
 	
+	public void startFeedbackService(){
+		Toast.makeText(this, getResources().getString(R.string.toast_feedback_thanks), Toast.LENGTH_LONG).show();
+	}
+	
 	@Override
 	public void onReceiveResult(int resultCode, Bundle resultData) {
 		if (activityDestroyed) return;
@@ -390,6 +398,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
     				mFriendsFragment = new ContactsFragment();
     			mFragment = mFriendsFragment;
     			break;
+    		case FRAGMENT_FEEDBACK:
+    			if (mFeedbackFragment == null)
+    				mFeedbackFragment = new FeedbackFragment();
+    			mFragment = mFeedbackFragment;
+    			break;
     		default:
     			return;
     	}
@@ -464,6 +477,11 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		Intent i = new Intent(Intent.ACTION_VIEW);
 		i.setData(Uri.parse(url));
 		startActivity(i);
+	}
+	
+	public void onClickFeedback(View v){
+		switchFragment(FRAGMENT_FEEDBACK);
+		selectMenuItem((TextView) v);
 	}
 	
 	// GCM

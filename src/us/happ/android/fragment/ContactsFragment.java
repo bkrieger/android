@@ -177,11 +177,6 @@ public class ContactsFragment extends HappFragment{
 	}
 	
 	@Override
-	public boolean onBackPressed() {
-		return false;
-	}
-	
-	@Override
 	public void onDestroy(){
 		mCursor.close();
 		super.onDestroy();
