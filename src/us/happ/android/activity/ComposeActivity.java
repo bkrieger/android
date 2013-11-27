@@ -7,6 +7,8 @@ import us.happ.android.model.Duration;
 import us.happ.android.model.Mood;
 import us.happ.android.model.Tag;
 import us.happ.android.utils.Happ;
+import us.happ.android.utils.Happ.KeyboardListener;
+import us.happ.android.utils.Storage;
 import us.happ.android.view.PickerListView;
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -59,12 +61,6 @@ public class ComposeActivity extends ActionBarActivity {
 
 	private TagsAdapter mTagsAdapter;
 	private DurationAdapter mDurationAdapter;
-	
-	// flags
-	private boolean keyboardInitialized = false;
-
-	private int actionbarHeight;
-	private int statusbarHeight;
 
 	private static final int PICKER_MOOD = 0x01;
 	private static final int PICKER_DURATION = 0x02;
@@ -79,6 +75,8 @@ public class ComposeActivity extends ActionBarActivity {
 	private boolean newlineDetected = false;
 	private String replacedText;
 	private int nextCursorPosition;
+
+	private int mKeyboardHeight;
 	
 	private static final int MAX_LENGTH = 50;
 
@@ -117,67 +115,11 @@ public class ComposeActivity extends ActionBarActivity {
 	}
 	
 	private void initView(){
-		actionbarHeight = Happ.getActionBarHeight(this);
-		statusbarHeight = Happ.getStatusBarHeight(this);
 		
 		final int colorWhite = getResources().getColor(R.color.white);
 		final int colorBlack = getResources().getColor(R.color.black);
 		final int colorPurple = getResources().getColor(R.color.happ_purple);
 		final int colorGray = getResources().getColor(R.color.gray);
-		
-		final View contentView = findViewById(android.R.id.content);
-		contentView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
-		    @Override
-		    public void onGlobalLayout() {
-		    	if (keyboardInitialized) return;
-		    	
-		        int heightDiff = contentView.getRootView().getHeight() - statusbarHeight - actionbarHeight - contentView.getHeight();
-		        
-		        if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
-		            Log.i("keyboard", "shown");
-		            keyboardInitialized = true; 
-		            
-		            // We do not need adjustResize anymore (which was causing rendering issues behind keyboard)
-		            getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
-		            
-		            View v = contentView.findViewById(R.id.activity_compose);
-		            
-		            int width = v.getWidth() - v.getPaddingLeft()*2;
-		            
-		            int marginTop = contentView.getHeight();
-		        
-		            mListView.setDimen(width,  heightDiff - v.getPaddingTop());
-		            LayoutParams params = (LayoutParams) mListView.getLayoutParams();
-		            params.topMargin = marginTop-mListView.getTop();
-		            mListView.setLayoutParams(params);
-		            
-		            // Positioning options
-		            optionsView.setVisibility(View.VISIBLE);
-		            optionsView.measure(
-		            		MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
-		            		MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
-		            int optionsHeight = optionsView.getMeasuredHeight();
-		            params = (LayoutParams) optionsView.getLayoutParams();
-		            params.topMargin = marginTop - optionsHeight;
-		            optionsView.setLayoutParams(params);
-		            
-		            // TODO improve performance (high process time of animation)
-		            // TODO explore options other than alpha animation + hardware Acceleration
-		    		// Maybe paint a white layer on top of the view to cover it?
-		            Animation anim = new AlphaAnimation(0.00f, 1.00f);
-		            anim.setDuration(500);
-		            Happ.startAnimationWithHardwareAcceleration(optionsView, anim);
-		            
-		            // Setting height of EditText
-		            mComposeET.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
-		            
-		            // Counter
-		            mCounterView.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
-		            mCounterView.setVisibility(View.VISIBLE);
-		        
-		        }
-		     }
-		});
 		
 		mComposeET.setOnEditorActionListener(new OnEditorActionListener(){
 
@@ -316,6 +258,66 @@ public class ComposeActivity extends ActionBarActivity {
 		mComposeET.requestFocus();
 		InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 		imm.showSoftInput(mComposeET, 0);
+		
+		mKeyboardHeight = Storage.getKeyboardHeight(mContext);
+		if (mKeyboardHeight != 0){
+			keyboardMeasured();
+		} else {
+			Happ.setKeyboardMeasurer(this, new KeyboardListener(){
+
+				@Override
+				public void onKeyboardMeasured(int keyboardHeight) {
+					mKeyboardHeight = keyboardHeight;
+					keyboardMeasured();
+				}
+				
+			});
+		}
+	}
+	
+	private void keyboardMeasured(){
+		int actionbarHeight = Happ.getActionBarHeight(this);
+		int statusbarHeight = Happ.getStatusBarHeight(this);
+		
+		View contentView = findViewById(android.R.id.content);
+		
+		View v = contentView.findViewById(R.id.activity_compose);
+        
+        int contentHeight = contentView.getRootView().getHeight() - statusbarHeight - actionbarHeight - mKeyboardHeight;
+		
+        int width = v.getWidth() - v.getPaddingLeft()*2;
+        
+        int marginTop = contentHeight;
+    
+        mListView.setDimen(width,  mKeyboardHeight - v.getPaddingTop());
+        LayoutParams params = (LayoutParams) mListView.getLayoutParams();
+        params.topMargin = marginTop-mListView.getTop();
+        mListView.setLayoutParams(params);
+        
+        // Positioning options
+        optionsView.setVisibility(View.VISIBLE);
+        optionsView.measure(
+        		MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED),
+        		MeasureSpec.makeMeasureSpec(0, MeasureSpec.UNSPECIFIED));
+        int optionsHeight = optionsView.getMeasuredHeight();
+        params = (LayoutParams) optionsView.getLayoutParams();
+        params.topMargin = marginTop - optionsHeight;
+        optionsView.setLayoutParams(params);
+        
+        // TODO improve performance (high process time of animation)
+        // TODO explore options other than alpha animation + hardware Acceleration
+		// Maybe paint a white layer on top of the view to cover it?
+        Animation anim = new AlphaAnimation(0.00f, 1.00f);
+        anim.setDuration(500);
+        Happ.startAnimationWithHardwareAcceleration(optionsView, anim);
+        
+        // Setting height of EditText
+        mComposeET.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
+        
+        // Counter
+        mCounterView.setLayoutParams(new LayoutParams(width, marginTop - optionsHeight));
+        mCounterView.setVisibility(View.VISIBLE);
+    
 	}
 	
 	@Override
@@ -323,7 +325,7 @@ public class ComposeActivity extends ActionBarActivity {
 		super.onResume();
 		// TODO
 		// Case when notification bar is dragged down before keyboard comes up
-		if (!keyboardInitialized){
+		if (mKeyboardHeight == 0){
 			InputMethodManager imm = (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
 			imm.showSoftInput(mComposeET, 0);
 		}

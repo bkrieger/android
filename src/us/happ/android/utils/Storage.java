@@ -16,6 +16,8 @@ public class Storage {
 	private static final String KEY_BLOCKED_NUMBERS = "blocked numbers";
 	private static final String KEY_TOTAL_HAPPS = "total happs";
 	
+	private static final String KEY_KEYBOARD_HEIGHT = "keyboard_height";
+	
 	// Settings
 	private static final String KEY_HINT_CONTACTS = "hint_contacts";
 	
@@ -87,6 +89,16 @@ public class Storage {
 		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
 		int totalHapps = sp.getInt(KEY_TOTAL_HAPPS, 0);
 		sp.edit().putInt(KEY_TOTAL_HAPPS, totalHapps + 1).commit();
+	}
+	
+	public static int getKeyboardHeight(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getInt(KEY_KEYBOARD_HEIGHT, 0);
+	}
+	
+	public static void setKeyboardHeight(Context context, int height){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putInt(KEY_KEYBOARD_HEIGHT, height).commit();
 	}
 	
 	// SETTINGS

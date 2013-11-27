@@ -31,6 +31,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.res.Configuration;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Parcelable;
@@ -47,6 +48,8 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.view.Window;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -174,7 +177,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 
             /** Called when a drawer has settled in a completely open state. */
             public void onDrawerOpened(View drawerView) {
-
+            	closeKeyboard();
             }
         };
 
@@ -482,6 +485,13 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	public void onClickFeedback(View v){
 		switchFragment(FRAGMENT_FEEDBACK);
 		selectMenuItem((TextView) v);
+	}
+	
+	private void closeKeyboard(){
+		InputMethodManager inputManager = (InputMethodManager)            
+            	getSystemService(Context.INPUT_METHOD_SERVICE); 
+            	inputManager.hideSoftInputFromWindow(MainActivity.this.getCurrentFocus().getWindowToken(),      
+            			    InputMethodManager.HIDE_NOT_ALWAYS);
 	}
 	
 	// GCM

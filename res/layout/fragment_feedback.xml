@@ -4,22 +4,39 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
-    android:padding="10dp" >
+    android:paddingLeft="10dp"
+    android:paddingRight="10dp" >
 
     <us.happ.android.view.LabelEditText
+        android:id="@+id/feedback_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Name"
+        android:hint="Name (optional)"
         android:inputType="textCapSentences|textNoSuggestions"
         android:textColor="@color/black"
         android:textSize="18dp" />
 
     <us.happ.android.view.LabelEditText
+        android:id="@+id/feedback_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="Email (optional)"
         android:inputType="textEmailAddress|textNoSuggestions"
         android:textColor="@color/black"
         android:textSize="18dp" />
+
+    <us.happ.android.view.LabelEditText
+        android:id="@+id/feedback_text"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Feedback"
+        android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+        android:paddingLeft="13dp"
+        android:paddingRight="13dp"
+        android:textColor="@color/black"
+        android:textSize="18dp" >
+
+        <requestFocus />
+    </us.happ.android.view.LabelEditText>
 
 </LinearLayout>

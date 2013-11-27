@@ -8,6 +8,7 @@ import android.graphics.Canvas;
 import android.graphics.Paint;
 import android.graphics.Paint.FontMetrics;
 import android.graphics.Typeface;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.AttributeSet;
@@ -48,6 +49,19 @@ public class LabelEditText extends EditText {
 	    
 		setPadding(getPaddingLeft(), getPaddingTop() + labelHeight, getPaddingRight(), getPaddingBottom());
 		
+		
+		final Handler mHandler = new Handler();
+		final Runnable r = new Runnable(){
+
+			@Override
+			public void run() {
+				labelPaint.setAlpha(0);
+				LabelEditText.this.clearAnimation();
+				invalidate();
+				labelShown = false;
+			}
+			
+		};
 		final ShowLabelAnimation anim = new ShowLabelAnimation();
 		anim.setDuration(500);
 		anim.setInterpolator(new SmoothInterpolator());
@@ -55,15 +69,17 @@ public class LabelEditText extends EditText {
 
 			@Override
 			public void afterTextChanged(Editable s) {
-				if (s.length() > 0 && !labelShown){
-					anim.reset();
-					startAnimation(anim);
-					labelShown = true;
+				if (s.length() > 0){
+					mHandler.removeCallbacks(r);
+					if (!labelShown){
+						anim.reset();
+						startAnimation(anim);
+						labelShown = true;
+					}
 				} else if (s.length() == 0 && labelShown){
-					labelPaint.setAlpha(0);
-					LabelEditText.this.clearAnimation();
-					invalidate();
-					labelShown = false;
+					// Need a delay because certain keyboards autocorrect will replace the entire string
+					// leading to s.length() = 0 temporarily
+					mHandler.postDelayed(r, 50);
 				}
 			}
 
@@ -98,8 +114,7 @@ public class LabelEditText extends EditText {
 	@Override
 	public void onDraw(Canvas canvas){
 		super.onDraw(canvas);
-		
-		canvas.drawText(placeholder, getPaddingLeft(), getPaddingTop() + animOffset - labelPaint.descent(), labelPaint);
+		canvas.drawText(placeholder, getPaddingLeft(), getScrollY() + getPaddingTop() + animOffset - labelPaint.descent(), labelPaint);
 	}
 	
 	private class ShowLabelAnimation extends Animation {

@@ -3,8 +3,10 @@ package us.happ.android.utils;
 
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -14,8 +16,11 @@ import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Build;
 import android.os.StrictMode;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.ViewTreeObserver.OnGlobalLayoutListener;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 
@@ -144,4 +149,38 @@ public class Happ {
 	    return activeNetworkInfo != null && activeNetworkInfo.isConnected();
 	}
 	
+	public static void setKeyboardMeasurer(final Activity context, final KeyboardListener keyboardListener){
+		context.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_RESIZE);
+		final View contentView = context.findViewById(android.R.id.content);
+		contentView.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener() {
+		    @TargetApi(Build.VERSION_CODES.JELLY_BEAN)
+			@Override
+		    public void onGlobalLayout() {
+		    	int actionbarHeight = getActionBarHeight(context);
+				int statusbarHeight = getStatusBarHeight(context);
+				
+		        int heightDiff = contentView.getRootView().getHeight() - statusbarHeight - actionbarHeight - contentView.getHeight();
+		        
+		        if (heightDiff > 100) { // if more than 100 pixels, its probably a keyboard...
+		            Log.i("keyboard", "shown");
+		            
+		            if (!hasJellyBean){
+		            	contentView.getViewTreeObserver().removeGlobalOnLayoutListener(this);
+		            } else {
+		            	contentView.getViewTreeObserver().removeOnGlobalLayoutListener(this);
+		            }
+		            
+		            // We do not need adjustResize anymore (which was causing rendering issues behind keyboard)
+		            context.getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_ADJUST_PAN);
+		           
+		            Storage.setKeyboardHeight(context, heightDiff);
+		            keyboardListener.onKeyboardMeasured(heightDiff);
+		        }
+		     }
+		});
+	}
+	
+	public interface KeyboardListener {
+		public void onKeyboardMeasured(int keyboardHeight);
+	}
 }
