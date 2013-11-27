@@ -5,10 +5,12 @@ import java.util.HashSet;
 import us.happ.android.R;
 import us.happ.android.activity.MainActivity;
 import us.happ.android.adapter.ContactsAdapter;
+import us.happ.android.utils.Happ;
 import us.happ.android.utils.SmoothInterpolator;
 import us.happ.android.utils.Storage;
 import us.happ.android.view.ContactsListView;
 import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.Context;
@@ -16,6 +18,7 @@ import android.content.DialogInterface;
 import android.database.Cursor;
 import android.graphics.Canvas;
 import android.os.Build.VERSION;
+import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.support.v4.app.Fragment;
@@ -101,6 +104,7 @@ public class ContactsFragment extends HappFragment{
 		}
 	}
 	
+	@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState){
 
@@ -139,6 +143,10 @@ public class ContactsFragment extends HappFragment{
 		mListView.setAdapter(mListAdapter);
 		mListView.setFastScrollEnabled(true);
 		mListView.setVerticalScrollBarEnabled(false);
+		// For some reason fast scroll doesn't work on kitkat without this line
+		if (Happ.hasKitkat){
+			mListView.setFastScrollAlwaysVisible(true);
+		}
 		mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
@@ -151,6 +159,13 @@ public class ContactsFragment extends HappFragment{
 		
 		return mView;
 	}
+	
+	@Override
+	public void onViewStateRestored(Bundle savedInstanceState){
+		super.onViewStateRestored(savedInstanceState);
+		mListView.setSelection(0); // scroll to top
+	}
+	
 	
 	@Override
 	public void onCreateOptionsMenu(Menu menu, MenuInflater inflater){

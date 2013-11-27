@@ -13,6 +13,7 @@
         android:dividerHeight="0dp"
         android:listSelector="@drawable/list_selector"
         android:paddingLeft="10dp"
+        android:scrollbarStyle="outsideOverlay"
         android:paddingRight="50dp" />
 
 </FrameLayout>

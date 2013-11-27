@@ -69,7 +69,6 @@ public class FeedbackFragment extends HappFragment{
 		imm.showSoftInput(feedbackET, 0);
 		
 		mKeyboardHeight = Storage.getKeyboardHeight(mContext);
-		Storage.setKeyboardHeight(mContext, 0);
 		if (mKeyboardHeight != 0){
 			keyboardMeasured();
 		} else {
