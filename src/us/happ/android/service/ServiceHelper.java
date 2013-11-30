@@ -37,6 +37,7 @@ public class ServiceHelper{
 	public static final int POST_GCM_REGISTER = 0x00;
 	public static final int GET_MOODS = 0x01;
 	public static final int POST_MOODS = 0x02;
+	public static final int POST_FEEDBACK = 0x03;
 	
 	private int idCount = 0;
 	

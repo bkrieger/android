@@ -69,6 +69,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	private int getMoodsId = -1;
 	private int postMoodsId = -1;
 	private int postGcmRegisterId = -1;
+	private int postFeedbackId = -1;
 	
 	// TODO should I keep a copy of all fragments? leak?
 	// Fragments
@@ -304,7 +305,14 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		getMoodsId = mServiceHelper.startService(this, ServiceHelper.GET_MOODS, extras);
 	}
 	
-	public void startFeedbackService(){
+	public void startFeedbackService(String name, String email, String feedback){
+		Bundle extras = new Bundle();
+		extras.putString("name", name);
+		extras.putString("number", mPhoneNumber);
+		extras.putString("email", email);
+		extras.putString("feedback", feedback);
+		extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
+		getMoodsId = mServiceHelper.startService(this, ServiceHelper.POST_FEEDBACK, extras);
 		Toast.makeText(this, getResources().getString(R.string.toast_feedback_thanks), Toast.LENGTH_LONG).show();
 	}
 	
@@ -355,6 +363,16 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 			} catch (JSONException e){}
 			
 			postGcmRegisterId = -1;
+		} else if (taskId == postFeedbackId){
+			try{
+				if (results != null){
+					JSONObject jResults = new JSONObject(results);
+					if (jResults.getInt("status") == 200){
+						Log.i("SUCCESS", "HERE");
+					}
+				}
+			} catch (JSONException e){}
+			postFeedbackId = -1;
 		}
 		
 		hideSpinner();
@@ -455,6 +473,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	}
 	
 	public void returnToBoard(){
+		closeKeyboard();
 		switchFragment(FRAGMENT_BOARD);
 		selectMenuItem(menuHappening);
 	}

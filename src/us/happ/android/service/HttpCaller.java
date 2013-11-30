@@ -12,6 +12,8 @@ import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 
+import us.happ.android.R;
+
 import android.content.Context;
 import android.util.Log;
 
@@ -30,7 +32,9 @@ public class HttpCaller {
 		// TODO
 		// Switch to namevaluepair later
 		// API key
-		url += "&muffin=2";
+		String key = context.getResources().getString(R.string.api_key_param);
+		String value = context.getResources().getString(R.string.api_key_value);
+		url += "&" + key + "=" + value;
 		
 		// Prepare a request object
 		HttpGet httpget = new HttpGet(url);

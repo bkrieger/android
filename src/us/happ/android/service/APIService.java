@@ -102,6 +102,26 @@ public class APIService extends IntentService {
 			
 			mServiceHelper.onReceive(ServiceHelper.SUCCESS, taskId, bundle);
 			
+			break;
+		case ServiceHelper.POST_FEEDBACK:
+			Log.i(TAG, "POST FEEDBACK");
+			
+			params = "";
+			try {
+				String feedback_name = URLEncoder.encode(intent.getStringExtra("name"), "UTF-8");
+				String feedback_email = URLEncoder.encode(intent.getStringExtra("email"), "UTF-8");
+				String feedback_phone = URLEncoder.encode(intent.getStringExtra("number"), "UTF-8");
+				String feedback_text = URLEncoder.encode(intent.getStringExtra("feedback"), "UTF-8");
+				params = "?name=" + feedback_name + "&email=" + feedback_email + "&phone=" + feedback_phone + "&feedback=" + feedback_text
+						+ "&os=android&version=" + URLEncoder.encode(Happ.getVersionCode(getApplicationContext()), "UTF-8");;
+			} catch (UnsupportedEncodingException e1) {}
+			
+			results = HttpCaller.postRequest(this,  "/feedback" + params);
+			bundle.putString(RESULTS, results);
+			
+			mServiceHelper.onReceive(ServiceHelper.SUCCESS, taskId, bundle);
+			
+			break;
 		default:
 			// No intent specified
 			break;

@@ -10,6 +10,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.content.pm.ResolveInfo;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
@@ -57,6 +58,15 @@ public class Happ {
 		
 		return sb.substring(0, sb.length() - separatorLength);
 
+	}
+	
+	public static String getVersionCode(Context context){
+		try {
+			return context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
+		} catch (NameNotFoundException e) {
+			e.printStackTrace();
+		}
+		return "";
 	}
 	
 	public static int getActionBarHeight(Context context){

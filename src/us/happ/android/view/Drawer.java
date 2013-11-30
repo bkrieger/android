@@ -2,6 +2,7 @@ package us.happ.android.view;
 
 
 import us.happ.android.R;
+import us.happ.android.utils.Happ;
 import us.happ.android.utils.Storage;
 import android.content.Context;
 import android.content.pm.PackageManager.NameNotFoundException;
@@ -30,12 +31,8 @@ public class Drawer extends ViewGroup {
 		totalHappsView = (TextView) findViewById(R.id.menu_total_happs_count);
 		totalHappsTextView = (TextView) findViewById(R.id.menu_total_happs);
 		
-		try {
-			String versionCode = context.getPackageManager().getPackageInfo(context.getPackageName(), 0).versionName;
-			((TextView) findViewById(R.id.copyright)).setText("v" + versionCode + " " + context.getResources().getString(R.string.copyright));
-		} catch (NameNotFoundException e) {
-			e.printStackTrace();
-		}
+		String versionCode = Happ.getVersionCode(context);
+		((TextView) findViewById(R.id.copyright)).setText("v" + versionCode + " " + context.getResources().getString(R.string.copyright));	
 		
 		updateTotalHapps();
 	}

@@ -38,7 +38,6 @@ public class FeedbackFragment extends HappFragment{
 	private int mKeyboardHeight;
 	private int mContentHeight;
 	private EditText nameET;
-//	private View mView;
 	private EditText emailET;
 
 	@Override
@@ -84,7 +83,6 @@ public class FeedbackFragment extends HappFragment{
 		}
 		
 		v.getViewTreeObserver().addOnGlobalLayoutListener(new OnGlobalLayoutListener(){
-
 			@TargetApi(Build.VERSION_CODES.JELLY_BEAN)
 			@Override
 			public void onGlobalLayout() {
@@ -94,8 +92,21 @@ public class FeedbackFragment extends HappFragment{
 				} else {
 					v.getViewTreeObserver().removeOnGlobalLayoutListener(this);
 				}
+			}	
+		});
+		
+		feedbackET.addTextChangedListener(new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				mActionSubmit.setEnabled(s.length() > 0);
 			}
 
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
 			
 		});
 		
@@ -132,7 +143,7 @@ public class FeedbackFragment extends HappFragment{
     }
 	
 	private void submitFeedback(){
-		mContext.startFeedbackService();
+		mContext.startFeedbackService(nameET.getText().toString(), emailET.getText().toString(), feedbackET.getText().toString());
 	}
 	
 	private void keyboardMeasured(){

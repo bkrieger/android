@@ -46,3 +46,6 @@ local.properties
 
 # mac
 .DS_Store
+
+# Happ
+secret.xml

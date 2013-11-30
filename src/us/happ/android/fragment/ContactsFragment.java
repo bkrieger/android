@@ -143,10 +143,10 @@ public class ContactsFragment extends HappFragment{
 		mListView.setAdapter(mListAdapter);
 		mListView.setFastScrollEnabled(true);
 		mListView.setVerticalScrollBarEnabled(false);
+	
 		// For some reason fast scroll doesn't work on kitkat without this line
-		if (Happ.hasKitkat){
-			mListView.setFastScrollAlwaysVisible(true);
-		}
+		if (Happ.hasKitkat) mListView.setFastScrollAlwaysVisible(true);
+	
 		mListView.setOnItemClickListener(new OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
