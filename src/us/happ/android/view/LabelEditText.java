@@ -32,13 +32,13 @@ public class LabelEditText extends EditText {
 	public LabelEditText(Context context, AttributeSet attrs) {
 		super(context, attrs);
 		
-		placeholder = (String) getHint();
+		placeholder = attrs.getAttributeValue(R.styleable.LabelEditText_label);
 		if (placeholder == null) placeholder = "";
 		
 		labelPaint = new Paint();
 		colorPurple = context.getResources().getColor(R.color.happ_purple);
 		colorGray = context.getResources().getColor(R.color.gray_solid);
-		labelPaint.setColor(colorPurple);
+		labelPaint.setColor(colorGray);
 		labelPaint.setAntiAlias(true);
 		labelPaint.setTypeface(Typeface.DEFAULT_BOLD);
 		int textSize = (int) Media.pxFromDp(context, 12);

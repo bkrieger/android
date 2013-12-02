@@ -39,6 +39,7 @@ public class FeedbackFragment extends HappFragment{
 	private int mContentHeight;
 	private EditText nameET;
 	private EditText emailET;
+	private TextWatcher mTextWatcher;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState){
@@ -49,6 +50,21 @@ public class FeedbackFragment extends HappFragment{
 		
 		// Action bar
 		actionbar = mContext.getSupportActionBar();
+		
+		mTextWatcher = new TextWatcher(){
+
+			@Override
+			public void afterTextChanged(Editable s) {
+				mActionSubmit.setEnabled(s.length() > 0);
+			}
+
+			@Override
+			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+			@Override
+			public void onTextChanged(CharSequence s, int start, int before, int count) {}
+			
+		};
 	}
 	
 	@Override
@@ -95,21 +111,6 @@ public class FeedbackFragment extends HappFragment{
 			}	
 		});
 		
-		feedbackET.addTextChangedListener(new TextWatcher(){
-
-			@Override
-			public void afterTextChanged(Editable s) {
-				mActionSubmit.setEnabled(s.length() > 0);
-			}
-
-			@Override
-			public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-			@Override
-			public void onTextChanged(CharSequence s, int start, int before, int count) {}
-			
-		});
-		
 	}
 	
 	@Override
@@ -126,7 +127,7 @@ public class FeedbackFragment extends HappFragment{
 		menu.clear();
 		inflater.inflate(R.menu.feedback, menu);
 		mActionSubmit = menu.findItem(R.id.action_submit);
-		mActionSubmit.setEnabled(false);
+		mActionSubmit.setEnabled(feedbackET.getText().length() > 0);
 		super.onCreateOptionsMenu(menu, inflater);
 	}
 	
@@ -154,6 +155,27 @@ public class FeedbackFragment extends HappFragment{
         
         mContentHeight = contentView.getRootView().getHeight() - statusbarHeight - actionbarHeight - mKeyboardHeight;
 
+	}
+	
+	@Override
+	public void onDestroyView(){
+		Storage.setFeedbackName(mContext, nameET.getText().toString());
+		Storage.setFeedbackEmail(mContext, emailET.getText().toString());
+		Storage.setFeedbackText(mContext, feedbackET.getText().toString());
+		super.onDestroyView();
+	}
+	
+	@Override
+	public void onViewStateRestored(Bundle bundle){
+		super.onViewStateRestored(bundle);
+		nameET.setText(Storage.getFeedbackName(mContext));
+		emailET.setText(Storage.getFeedbackEmail(mContext));
+		feedbackET.setText(Storage.getFeedbackText(mContext));
+		
+		feedbackET.setSelection(0, feedbackET.getText().length());
+		
+		feedbackET.removeTextChangedListener(mTextWatcher);
+		feedbackET.addTextChangedListener(mTextWatcher);
 	}
 	
 }

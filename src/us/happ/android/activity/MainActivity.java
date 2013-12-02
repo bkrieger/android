@@ -312,7 +312,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 		extras.putString("email", email);
 		extras.putString("feedback", feedback);
 		extras.putParcelable(ServiceReceiver.NAME, (Parcelable) mReceiver);
-		getMoodsId = mServiceHelper.startService(this, ServiceHelper.POST_FEEDBACK, extras);
+		postFeedbackId = mServiceHelper.startService(this, ServiceHelper.POST_FEEDBACK, extras);
 		Toast.makeText(this, getResources().getString(R.string.toast_feedback_thanks), Toast.LENGTH_LONG).show();
 	}
 	
@@ -368,8 +368,10 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 				if (results != null){
 					JSONObject jResults = new JSONObject(results);
 					if (jResults.getInt("status") == 200){
-						Log.i("SUCCESS", "HERE");
+						Storage.setFeedbackText(this, "");
 					}
+				} else {
+					Toast.makeText(this, getResources().getString(R.string.toast_feedback_error), Toast.LENGTH_SHORT).show();
 				}
 			} catch (JSONException e){}
 			postFeedbackId = -1;

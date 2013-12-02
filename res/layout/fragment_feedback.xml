@@ -13,6 +13,7 @@
         android:layout_height="wrap_content"
         android:hint="Name (optional)"
         android:inputType="textCapSentences|textNoSuggestions"
+        android:label="Name"
         android:textColor="@color/black"
         android:textSize="18dp" />
 
@@ -22,6 +23,7 @@
         android:layout_height="wrap_content"
         android:hint="Email (optional)"
         android:inputType="textEmailAddress|textNoSuggestions"
+        android:label="Email"
         android:textColor="@color/black"
         android:textSize="18dp" />
 
@@ -29,8 +31,9 @@
         android:id="@+id/feedback_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Feedback"
+        android:hint="Feedback for us :)"
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
+        android:label="Feedback"
         android:paddingLeft="13dp"
         android:paddingRight="13dp"
         android:textColor="@color/black"

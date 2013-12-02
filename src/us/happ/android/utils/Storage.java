@@ -18,6 +18,10 @@ public class Storage {
 	
 	private static final String KEY_KEYBOARD_HEIGHT = "keyboard_height";
 	
+	private static final String KEY_FEEDBACK_NAME = "feedback_name";
+	private static final String KEY_FEEDBACK_EMAIL = "feedback_email";
+	private static final String KEY_FEEDBACK_TEXT = "feedback_text";
+	
 	// Settings
 	private static final String KEY_HINT_CONTACTS = "hint_contacts";
 	
@@ -99,6 +103,37 @@ public class Storage {
 	public static void setKeyboardHeight(Context context, int height){
 		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
 		sp.edit().putInt(KEY_KEYBOARD_HEIGHT, height).commit();
+	}
+	
+	// FEEDBACK
+	public static String getFeedbackName(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getString(KEY_FEEDBACK_NAME, "");
+	}
+	
+	public static void setFeedbackName(Context context, String feedbackName){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putString(KEY_FEEDBACK_NAME, feedbackName).commit();
+	}
+	
+	public static String getFeedbackEmail(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getString(KEY_FEEDBACK_EMAIL, "");
+	}
+	
+	public static void setFeedbackEmail(Context context, String feedbackEmail){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putString(KEY_FEEDBACK_EMAIL, feedbackEmail).commit();
+	}
+	
+	public static String getFeedbackText(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getString(KEY_FEEDBACK_TEXT, "");
+	}
+	
+	public static void setFeedbackText(Context context, String feedbackText){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putString(KEY_FEEDBACK_TEXT, feedbackText).commit();
 	}
 	
 	// SETTINGS

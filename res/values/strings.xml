@@ -25,6 +25,7 @@
     <string name="toast_fetch_error">Couldn\'t refresh happs. Make sure your Internet connection is enabled.</string>
     <string name="toast_post_error">Error submitting. Please try again.</string>
     <string name="toast_feedback_thanks">Thank you for submitting feedback and making Happ better!</string>
+    <string name="toast_feedback_error">Error submitting feedback. Please try again.</string>
     
     <string name="drawer_open">Open side navigation</string>
     <string name="drawer_close">Close side navigation</string>
