@@ -42,4 +42,7 @@
     <string name="total_happs_s">Total Happ</string>
     <string name="total_happs_pl">Total Happs</string>
     
+    <string name="startup_hint">Happ uses your contacts to find friends and lets you see what they are up to. Your contacts will not be shared with anyone.</string>
+    <string name="startup_allow_access">Allow access to contacts</string>
+    
 </resources>

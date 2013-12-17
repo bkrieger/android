@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     android:padding="10dp" >
 
-    <us.happ.android.view.AvatarView
+    <us.happ.view.AvatarView
         android:id="@+id/board_avatar"
         android:layout_width="70dp"
         android:layout_height="70dp"

@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="us.happ.android"
-    android:versionCode="1"
-    android:versionName="2.0.0" >
+    package="us.happ"
+    android:versionCode="2"
+    android:versionName="2.0.1" >
 
     <uses-sdk
+        android:maxSdkVersion="19"
         android:minSdkVersion="10"
         android:targetSdkVersion="19" />
 
@@ -18,11 +19,11 @@
     <uses-permission android:name="android.permission.WAKE_LOCK" />
 
     <permission
-        android:name="us.happ.android.permission.C2D_MESSAGE"
+        android:name="us.happ.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
 
     <application
-        android:name="us.happ.android.HappApplication"
+        android:name="us.happ.HappApplication"
         android:allowBackup="true"
         android:hardwareAccelerated="true"
         android:icon="@drawable/ic_launcher"
@@ -33,20 +34,21 @@
             android:value="@integer/google_play_services_version" />
 
         <receiver
-            android:name="us.happ.android.gcm.GcmBroadcastReceiver"
+            android:name="us.happ.gcm.GcmBroadcastReceiver"
             android:exported="true"
             android:permission="com.google.android.c2dm.permission.SEND" >
             <intent-filter>
                 <action android:name="com.google.android.c2dm.intent.RECEIVE" />
 
-                <category android:name="us.happ.android" />
+                <category android:name="us.happ" />
             </intent-filter>
         </receiver>
 
-        <service android:name="us.happ.android.gcm.GcmIntentService" />
+        <service android:name="us.happ.gcm.GcmIntentService" />
+        <service android:name="us.happ.service.APIService" />
 
         <activity
-            android:name="us.happ.android.activity.MainActivity"
+            android:name="us.happ.activity.MainActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" >
@@ -57,13 +59,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="us.happ.android.activity.ComposeActivity"
+            android:name="us.happ.activity.ComposeActivity"
             android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustPan" >
         </activity>
-
-        <service android:name=".service.APIService" />
+        <activity
+            android:name="us.happ.activity.StartupActivity"
+            android:label="@string/app_name"
+            android:screenOrientation="portrait"
+            android:windowSoftInputMode="adjustPan" >
+        </activity>
     </application>
 
 </manifest>

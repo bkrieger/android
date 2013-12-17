@@ -7,7 +7,7 @@
     android:paddingLeft="10dp"
     android:paddingRight="10dp" >
 
-    <us.happ.android.view.LabelEditText
+    <us.happ.view.LabelEditText
         android:id="@+id/feedback_name"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -17,7 +17,7 @@
         android:textColor="@color/black"
         android:textSize="18dp" />
 
-    <us.happ.android.view.LabelEditText
+    <us.happ.view.LabelEditText
         android:id="@+id/feedback_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
         android:textColor="@color/black"
         android:textSize="18dp" />
 
-    <us.happ.android.view.LabelEditText
+    <us.happ.view.LabelEditText
         android:id="@+id/feedback_text"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -40,6 +40,6 @@
         android:textSize="18dp" >
 
         <requestFocus />
-    </us.happ.android.view.LabelEditText>
+    </us.happ.view.LabelEditText>
 
 </LinearLayout>
