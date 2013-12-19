@@ -54,7 +54,7 @@ public class ComposeActivity extends ActionBarActivity {
 	private int chosen_duration_position;
 	
 	private ImageView mMoodIconView;
-	private TextView mMoodTextView;
+//	private TextView mMoodTextView;
 	private TextView mDurationTextView;
 
 	private PickerListView mListView;
@@ -199,12 +199,12 @@ public class ComposeActivity extends ActionBarActivity {
 						pickerId = PICKER_MOOD;
 					}
 					moodWrapper.setBackgroundColor(colorPurple);
-					mMoodTextView.setTextColor(colorWhite);
+//					mMoodTextView.setTextColor(colorWhite);
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, true)));
 				} else {
 					moodWrapper.setBackgroundResource(R.drawable.list_selector);
-					mMoodTextView.setTextColor(colorBlack);
+//					mMoodTextView.setTextColor(colorBlack);
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, false)));
 				}
@@ -224,10 +224,10 @@ public class ComposeActivity extends ActionBarActivity {
 						pickerId = PICKER_DURATION;
 					}
 					mDurationTextView.setTextColor(colorWhite);
-					mDurationTextView.setBackgroundColor(colorPurple);
+					durationWrapper.setBackgroundColor(colorPurple);
 				} else {
 					mDurationTextView.setTextColor(colorBlack);
-					mDurationTextView.setBackgroundResource(0);
+					durationWrapper.setBackgroundResource(R.drawable.list_selector);
 				}
 			}
 			
@@ -238,7 +238,7 @@ public class ComposeActivity extends ActionBarActivity {
 	
 		mCounterView = (TextView) findViewById(R.id.compose_counter);
 		mMoodIconView = (ImageView) findViewById(R.id.mood_icon);
-		mMoodTextView = (TextView) findViewById(R.id.mood_value);
+//		mMoodTextView = (TextView) findViewById(R.id.mood_value);
 		mDurationTextView = (TextView) findViewById(R.id.duration_value);	
 		
 		mListView = (PickerListView) findViewById(android.R.id.list);
@@ -378,8 +378,8 @@ public class ComposeActivity extends ActionBarActivity {
 	// Initial tag is purple instead of white
 	public void setTag(Tag tag, boolean inverse){
 		this.tag = tag;
-		if (mMoodTextView != null){
-			mMoodTextView.setText(tag.label);
+		if (mMoodIconView != null){
+//			mMoodTextView.setText(tag.label);
 			mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, inverse)));
 		}
 	}
