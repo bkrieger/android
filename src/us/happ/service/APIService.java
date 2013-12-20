@@ -76,7 +76,7 @@ public class APIService extends IntentService {
 			}
 			String tag = intent.getStringExtra("tag");
 			String duration = intent.getStringExtra("duration");
-			params = "?id="+ number + "&msg=" + msg + "&tag="+ tag + "&duration=" + duration;
+			params = "?id="+ number + "&msg=" + msg + "&tag="+ tag + "&duration=" + duration + "&notify=0";
 			
 			String[] numbers2 = intent.getStringArrayExtra("n");
 			// TODO building url

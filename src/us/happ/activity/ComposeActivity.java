@@ -1,9 +1,11 @@
 package us.happ.activity;
 
 import us.happ.adapter.DurationAdapter;
+import us.happ.adapter.GroupAdapter;
 import us.happ.adapter.TagsAdapter;
 import us.happ.R;
 import us.happ.model.Duration;
+import us.happ.model.Group;
 import us.happ.model.Mood;
 import us.happ.model.Tag;
 import us.happ.utils.Happ;
@@ -50,20 +52,24 @@ public class ComposeActivity extends ActionBarActivity {
 
 	private Tag tag;
 	private Duration duration;
+	private Group group;
 	private int chosen_tag_position;
 	private int chosen_duration_position;
+	private int chosen_group_position;
 	
 	private ImageView mMoodIconView;
-//	private TextView mMoodTextView;
 	private TextView mDurationTextView;
+	private TextView mGroupTextView;
 
 	private PickerListView mListView;
 
 	private TagsAdapter mTagsAdapter;
 	private DurationAdapter mDurationAdapter;
+	private GroupAdapter mGroupAdapter;
 
 	private static final int PICKER_MOOD = 0x01;
 	private static final int PICKER_DURATION = 0x02;
+	private static final int PICKER_GROUP = 0x03;
 	
 	private int pickerId;
 
@@ -186,6 +192,7 @@ public class ComposeActivity extends ActionBarActivity {
 		
 		final View moodWrapper = findViewById(R.id.mood_wrapper);
 		final View durationWrapper = findViewById(R.id.duration_wrapper);
+		final View groupWrapper = findViewById(R.id.group_wrapper);
 		
 		moodWrapper.setOnFocusChangeListener(new OnFocusChangeListener(){
 
@@ -199,12 +206,10 @@ public class ComposeActivity extends ActionBarActivity {
 						pickerId = PICKER_MOOD;
 					}
 					moodWrapper.setBackgroundColor(colorPurple);
-//					mMoodTextView.setTextColor(colorWhite);
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, true)));
 				} else {
 					moodWrapper.setBackgroundResource(R.drawable.list_selector);
-//					mMoodTextView.setTextColor(colorBlack);
 					// TODO cache all the drawables?
 					mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, false)));
 				}
@@ -233,23 +238,47 @@ public class ComposeActivity extends ActionBarActivity {
 			
 		});
 		
+		groupWrapper.setOnFocusChangeListener(new OnFocusChangeListener(){
+
+			@Override
+			public void onFocusChange(View v, boolean hasFocus) {
+				if (hasFocus) {
+					mListView.setVisibility(View.VISIBLE);
+					if (pickerId != PICKER_GROUP){
+						mListView.setAdapter(mGroupAdapter);
+						mListView.setChosen(chosen_group_position);
+						pickerId = PICKER_GROUP;
+					}
+					mGroupTextView.setTextColor(colorWhite);
+					groupWrapper.setBackgroundColor(colorPurple);
+				} else {
+					mGroupTextView.setTextColor(colorBlack);
+					groupWrapper.setBackgroundResource(R.drawable.list_selector);
+				}
+			}
+			
+		});
+		
 		// Option buttons
 		optionsView = findViewById(R.id.compose_options);
 	
 		mCounterView = (TextView) findViewById(R.id.compose_counter);
 		mMoodIconView = (ImageView) findViewById(R.id.mood_icon);
-//		mMoodTextView = (TextView) findViewById(R.id.mood_value);
 		mDurationTextView = (TextView) findViewById(R.id.duration_value);	
+		mGroupTextView = (TextView) findViewById(R.id.group_value);
 		
 		mListView = (PickerListView) findViewById(android.R.id.list);
 		mTagsAdapter = new TagsAdapter(this, 0, Tag.values());
 		mDurationAdapter = new DurationAdapter(this, 0, Duration.values());
+		mGroupAdapter = new GroupAdapter(this, 0, Group.values());
 
 		// Should have a better way of doing this
 		setTag(Tag.CHILL, false);
 		chosen_tag_position = 0;
 		setDuration(Duration.FOUR_HOURS);
 		chosen_duration_position = 4;
+		setGroup(Group.FRIENDS);
+		chosen_group_position = 0;
 		
 		// Show keyboard
 		mComposeET.setFocusable(true);
@@ -372,6 +401,9 @@ public class ComposeActivity extends ActionBarActivity {
 		} else if (pickerId == PICKER_DURATION){
 			setDuration(Duration.values()[position]);
 			chosen_duration_position = position;
+		} else if (pickerId == PICKER_GROUP){
+			setGroup(Group.values()[position]);
+			chosen_group_position = position;
 		}
 	}
 	
@@ -379,7 +411,6 @@ public class ComposeActivity extends ActionBarActivity {
 	public void setTag(Tag tag, boolean inverse){
 		this.tag = tag;
 		if (mMoodIconView != null){
-//			mMoodTextView.setText(tag.label);
 			mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, inverse)));
 		}
 	}
@@ -392,6 +423,12 @@ public class ComposeActivity extends ActionBarActivity {
 		this.duration = duration;
 		if (mDurationTextView != null)
 			mDurationTextView.setText(duration.label);
+	}
+	
+	public void setGroup(Group group){
+		this.group = group;
+		if (mGroupTextView != null)
+			mGroupTextView.setText(group.label);
 	}
 	
 	public void submit() {
