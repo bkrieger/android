@@ -135,8 +135,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
         mServiceHelper = ServiceHelper.getInstance();
         
         // Get self number
-        TelephonyManager tMgr =(TelephonyManager)getSystemService(Context.TELEPHONY_SERVICE);
-        mPhoneNumber = ContactsManager.cleanNumber(tMgr.getLine1Number());
+        mPhoneNumber = ContactsManager.getSelfNumber(this);
         
         // Action Bar
         actionbar = getSupportActionBar();

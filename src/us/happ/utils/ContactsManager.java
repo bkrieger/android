@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import android.accounts.Account;
+import android.accounts.AccountManager;
 import android.content.ContentResolver;
 import android.content.ContentUris;
 import android.content.Context;
@@ -19,6 +21,7 @@ import android.os.Build;
 import android.provider.ContactsContract;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Contacts;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 
 public class ContactsManager {
@@ -49,6 +52,32 @@ public class ContactsManager {
 			instance = new ContactsManager(context);
 		}
 		return instance;
+	}
+	
+	public static String getSelfNumber(Context context){
+		String number = "";
+		
+		TelephonyManager tMgr = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
+        
+		try{
+			number = tMgr.getLine1Number();
+		} catch(NullPointerException e){}
+
+		if(number.equals("")){
+			Account[] accounts = AccountManager.get(context).getAccounts();
+			String acname = null;  
+	        String actype = null;    
+	        for (Account ac : accounts) {  
+	        	acname = ac.name;     
+	            actype = ac.type;
+	       
+		        if(actype.equals("com.whatsapp")){  
+		        	number = acname;  
+		        	break;
+		        }
+	        }
+		}
+		return cleanNumber(number);
 	}
 
 	public String[] getAllContacts(){
