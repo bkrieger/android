@@ -14,6 +14,7 @@ import us.happ.utils.Happ;
 import us.happ.utils.Storage;
 import us.happ.utils.Happ.KeyboardListener;
 import us.happ.view.PickerListView;
+import us.happ.view.PickerListView.PickerListViewListener;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -21,6 +22,7 @@ import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.provider.ContactsContract.Contacts;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
@@ -281,6 +283,42 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 		mGroupAdapter = new GroupAdapter(this, null);
 		
 		getSupportLoaderManager().initLoader(LOADER_ID, null, this);
+		
+		mListView.setListener(new PickerListViewListener(){
+
+			@Override
+			public void onScrollStop(int position) {
+				if (pickerId == PICKER_GROUP && position == 0){
+					Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);  
+				    startActivity(contactPickerIntent); 
+				}
+			}
+
+			@Override
+			public void onItemClicked(int position) {
+				if (pickerId == PICKER_GROUP && position == 0){
+					Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);  
+				    startActivity(contactPickerIntent); 
+				}
+			}
+
+			@Override
+			public void onItemSelected(int position) {
+				if (pickerId == PICKER_MOOD){
+					setTag(Tag.values()[position]);
+					chosen_tag_position = position;
+				} else if (pickerId == PICKER_DURATION){
+					setDuration(Duration.values()[position]);
+					chosen_duration_position = position;
+				} else if (pickerId == PICKER_GROUP){
+					if (position >0){
+						setGroup(mGroupAdapter.getGroupLabel(position), mGroupAdapter.getGroupValue(position));
+						chosen_group_position = position;
+					}
+				}
+			}
+			
+		});
 
 		// Should have a better way of doing this
 		setTag(Tag.CHILL, false);
@@ -402,19 +440,6 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 			return true;
 		}
 		return super.onKeyDown(keyCode, event);
-	}
-	
-	public void setPicker(int position){
-		if (pickerId == PICKER_MOOD){
-			setTag(Tag.values()[position]);
-			chosen_tag_position = position;
-		} else if (pickerId == PICKER_DURATION){
-			setDuration(Duration.values()[position]);
-			chosen_duration_position = position;
-		} else if (pickerId == PICKER_GROUP){
-			setGroup(mGroupAdapter.getGroupLabel(position), mGroupAdapter.getGroupValue(position));
-			chosen_group_position = position;
-		}
 	}
 	
 	// Initial tag is purple instead of white

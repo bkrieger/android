@@ -38,6 +38,7 @@ public class PickerListView extends ListView {
 	private int mScrollOffset;
 	private Runnable mRunnable;
 	private boolean isTouched = false;
+	private PickerListViewListener mListener;
 	
 	public PickerListView(Context context, AttributeSet attrs) {
 		super(context, attrs);
@@ -70,7 +71,7 @@ public class PickerListView extends ListView {
 				int oldPosition = positionChosen;
 				positionChosen = getSelectedPosition(firstVisibleItem);
 				if (oldPosition != positionChosen)
-					((ComposeActivity) mContext).setPicker(positionChosen);
+					mListener.onItemSelected(positionChosen);
 				
 			}
 
@@ -93,6 +94,7 @@ public class PickerListView extends ListView {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
 				positionChosen = position-1;
+				mListener.onItemClicked(positionChosen);
 				smoothScroll();
 			}
 		});
@@ -104,6 +106,8 @@ public class PickerListView extends ListView {
 		mScrollOffset = getChildAt(pos).getTop() - (height-childHeight)/2;
 		if (mScrollOffset != 0){
 			mHandler.postDelayed(mRunnable, 20);
+		} else {
+			mListener.onScrollStop(positionChosen);
 		}
 	}
 	
@@ -196,6 +200,18 @@ public class PickerListView extends ListView {
 			child.layout(0, childTop, width, childTop + height);
 			
 		}
+	}
+	
+	public void setListener(PickerListViewListener listener){
+		mListener = listener;
+	}
+	
+	public interface PickerListViewListener {
+		public void onScrollStop(int position);
+		// When item is first clicked
+		public void onItemClicked(int position);
+		// When the label should change
+		public void onItemSelected(int position);
 	}
 
 

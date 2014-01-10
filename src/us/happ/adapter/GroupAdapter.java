@@ -53,7 +53,6 @@ public class GroupAdapter extends CursorAdapter{
 	public Cursor swapCursor(Cursor newCursor){
 		super.swapCursor(newCursor);
 		mCursor = newCursor;
-		Log.i("CURSOR", "SWAPPED");
 		return mCursor;
 	}
 	
