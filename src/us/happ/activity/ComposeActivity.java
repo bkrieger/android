@@ -3,11 +3,13 @@ package us.happ.activity;
 import us.happ.adapter.DurationAdapter;
 import us.happ.adapter.GroupAdapter;
 import us.happ.adapter.TagsAdapter;
+import us.happ.database.GroupTable;
 import us.happ.R;
 import us.happ.model.Duration;
 import us.happ.model.Group;
 import us.happ.model.Mood;
 import us.happ.model.Tag;
+import us.happ.provider.GroupContentProvider;
 import us.happ.utils.Happ;
 import us.happ.utils.Storage;
 import us.happ.utils.Happ.KeyboardListener;
@@ -15,9 +17,13 @@ import us.happ.view.PickerListView;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Handler;
+import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
@@ -43,7 +49,7 @@ import android.widget.TextView;
 import android.widget.TextView.OnEditorActionListener;
 import android.widget.Toast;
 
-public class ComposeActivity extends ActionBarActivity {
+public class ComposeActivity extends ActionBarActivity implements LoaderManager.LoaderCallbacks<Cursor>{
 
 	private Context mContext;
 	
@@ -66,6 +72,8 @@ public class ComposeActivity extends ActionBarActivity {
 	private TagsAdapter mTagsAdapter;
 	private DurationAdapter mDurationAdapter;
 	private GroupAdapter mGroupAdapter;
+	
+	private final static int LOADER_ID = 0x01;
 
 	private static final int PICKER_MOOD = 0x01;
 	private static final int PICKER_DURATION = 0x02;
@@ -270,15 +278,17 @@ public class ComposeActivity extends ActionBarActivity {
 		mListView = (PickerListView) findViewById(android.R.id.list);
 		mTagsAdapter = new TagsAdapter(this, 0, Tag.values());
 		mDurationAdapter = new DurationAdapter(this, 0, Duration.values());
-		mGroupAdapter = new GroupAdapter(this, 0, Group.values());
+		mGroupAdapter = new GroupAdapter(this, null);
+		
+		getSupportLoaderManager().initLoader(LOADER_ID, null, this);
 
 		// Should have a better way of doing this
 		setTag(Tag.CHILL, false);
-		chosen_tag_position = 0;
+		chosen_tag_position = Tag.CHILL.ordinal();
 		setDuration(Duration.FOUR_HOURS);
-		chosen_duration_position = 4;
-		setGroup(Group.FRIENDS);
-		chosen_group_position = 0;
+		chosen_duration_position = Duration.FOUR_HOURS.ordinal();
+		setGroup(mGroupAdapter.getGroupLabel(1), null);
+		chosen_group_position = 1;
 		
 		// Show keyboard
 		mComposeET.setFocusable(true);
@@ -402,7 +412,7 @@ public class ComposeActivity extends ActionBarActivity {
 			setDuration(Duration.values()[position]);
 			chosen_duration_position = position;
 		} else if (pickerId == PICKER_GROUP){
-			setGroup(Group.values()[position]);
+			setGroup(mGroupAdapter.getGroupLabel(position), mGroupAdapter.getGroupValue(position));
 			chosen_group_position = position;
 		}
 	}
@@ -410,6 +420,7 @@ public class ComposeActivity extends ActionBarActivity {
 	// Initial tag is purple instead of white
 	public void setTag(Tag tag, boolean inverse){
 		this.tag = tag;
+		mGroupAdapter.setTag(tag.valueForPost);
 		if (mMoodIconView != null){
 			mMoodIconView.setImageDrawable(getResources().getDrawable(Mood.resIdFromTag(tag.valueForPost, inverse)));
 		}
@@ -425,10 +436,10 @@ public class ComposeActivity extends ActionBarActivity {
 			mDurationTextView.setText(duration.label);
 	}
 	
-	public void setGroup(Group group){
+	public void setGroup(String label, Group group){
 		this.group = group;
 		if (mGroupTextView != null)
-			mGroupTextView.setText(group.label);
+			mGroupTextView.setText(label);
 	}
 	
 	public void submit() {
@@ -453,6 +464,22 @@ public class ComposeActivity extends ActionBarActivity {
 
 		finish();
 		overridePendingTransition(R.anim.fade_in, R.anim.slide_down);
+	}
+
+	@Override
+	public Loader<Cursor> onCreateLoader(int arg0, Bundle arg1) {
+		return new CursorLoader(this, GroupContentProvider.CONTENT_URI,
+				GroupTable.allColumns, null, null, null);
+	}
+
+	@Override
+	public void onLoadFinished(Loader<Cursor> loader, Cursor c) {
+		mGroupAdapter.swapCursor(c);
+	}
+
+	@Override
+	public void onLoaderReset(Loader<Cursor> c) {
+		mGroupAdapter.swapCursor(null);
 	}
 
 }

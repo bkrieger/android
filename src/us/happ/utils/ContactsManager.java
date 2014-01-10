@@ -55,7 +55,12 @@ public class ContactsManager {
 	}
 	
 	public static String getSelfNumber(Context context){
-		String number = "";
+		String number = Storage.getSelfNumber(context);
+		if (!number.equals("")){
+			return number;
+		}
+		
+		number = "";
 		
 		TelephonyManager tMgr = (TelephonyManager)context.getSystemService(Context.TELEPHONY_SERVICE);
         
@@ -77,6 +82,12 @@ public class ContactsManager {
 		        }
 	        }
 		}
+		
+		if (!number.equals("")){
+			Storage.setSelfNumber(context, number);
+		}
+		// TODO
+		// If whatsapp is not installed, use ios tactic
 		return cleanNumber(number);
 	}
 

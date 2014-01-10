@@ -27,14 +27,14 @@ public class Mood {
 		moodIconInverseMap.put(5, R.drawable.ic_tag_sport_i);
 	}
 	
-	public static final HashMap<Integer, String> moodNotificationMap;
+	public static final HashMap<Integer, String> moodActionMap;
 	static {
-		moodNotificationMap = new HashMap<Integer, String>();
-		moodNotificationMap.put(1, "wants to chill with you");
-		moodNotificationMap.put(2, "wants to get food with you");
-		moodNotificationMap.put(3, "wants to watch a movie with you");
-		moodNotificationMap.put(4, "wants to party with you");
-		moodNotificationMap.put(5, "wants to play sports with you");
+		moodActionMap = new HashMap<Integer, String>();
+		moodActionMap.put(1, "to chill with");
+		moodActionMap.put(2, "to get food with");
+		moodActionMap.put(3, "to watch a movie with");
+		moodActionMap.put(4, "to party with");
+		moodActionMap.put(5, "to play sports with");
 	}
 
 	private String number;
@@ -51,6 +51,10 @@ public class Mood {
 		this.duration = duration;
 		this.setResId(moodIconMap.get(tagId));
 		this.checked = false;
+	}
+	
+	public static String getNotificationText(int tagId){
+		return "wants " + Mood.moodActionMap.get(tagId) + " you";
 	}
 	
 	public static int resIdFromTag(int tagId){

@@ -87,7 +87,7 @@ public class GcmIntentService extends IntentService {
 		}
 		if (extra.containsKey("tag")){
 			int tag = Integer.parseInt(extra.getString("tag"));		
-			msg = Mood.moodNotificationMap.get(tag);
+			msg = Mood.getNotificationText(tag);
 		}
 		msg = sender + " " + msg;
 		

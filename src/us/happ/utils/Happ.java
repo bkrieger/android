@@ -45,6 +45,14 @@ public class Happ {
 			viewHidden.setVisibility(View.VISIBLE);
 		}
 	}
+	
+	public static String arrayToString(String[] arr){
+	    return implode(arr, ",");
+	}
+	
+	public static String[] stringToArray(String str){
+	    return str.split(",");
+	}
 
 	public static String implode(String[] arr, String separator) {
 

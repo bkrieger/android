@@ -28,6 +28,7 @@ public class Storage {
 	
 	// Settings
 	private static final String KEY_HINT_CONTACTS = "hint_contacts";
+	private static final String KEY_SELF_NUMBER = "self_number";
 	
 	public static boolean allowContactsAccess(Context context){
 		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
@@ -171,4 +172,13 @@ public class Storage {
 		sp.edit().putBoolean(KEY_HINT_CONTACTS, false).commit();
 	}
 	
+	public static String getSelfNumber(Context context){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		return sp.getString(KEY_SELF_NUMBER, "");
+	}
+	
+	public static void setSelfNumber(Context context, String number){
+		SharedPreferences sp = context.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
+		sp.edit().putString(KEY_SELF_NUMBER, number).commit();
+	}
 }
