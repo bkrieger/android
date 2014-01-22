@@ -55,7 +55,6 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 
 	private Context mContext;
 	
-	private ActionBar actionbar;
 	private EditText mComposeET;
 
 	private Tag tag;
@@ -74,6 +73,8 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 	private TagsAdapter mTagsAdapter;
 	private DurationAdapter mDurationAdapter;
 	private GroupAdapter mGroupAdapter;
+	
+	private final static int ACTIVITY_EDITGROUP = 0x01;
 	
 	private final static int LOADER_ID = 0x01;
 
@@ -105,7 +106,7 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 		
 		mContext = this;
 
-		actionbar = getSupportActionBar();
+		ActionBar actionbar = getSupportActionBar();
 		actionbar.setHomeButtonEnabled(true);
 		actionbar.setDisplayHomeAsUpEnabled(true);
 		actionbar.setTitle("Back");
@@ -288,18 +289,12 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 
 			@Override
 			public void onScrollStop(int position) {
-				if (pickerId == PICKER_GROUP && position == 0){
-					Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);  
-				    startActivity(contactPickerIntent); 
-				}
+				startContactPickerActivity(position);
 			}
 
 			@Override
-			public void onItemClicked(int position) {
-				if (pickerId == PICKER_GROUP && position == 0){
-					Intent contactPickerIntent = new Intent(Intent.ACTION_PICK, Contacts.CONTENT_URI);  
-				    startActivity(contactPickerIntent); 
-				}
+			public boolean onItemClicked(int position) {
+				return startContactPickerActivity(position);
 			}
 
 			@Override
@@ -311,7 +306,7 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 					setDuration(Duration.values()[position]);
 					chosen_duration_position = position;
 				} else if (pickerId == PICKER_GROUP){
-					if (position >0){
+					if (position > 0){
 						setGroup(mGroupAdapter.getGroupLabel(position), mGroupAdapter.getGroupValue(position));
 						chosen_group_position = position;
 					}
@@ -489,6 +484,36 @@ public class ComposeActivity extends ActionBarActivity implements LoaderManager.
 
 		finish();
 		overridePendingTransition(R.anim.fade_in, R.anim.slide_down);
+	}
+	
+	public boolean startContactPickerActivity(int position){
+		if (pickerId == PICKER_GROUP && position == 0){
+			Intent intent = new Intent(this, EditGroupActivity.class);
+			startActivityForResult(intent, ACTIVITY_EDITGROUP);
+			return true;
+		}
+		return false;
+	}
+	
+	@Override
+	protected void onActivityResult(int requestCode, int resultCode, Intent data){
+		if (requestCode == ACTIVITY_EDITGROUP){
+			if (resultCode == RESULT_OK){
+				// scroll to group
+				
+//				String msg = data.getStringExtra("compose_msg");
+//				int tag = data.getIntExtra("compose_tag", 1);
+//				String duration = data.getStringExtra("compose_duration");
+				
+//				startPostService(msg, tag, duration);
+
+			} else {
+				// scroll to friends
+				setGroup(mGroupAdapter.getGroupLabel(1), null);
+				chosen_group_position = 1;
+				mListView.setChosen(chosen_group_position);
+			}
+		}
 	}
 
 	@Override

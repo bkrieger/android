@@ -94,8 +94,8 @@ public class PickerListView extends ListView {
 			@Override
 			public void onItemClick(AdapterView<?> adapterView, View v, int position, long id) {
 				positionChosen = position-1;
-				mListener.onItemClicked(positionChosen);
-				smoothScroll();
+				if (!mListener.onItemClicked(positionChosen))
+					smoothScroll();
 			}
 		});
 	}
@@ -208,8 +208,8 @@ public class PickerListView extends ListView {
 	
 	public interface PickerListViewListener {
 		public void onScrollStop(int position);
-		// When item is first clicked
-		public void onItemClicked(int position);
+		// When item is first clicked, true if should interrupt scroll
+		public boolean onItemClicked(int position);
 		// When the label should change
 		public void onItemSelected(int position);
 	}

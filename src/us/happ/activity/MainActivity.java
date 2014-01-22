@@ -278,7 +278,7 @@ public class MainActivity extends ActionBarActivity implements ServiceReceiver.R
 	
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data){
-		if (requestCode == ACTIVITY_COMPOSE && resultCode == 1){
+		if (requestCode == ACTIVITY_COMPOSE && resultCode == RESULT_OK){
 			
 			String msg = data.getStringExtra("compose_msg");
 			int tag = data.getIntExtra("compose_tag", 1);
