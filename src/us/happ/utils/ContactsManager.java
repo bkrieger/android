@@ -142,6 +142,8 @@ public class ContactsManager {
 		Contact contact;
 		
 		while (cur.moveToNext()){
+			// TODO
+			// use primary displayname for API 11, what if they don't have phone number?
 			String name = cur.getString(cur.getColumnIndex(Phone.DISPLAY_NAME));
 			String phoneNo = cleanNumber(cur.getString(cur.getColumnIndex(Phone.NUMBER)));
 			int photoId = cur.getInt(cur.getColumnIndex(Phone.PHOTO_ID));

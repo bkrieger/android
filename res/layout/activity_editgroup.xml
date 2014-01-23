@@ -10,7 +10,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@null"
-        android:hint="Search contacts by name, email or number"
+        android:hint="Search contacts by name or number"
         android:inputType="textNoSuggestions"
         android:paddingBottom="15dp"
         android:paddingLeft="10dp"
@@ -25,5 +25,13 @@
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="@color/divider" />
+
+    <ListView
+        android:id="@+id/search_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="50dp"
+        android:visibility="visible"
+        android:background="@drawable/list_search_bg" />
 
 </LinearLayout>
