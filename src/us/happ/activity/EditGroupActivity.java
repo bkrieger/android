@@ -20,6 +20,9 @@ import android.support.v7.app.ActionBarActivity;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.KeyEvent;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
@@ -80,6 +83,36 @@ public class EditGroupActivity extends ActionBarActivity implements LoaderManage
 
 	}
 	
+	@Override
+	public boolean onCreateOptionsMenu(Menu menu) {
+		// Inflate the menu; this adds items to the action bar if it is present.
+		getMenuInflater().inflate(R.menu.group, menu);
+		return true;
+	}
+
+	@Override
+	public boolean onOptionsItemSelected(MenuItem item) {
+		switch (item.getItemId()) {
+		case android.R.id.home:
+			finish();
+			return true;
+		case R.id.action_done:
+			finish();
+			return true;
+		default:
+			return super.onOptionsItemSelected(item);
+		}
+	}
+	
+	@Override
+	public void onBackPressed(){
+		if (mSearchList.isShown()){
+			mSearchList.setVisibility(View.GONE);
+		} else {
+			finish();
+		}
+	}
+
 	private void search(String newText){
 		
 		String newFilter = !TextUtils.isEmpty(newText) ? newText : null;
@@ -94,6 +127,7 @@ public class EditGroupActivity extends ActionBarActivity implements LoaderManage
 		}
 		
 		mCurFilter = newFilter;
+		mSearchAdapter.setKeyWord(mCurFilter);
 		getSupportLoaderManager().restartLoader(LOADER_ID, null, this);
 		
 	}

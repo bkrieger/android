@@ -9,6 +9,7 @@ import android.database.Cursor;
 import android.provider.ContactsContract.CommonDataKinds.Phone;
 import android.provider.ContactsContract.Data;
 import android.support.v4.widget.CursorAdapter;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,6 +19,7 @@ import android.widget.TextView;
 public class SearchAdapter extends CursorAdapter{
 
 	private LayoutInflater inflater;
+	private String mKeyword;
 
 	public SearchAdapter(Context context, Cursor c) {
 		super(context, c, 0);
@@ -41,8 +43,8 @@ public class SearchAdapter extends CursorAdapter{
 		String number = c.getString(c.getColumnIndex(Phone.NUMBER));
 		
 		ViewHolder holder = (ViewHolder) convertView.getTag();
-		holder.name.setText(name);
-		holder.number.setText(number);
+		holder.name.setText(Html.fromHtml(name.replaceAll("(?i)" + mKeyword, "<b>$0</b>")));
+		holder.number.setText(Html.fromHtml(number.replaceAll("(?i)" + mKeyword, "<b>$0</b>")));
 	}
 
 	@Override
@@ -60,6 +62,10 @@ public class SearchAdapter extends CursorAdapter{
 	class ViewHolder {
 		TextView name;
 		TextView number;
+	}
+	
+	public void setKeyWord(String keyword){
+		mKeyword = keyword;
 	}
 	
 	@Override

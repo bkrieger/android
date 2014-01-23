@@ -11,7 +11,7 @@
         android:layout_height="wrap_content"
         android:text="Brandon Krieger"
         android:textColor="@color/black"
-        android:textSize="16dp" />
+        android:textSize="18dp" />
 
     <TextView
         android:id="@+id/contact_number"

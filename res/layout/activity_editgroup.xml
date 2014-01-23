@@ -29,9 +29,9 @@
     <ListView
         android:id="@+id/search_list"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginLeft="50dp"
-        android:visibility="visible"
+        android:visibility="gone"
         android:background="@drawable/list_search_bg" />
 
 </LinearLayout>
